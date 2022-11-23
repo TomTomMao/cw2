@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>New Report</title>
-</head>
+<?php $pageTitle = "New Report";
+    require("../head.php");
+?>
 <body>
     <div class="navbar">
         <a href="../People/lookup.php">Lookup People</a>

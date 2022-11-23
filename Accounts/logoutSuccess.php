@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <title>Logout Success</title>
-</head>
+<?php $pageTitle = "Logout Success";
+    require("../head.php");
+?>
 <?php
     session_start();
     require("_account.php");

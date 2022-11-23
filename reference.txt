@@ -1,1 +1,2 @@
-/Accounts/changePassword.php https://www.w3schools.com/howto/howto_js_toggle_password.asp
+https://www.w3schools.com/howto/howto_js_toggle_password.asp ----for---- /Accounts/changePassword.php; /Accounts/login.php
+Mithril Emmet ----for---- /head.php 

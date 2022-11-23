@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <title>Change Password</title>
-</head>
+<?php $pageTitle = "Change Password";
+    require("../head.php");
+?>
 
 <?php
 
@@ -54,7 +50,7 @@
                 <td></td>
             </tr>
             <tr>
-                <!-- // the effect of toggle password referenced this page:
+                <!-- // the effect of toggle password here referenced this page:
                 https://www.w3schools.com/howto/howto_js_toggle_password.asp -->
                 <td>New password:</td>
                 <td>
@@ -77,7 +73,7 @@
                 </td>
             </tr>
             <tr>
-                <!-- // the effect of toggle password referenced this page:
+                <!-- // the effect of toggle password here referenced this page:
                 https://www.w3schools.com/howto/howto_js_toggle_password.asp -->
                 <td>Confirm password:</td>
                 <td>

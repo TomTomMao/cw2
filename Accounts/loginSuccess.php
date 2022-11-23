@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <title>Login Success</title>
-</head>
+<?php $pageTitle = "Login Success";
+    require("../head.php");
+?>
 <?php
     session_start();
     require("_account.php");
