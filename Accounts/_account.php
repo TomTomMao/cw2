@@ -3,7 +3,7 @@ require("../config/debug.php");
 class User {
     // Assume session is started
     // rely on the $_SESSION
-        // USE: $_SESSION["username"], $_SESSION["userStatus"], $_SESSION["userType"]
+        // USE: $_SESSION["username"], $_SESSION["userStatus"], $_SESSION["userType"], $_SESSION["officerName"], $_SESSION["officerID"]
         // These session do not have to be set initially.
         // userStatus could be "logged" or "notLogged"
         // userType could be "police" or "admin"
@@ -23,6 +23,8 @@ class User {
             // and set $_SESSION['username'] to be the username
             // and set $_SESSION['userType'] to be the userType(either "police" or "admin")
             // and set $_SESSION['userStatus'] to be "logged"
+            // and set $_SESSION['officerName'] to be the officer's name
+            // and set $_SESSION['officerID'] to be the officer's officerID
         // if username is in the database but password is wrong,
             // return "wrongPassword"
         // if username is not in the database
@@ -42,7 +44,7 @@ class User {
            die();
         } else { // success to connect database
             debugEcho("MySQL connection OK<br>"); // for debugging
-            $sql = "SELECT * FROM Accounts WHERE Account_username='".$username."';"; // select a row match the user
+            $sql = "SELECT * FROM Accounts WHERE Account_Username='".$username."';"; // select a row match the user
             debugEcho($sql); // for debugging
             $result = mysqli_query($conn, $sql);
             if (mysqli_num_rows($result)>1) { // to much result, database has a problem
@@ -51,11 +53,13 @@ class User {
             } elseif (mysqli_num_rows($result)==1) { // account exist, need to check password
                 $row = mysqli_fetch_assoc($result);
                 debugPrint_r($row); // for debugging
-                if ($row["Account_password"]==$password) {
+                if ($row["Account_Password"]==$password) { // PASSWORD CORRECT
                     debugEcho("login success"); // for debugging
-                    $_SESSION["username"]=$username;
-                    $_SESSION["userType"]=$row["Account_type"];
+                    $_SESSION["username"]=$row["Account_Username"];
+                    $_SESSION["userType"]=$row["Account_UserType"];
                     $_SESSION["userStatus"]="logged";
+                    $_SESSION["officerName"] = $row["Officer_Name"];
+                    $_SESSION["officerID"] = $row["Officer_ID"];
                     return "success";
                 } else {
                     debugEcho("wrong password"); // for debugging
@@ -90,6 +94,8 @@ class User {
         unset($_SESSION['username']);
         unset($_SESSION['userType']);
         unset($_SESSION['userStatus']);
+        unset($_SESSION['officerName']);
+        unset($_SESSION['officerID']);
         if (!$this->isLoggedIn()) {
             debugEcho("logout successfully");
         } else {
@@ -111,7 +117,21 @@ class User {
             return $_SESSION["userType"];
         }
     }
-    
+
+    function getOfficerName() {
+        $this->hasSessionStarted();
+        if ($this->isLoggedIn()) {
+            return $_SESSION["officerName"];
+        }
+    }
+
+    function getOfficerID() {
+        $this->hasSessionStarted();
+        if ($this->isLoggedIn()) {
+            return $_SESSION["officerID"];
+        }
+    }
+
     function isAdmin() {
         $this->hasSessionStarted();
         if ($this->getUserType()=="admin") {
@@ -142,7 +162,7 @@ class User {
            die();
         } else { // success to connect database
             debugEcho("MySQL connection OK<br>"); // for debugging
-            $sql = "UPDATE Accounts SET Account_password='".$newPassword."' WHERE Account_username='".$this->getUsername()."';"; // update the password
+            $sql = "UPDATE Accounts SET Account_Password='".$newPassword."' WHERE Account_Username='".$this->getUsername()."';"; // update the password
             debugEcho ($sql); // for debugging
             $result = mysqli_query($conn, $sql);
             mysqli_close($conn); // disconnect

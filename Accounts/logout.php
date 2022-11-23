@@ -3,5 +3,6 @@
     require("_account.php");
     $user = new User();
     $user -> logOut();
-    header("location: login.php")
+    
+    header("location: logoutSuccess.php")
 ?>

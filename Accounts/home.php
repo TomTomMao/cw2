@@ -28,8 +28,8 @@
         <table>
             <tr><td>Username:</td><td><?php echo $user->getUsername();?></td><td></td></tr>
             <tr><td>Password:</td><td>*********</td><td><a href="changePassword.php">reset</a></td></tr>
-            <tr><td>Officer Name:</td><td>$officerName</td><td></td></tr>
-            <tr><td>Officer ID:</td><td>$officerId</td><td></td></tr>
+            <tr><td>Officer Name:</td><td><?php echo $user->getOfficerName();?></td><td></td></tr>
+            <tr><td>Officer ID:</td><td><?php echo $user->getOfficerID();?></td><td></td></tr>
         </table>
     </div>
 </body>

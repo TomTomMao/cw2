@@ -12,19 +12,22 @@
 
 DROP TABLE IF EXISTS Accounts;
 CREATE TABLE Accounts (
-  Account_username varchar(40) NOT NULL,
-  Account_password varchar(40) NOT NULL,
-  Account_type varchar(10) NOT NULL
+  Account_Username varchar(40) NOT NULL,
+  Account_Password varchar(40) NOT NULL,
+  Account_UserType varchar(10) NOT NULL,
+  Officer_Name varchar(40) NOT NULL,
+  Officer_ID varchar(20) NOT NULL UNIQUE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO Accounts (Account_username, Account_password, Account_type) VALUES
-("mcnulty", "plod123", "police"),
-("moreland", "fuzz42", "police"),
-("daniels", "copper99", "admin");
+INSERT INTO Accounts (Account_Username, Account_Password, Account_UserType, Officer_Name, Officer_ID) VALUES
+("mcnulty", "plod123", "police", "Mike Nulty", "mk001"),
+("moreland", "fuzz42", "police", "More Land", "ml001"),
+("daniels", "copper99", "admin", "Daniel Sull", "ds001");
 
 ALTER TABLE Accounts
-  ADD PRIMARY KEY (Account_username),
-  ADD CHECK(Account_type IN ("police","admin"));
+  ADD PRIMARY KEY (Account_Username),
+  ADD CHECK(Account_UserType IN ("police","admin"));
+
 
 
 
