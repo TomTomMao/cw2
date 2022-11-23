@@ -44,7 +44,7 @@ class User {
            die();
         } else { // success to connect database
             debugEcho("MySQL connection OK<br>"); // for debugging
-            $sql = "SELECT * FROM Accounts WHERE Account_Username='".$username."';"; // select a row match the user
+            $sql = "SELECT * FROM Accounts WHERE Account_username='".$username."';"; // select a row match the user
             debugEcho($sql); // for debugging
             $result = mysqli_query($conn, $sql);
             if (mysqli_num_rows($result)>1) { // to much result, database has a problem
@@ -53,12 +53,12 @@ class User {
             } elseif (mysqli_num_rows($result)==1) { // account exist, need to check password
                 $row = mysqli_fetch_assoc($result);
                 debugPrint_r($row); // for debugging
-                if ($row["Account_Password"]==$password) { // PASSWORD CORRECT
+                if ($row["Account_password"]==$password) { // PASSWORD CORRECT
                     debugEcho("login success"); // for debugging
-                    $_SESSION["username"]=$row["Account_Username"];
-                    $_SESSION["userType"]=$row["Account_UserType"];
+                    $_SESSION["username"]=$row["Account_username"];
+                    $_SESSION["userType"]=$row["Account_userType"];
                     $_SESSION["userStatus"]="logged";
-                    $_SESSION["officerName"] = $row["Officer_Name"];
+                    $_SESSION["officerName"] = $row["Officer_name"];
                     $_SESSION["officerID"] = $row["Officer_ID"];
                     return "success";
                 } else {
@@ -162,7 +162,7 @@ class User {
            die();
         } else { // success to connect database
             debugEcho("MySQL connection OK<br>"); // for debugging
-            $sql = "UPDATE Accounts SET Account_Password='".$newPassword."' WHERE Account_Username='".$this->getUsername()."';"; // update the password
+            $sql = "UPDATE Accounts SET Account_password='".$newPassword."' WHERE Account_username='".$this->getUsername()."';"; // update the password
             debugEcho ($sql); // for debugging
             $result = mysqli_query($conn, $sql);
             mysqli_close($conn); // disconnect
