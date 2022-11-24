@@ -9,6 +9,14 @@
  * modifying it to some extent.
  */
 
+DROP TABLE IF EXISTS Fines;
+DROP TABLE IF EXISTS Incident;
+DROP TABLE IF EXISTS Offence;
+DROP TABLE IF EXISTS Ownership;
+DROP TABLE IF EXISTS People;
+DROP TABLE IF EXISTS Vehicles;
+DROP TABLE IF EXISTS Accounts;
+
 
 DROP TABLE IF EXISTS Accounts;
 CREATE TABLE Accounts (
@@ -27,6 +35,216 @@ INSERT INTO Accounts (Account_username, Account_password, Account_userType, Offi
 ALTER TABLE Accounts
   ADD PRIMARY KEY (Account_username),
   ADD CHECK(Account_userType IN ("police","admin"));
+
+
+
+
+
+
+
+DROP TABLE IF EXISTS Vehicles;
+CREATE TABLE Vehicles (
+  Vehicle_ID int(20) NOT NULL,
+  Vehicle_type varchar(35) DEFAULT NULL,
+  Vehicle_colour varchar(20) DEFAULT NULL,
+  Vehicle_licence varchar(7) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE Vehicles
+  ADD PRIMARY KEY (Vehicle_ID);
+
+INSERT INTO Vehicles (Vehicle_ID, Vehicle_type, Vehicle_colour, Vehicle_licence) VALUES
+  (12, 'Ford Fiesta', 'Blue', 'LB15AJL'),
+  (13, 'Ferrari 458', 'Red', 'MY64PRE'),
+  (14, 'Vauxhall Astra', 'Silver', 'FD65WPQ'),
+  (15, 'Honda Civic', 'Green', 'FJ17AUG'),
+  (16, 'Toyota Prius', 'Silver', 'FP16KKE'),
+  (17, 'Ford Mondeo', 'Black', 'FP66KLM'),
+  (18, 'Ford Focus', 'White', 'DJ14SLE'),
+  (20, 'Nissan Pulsar', 'Red', 'NY64KWD'),
+  (21, 'Renault Scenic', 'Silver', 'BC16OEA'),
+  (22, 'Hyundai i30', 'Grey', 'AD223NG');
+
+ALTER TABLE Vehicles
+  MODIFY Vehicle_ID int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+
+
+
+
+
+
+
+DROP TABLE IF EXISTS People;
+CREATE TABLE People (
+  People_ID int(20) NOT NULL,
+  People_name varchar(50) NOT NULL,
+  People_address varchar(50) DEFAULT NULL,
+  People_licence varchar(16) DEFAULT NULL,
+  People_DOB date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE People
+  ADD PRIMARY KEY (People_ID);
+
+INSERT INTO People (People_ID, People_name, People_address, People_licence, People_DOB) VALUES
+(1, 'James Smith', '23 Barnsdale Road, Leicester', 'SMITH92LDOFJJ829', '1991-02-12'),
+(2, 'Jennifer Allen', '46 Bramcote Drive, Nottingham', 'ALLEN88K23KLR9B3', '1994-03-12'),
+(3, 'John Myers', '323 Derby Road, Nottingham', 'MYERS99JDW8REWL3', '1981-04-25'),
+(4, 'James Smith', '26 Devonshire Avenue, Nottingham', 'SMITHR004JFS20TR', '1978-11-24'),
+(5, 'Terry Brown', '7 Clarke Rd, Nottingham', 'BROWND3PJJ39DLFG', '1995-06-14'),
+(6, 'Mary Adams', '38 Thurman St, Nottingham', 'ADAMSH9O3JRHH107', '1996-03-11'),
+(7, 'Neil Becker', '6 Fairfax Close, Nottingham', 'BECKE88UPR840F9R', '1988-11-22'),
+(8, 'Angela Smith', '30 Avenue Road, Grantham', 'SMITH222LE9FJ5DS', '1953-09-22'),
+(9, 'Xene Medora', '22 House Drive, West Bridgford', 'MEDORH914ANBB223', '1969-07-22');
+
+ALTER TABLE People
+  MODIFY People_ID int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+
+
+
+
+
+
+DROP TABLE IF EXISTS Ownership;
+CREATE TABLE Ownership (
+  Ownership_ID int(21) NOT NULL,
+  People_ID int(20) DEFAULT NULL,
+  Vehicle_ID int(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE Ownership
+  ADD PRIMARY KEY (Ownership_ID),
+  ADD KEY fk_people (People_ID),
+  ADD KEY fk_vehicles (Vehicle_ID);
+
+INSERT INTO Ownership (Ownership_ID, People_ID, Vehicle_ID) VALUES
+(1, 3, 12),
+(2, 8, 20),
+(3, 4, 15),
+(4, 4, 13),
+(5, 1, 16),
+(6, 2, 14),
+(7, 5, 17),
+(8, 6, 18),
+(9, 7, 21),
+(10, NULL, 22);
+
+ALTER TABLE Ownership
+  MODIFY Ownership_ID int(21) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+ALTER TABLE Ownership
+  ADD CONSTRAINT fk_people FOREIGN KEY (People_ID) REFERENCES People (People_ID),
+  ADD CONSTRAINT fk_vehicles FOREIGN KEY (Vehicle_ID) REFERENCES Vehicles (Vehicle_ID);
+
+
+
+
+
+
+
+
+DROP TABLE IF EXISTS Offence;
+CREATE TABLE Offence (
+  Offence_ID int(11) NOT NULL,
+  Offence_description varchar(50) NOT NULL,
+  Offence_maxFine int(11) NOT NULL,
+  Offence_maxPoints int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE Offence
+  ADD PRIMARY KEY (Offence_ID);
+
+INSERT INTO Offence (Offence_ID, Offence_description, Offence_maxFine, Offence_maxPoints) VALUES
+(1, 'Speeding', 1000, 3),
+(2, 'Speeding on a motorway', 2500, 6),
+(3, 'Seat belt offence', 500, 0),
+(4, 'Illegal parking', 500, 0),
+(5, 'Drink driving', 10000, 11),
+(6, 'Driving without a licence', 10000, 0),
+(7, 'Driving without a licence', 10000, 0),
+(8, 'Traffic light offences', 1000, 3),
+(9, 'Cycling on pavement', 500, 0),
+(10, 'Failure to have control of vehicle', 1000, 3),
+(11, 'Dangerous driving', 1000, 11),
+(12, 'Careless driving', 5000, 6),
+(13, 'Dangerous cycling', 2500, 0);
+
+ALTER TABLE Offence
+  MODIFY Offence_ID int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+
+
+
+
+
+
+
+DROP TABLE IF EXISTS Incident;
+CREATE TABLE Incident (
+  Incident_ID int(15) NOT NULL,
+  Ownership_ID int(21) DEFAULT NULL, -- foriegn key (Ownership) owner of the vehicles involved in the incident is here
+  People_ID int(20) DEFAULT NULL, -- foriegn key (People) the one who break the law
+  Offence_ID int(11) NOT NULL, -- foriegn key (Offence)
+  Account_username varchar(40) NOT NULL, -- foriegn key (Account)
+  Incident_date date NOT NULL,
+  Incident_report varchar(500) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE Incident
+  ADD PRIMARY KEY (Incident_ID);
+
+INSERT INTO Incident (Incident_ID, Ownership_ID, People_ID, Offence_ID, Account_username, Incident_Date, Incident_Report) VALUES
+(1, 3, 4, 1, "daniels", '2017-12-01', '40mph in a 30 limit'),
+(2, 2, 8, 4, "moreland", '2017-11-01', 'Double parked'),
+(3, 4, 4, 1, "mcnulty", '2017-09-17', '110mph on motorway'),
+(4, 6, 2, 8, "moreland", '2017-08-22', 'Failure to stop at a red light - travelling 25mph'),
+(5, 4, 4, 3, "daniels", '2017-10-17', 'Not wearing a seatbelt on the M1');
+
+ALTER TABLE Incident
+  MODIFY Incident_ID int(15) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6,
+  ADD CONSTRAINT fk_incident_offence FOREIGN KEY (Offence_ID) REFERENCES Offence (Offence_ID),
+  ADD CONSTRAINT fk_incident_people FOREIGN KEY (People_ID) REFERENCES People (People_ID),
+  ADD CONSTRAINT fk_incident_ownership FOREIGN KEY (Ownership_ID) REFERENCES Ownership (Ownership_ID),
+  ADD CONSTRAINT fk_incident_accounts FOREIGN KEY (Account_username) REFERENCES Accounts (Account_username);
+
+
+
+
+
+
+
+
+DROP TABLE IF EXISTS Fines;
+CREATE TABLE Fines (
+  Fine_ID int(20) NOT NULL,
+  Fine_amount int(20) NOT NULL,
+  Fine_points int(20) NOT NULL,
+  Incident_ID int(11) NOT NULL -- foreign key (Incident)
+  -- There is a one-to-one relation ship between Incident and Fines. Because Fines is a individual object. 
+    -- I put Incident_ID in Fines rather than the oppsite way, because it can reduce null value in Incident. 
+    -- It also save space in the database.
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE Fines
+  ADD PRIMARY KEY (Fine_ID);
+
+INSERT INTO Fines (Fine_ID, Fine_amount, Fine_points, Incident_ID) VALUES
+(1, 2000, 6, 3),
+(2, 50, 0, 2),
+(3, 500, 3, 4);
+
+ALTER TABLE Fines
+  MODIFY Fine_ID int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4,
+  ADD CONSTRAINT fk_fines_incident FOREIGN KEY (Incident_ID) REFERENCES Incident (Incident_ID);
+
+
+
+
+
+
+
+
 
 -- DROP TABLE IF EXISTS Fines;
 -- CREATE TABLE Fines (
