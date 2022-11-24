@@ -95,10 +95,11 @@ INSERT INTO People (People_ID, People_name, People_address, People_licence, Peop
 (6, 'Mary Adams', '38 Thurman St, Nottingham', 'ADAMSH9O3JRHH107', '1996-03-11'),
 (7, 'Neil Becker', '6 Fairfax Close, Nottingham', 'BECKE88UPR840F9R', '1988-11-22'),
 (8, 'Angela Smith', '30 Avenue Road, Grantham', 'SMITH222LE9FJ5DS', '1953-09-22'),
-(9, 'Xene Medora', '22 House Drive, West Bridgford', 'MEDORH914ANBB223', '1969-07-22');
+(9, 'Xene Medora', '22 House Drive, West Bridgford', 'MEDORH914ANBB223', '1969-07-22'),
+(10, 'Smith Tony', '22 Avenue Road, Grantham', NULL, NULL);
 
 ALTER TABLE People
-  MODIFY People_ID int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY People_ID int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 
 

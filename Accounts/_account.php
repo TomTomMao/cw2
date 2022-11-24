@@ -1,5 +1,6 @@
 <?php
-require("../config/debug.php");
+$debugOn=false;
+require_once("../config/debug.php");
 class User {
     // Assume session is started
     // rely on the $_SESSION

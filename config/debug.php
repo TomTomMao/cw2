@@ -1,5 +1,4 @@
 <?php
-    $debugOn = false;
     if ($debugOn) {
         function debugPrint_r($debugVariable) {
             echo "<div style='color: black; border: 1px black solid'>\""

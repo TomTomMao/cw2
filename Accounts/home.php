@@ -2,7 +2,7 @@
     require("../head.php");
 ?>
 
-<?php
+<?php // handle not login error
     session_start();
     require("_account.php");// there is a User class
     $user = new User();
