@@ -42,7 +42,7 @@
         <table>
             <tr>
                 <td>Licence:</td>
-                <td><input type="text" name="peopleLicence"></td>
+                <td><input type="text" name="peopleLicence" value="<?php if (!empty($_POST['peopleLicence'])) { echo $_POST['peopleLicence'];}?>"></td>
                 <td><input type="submit" value="search"></td>
             </tr>
         </table>
@@ -56,7 +56,7 @@
             // check and render the data
             echo "<hr>";
             if (count($peopleData)<=0) {
-                echo "Not found";
+                echo "'".$_POST["peopleName"]."'"." Not found";
             } else {
                 $peopleTable = $peopleDB->renderPeopleData($peopleData);
                 echo $peopleTable;
@@ -68,15 +68,15 @@
 
             // check and render the data
             echo "<hr>";
-            if (count($peopleData)<=0) {
-                echo "Not found";
+            if (!$peopleData) {
+                echo "'".$_POST["peopleLicence"]."'"."Not found";
             } else {
                 $peopleTable = $peopleDB->renderPeopleData($peopleData);
                 echo $peopleTable;
             }
 
         } elseif(isset($_POST["peopleName"]) || isset($_POST["peopleLicence"])) {
-            echo "please enter a name or licence";
+            echo "<p style='color: red'>please enter a name or licence</p>";
         }
     ?>
     
