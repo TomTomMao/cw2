@@ -32,6 +32,7 @@
                 while ($row = mysqli_fetch_assoc($results)) {
                     $peopleData[$row["People_ID"]] = $row;
                 }
+                mysqli_close($conn); // disconnect
             }
             return $peopleData;
         }
@@ -91,6 +92,7 @@
                 while ($row = mysqli_fetch_assoc($results)) {
                     $peopleData[$row["People_ID"]] = $row;
                 }
+                mysqli_close($conn); // disconnect
             }
             if (count($peopleData))
             return $peopleData;

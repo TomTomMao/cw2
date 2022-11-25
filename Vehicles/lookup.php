@@ -1,24 +1,63 @@
-<?php $pageTitle = "Lookup Vehicles";
-    require("../head.php");
-?>
-<body>
-    <div class="navbar">
-        <a href="../People/lookup.php">Lookup People</a>
-        <a href="../Vehicles/lookup.php">Lookup Vehicles</a>
-        <a href="../Vehicles/new.php">New Vehicles</a>
-        <a href="../Reports/new.php">New report</a>
-        <a href="../Accounts/home.php">My Account</a>
-    </div>
-    <hr>
-    <h1>Look Up Vehicles</h1>
-    <hr>
-    <form action="lookup.php" method="post">
-        <h3>Search by Registration Number</h3>
-        <div>
-            Registration Number:
-            <input type="text" name="Registration Number">
+<?php 
+    try { ?>
+    <?php $pageTitle = "Lookup Vehicle";
+        require_once("../head.php");
+    ?>
+
+    <?php // handle not login error
+        session_start();
+        require("../Accounts/_account.php");// there is a User class
+        $user = new User();
+        if (!$user->isLoggedIn()) {
+            header("location: ../Accounts/notLoginError.html"); // check if logged in
+        }
+    ?>
+
+    <?php    
+        require_once("_ownership.php");
+    ?>
+    <body>
+        <div class="navbar">
+            <a href="../People/lookup.php">Lookup People</a>
+            <a href="../Vehicles/lookup.php">Lookup Vehicles</a>
+            <a href="../Vehicles/new.php">New Vehicles</a>
+            <a href="../Reports/new.php">New report</a>
+            <a href="../Accounts/home.php">My Account</a>
         </div>
-        <input type="submit" value="search">
-    </form>
+        <hr>
+        <h1>Look Up Vehicles</h1>
+        <hr>
+        <form action="lookup.php" method="post">
+            <table>
+                <tr>
+                    <td>Vehicle Licence:</td>
+                    <td><input type="text" name="vehicleLicence" value="<?php if (!empty($_POST['vehicleLicence'])) { echo $_POST['vehicleLicence'];}?>"></td>
+                    <td><input type="submit" value="search"></td>
+                </tr>
+            </table>
+        </form>
+        
+        
+        <?php
+            if(!empty($_POST["vehicleLicence"])) {
+                $ownershipDB = new OwnershipDB($user->getUsername());
+                $ownershipsdata = $ownershipDB->getVehicleByLicence($_POST["vehicleLicence"]);
+
+                // check and render the data
+                echo "<hr>";
+                
+                    $ownershipDiv = $ownershipDB->renderOwnershipData($ownershipsdata);
+                    echo $ownershipDiv;
+
+            } elseif(isset($_POST["vehicleLicence"])) {
+                echo "<p style='color: red'>please enter a licence</p>";
+            }
+        ?>
+    
+<?php 
+    } catch (Exception $error) {
+        header("location: ../error.php?errorMessage=".$error->getMessage());
+    }
+?>
 </body>
 </html>
