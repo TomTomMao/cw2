@@ -80,23 +80,24 @@ CREATE TABLE People (
   People_name varchar(50) NOT NULL,
   People_address varchar(50) DEFAULT NULL,
   People_licence varchar(16) DEFAULT NULL,
-  People_DOB date DEFAULT NULL
+  People_DOB date DEFAULT NULL,
+  People_photoID int(20) DEFAULT NULL -- prefix of file name
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 ALTER TABLE People
   ADD PRIMARY KEY (People_ID);
 
-INSERT INTO People (People_ID, People_name, People_address, People_licence, People_DOB) VALUES
-(1, 'James Smith', '23 Barnsdale Road, Leicester', 'SMITH92LDOFJJ829', '1991-02-12'),
-(2, 'Jennifer Allen', '46 Bramcote Drive, Nottingham', 'ALLEN88K23KLR9B3', '1994-03-12'),
-(3, 'John Myers', '323 Derby Road, Nottingham', 'MYERS99JDW8REWL3', '1981-04-25'),
-(4, 'James Smith', '26 Devonshire Avenue, Nottingham', 'SMITHR004JFS20TR', '1978-11-24'),
-(5, 'Terry Brown', '7 Clarke Rd, Nottingham', 'BROWND3PJJ39DLFG', '1995-06-14'),
-(6, 'Mary Adams', '38 Thurman St, Nottingham', 'ADAMSH9O3JRHH107', '1996-03-11'),
-(7, 'Neil Becker', '6 Fairfax Close, Nottingham', 'BECKE88UPR840F9R', '1988-11-22'),
-(8, 'Angela Smith', '30 Avenue Road, Grantham', 'SMITH222LE9FJ5DS', '1953-09-22'),
-(9, 'Xene Medora', '22 House Drive, West Bridgford', 'MEDORH914ANBB223', '1969-07-22'),
-(10, 'Smith Tony', '22 Avenue Road, Grantham', NULL, NULL);
+INSERT INTO People (People_ID, People_name, People_address, People_licence, People_DOB, People_photoID) VALUES
+(1, 'James Smith', '23 Barnsdale Road, Leicester', 'SMITH92LDOFJJ829', '1991-02-12', NULL),
+(2, 'Jennifer Allen', '46 Bramcote Drive, Nottingham', 'ALLEN88K23KLR9B3', '1994-03-12', NULL),
+(3, 'John Myers', '323 Derby Road, Nottingham', 'MYERS99JDW8REWL3', '1981-04-25', NULL),
+(4, 'James Smith', '26 Devonshire Avenue, Nottingham', 'SMITHR004JFS20TR', '1978-11-24', NULL),
+(5, 'Terry Brown', '7 Clarke Rd, Nottingham', 'BROWND3PJJ39DLFG', '1995-06-14', NULL),
+(6, 'Mary Adams', '38 Thurman St, Nottingham', 'ADAMSH9O3JRHH107', '1996-03-11', NULL),
+(7, 'Neil Becker', '6 Fairfax Close, Nottingham', 'BECKE88UPR840F9R', '1988-11-22', NULL),
+(8, 'Angela Smith', '30 Avenue Road, Grantham', 'SMITH222LE9FJ5DS', '1953-09-22', NULL),
+(9, 'Xene Medora', '22 House Drive, West Bridgford', 'MEDORH914ANBB223', '1969-07-22', NULL),
+(10, 'Smith Tony', '22 Avenue Road, Grantham', NULL, NULL, NULL);
 
 ALTER TABLE People
   MODIFY People_ID int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
