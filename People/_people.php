@@ -1,6 +1,47 @@
 <?php
     $debugOn=false;
     require_once("../config/debug.php");
+    class Person {
+        function __construct($ID, $licence, $address, $dateOfBirth, $name, $photoID) {
+            $this->ID = $ID;
+            $this->licence = $licence;
+            $this->address = $address;
+            $this->dateOfBirth = $dateOfBirth;
+            $this->name = $name;
+            $this->photoID = $photoID;
+        }
+
+        function getFullName() {
+            return $this->name;
+        }
+
+        function getFirstName() {
+            return explode(" ", $this->getFullName())[0];
+        }
+
+        function getLastName() {
+            return explode(" ", $this->getFullName())[1];
+        }
+
+        function getAddress() {
+            return $this->address;
+        }
+
+        function getDOB() {
+            return $this->dateOfBirth;
+        }
+
+        function getID() {
+            return $this->ID;
+        }
+
+        function getLicence() {
+            return $this->licence;
+        }
+        function getPhotoID() {
+            return $this->photoID;
+        }
+    }
     class PeopleDB {
         // this is a class for handling data about people
         function __construct($username){
@@ -13,8 +54,8 @@
             // Record the audit trial data into the table PeopleSearchAudit inside the database: (not implemented yet)
                 // Officer_ID: $officerID
                 // "search", ""
-            // Return an array of people matches the name.
-            $peopleData = array();
+            // Return an array of person object that matches the name.
+            $people = array();
             $sql = "SELECT * FROM People WHERE People.People_name LIKE '"
             .$peopleName." %' OR 
             People.People_name LIKE '% ".$peopleName."' OR 
@@ -29,15 +70,18 @@
             } else { // success to connect database
                 debugEcho("MySQL connection OK<br>");
                 $results = mysqli_query($conn, $sql);
+                $index = 0;
                 while ($row = mysqli_fetch_assoc($results)) {
-                    $peopleData[$row["People_ID"]] = $row;
+                    $people[$index] = new Person($row["People_ID"], $row["People_licence"], 
+                    $row["People_address"], $row["People_DOB"], $row["People_name"], $row["People_photoID"]);
+                    $index += 1;
                 }
                 mysqli_close($conn); // disconnect
             }
-            return $peopleData;
+            return $people;
         }
-        function renderPeopleData($peopleData) {
-            // GIVEN PEOPLE DATA, RETURN A TABLE.
+        function renderPeople($people) {
+            // input an array of person object, return an html <table>.
             $peopleTable =  
                 "<table class='people-table'>
                     <tr>
@@ -47,11 +91,12 @@
                         <th>Driving Licence</th>
                         <th>DOB</th>
                     </tr>";
-            foreach($peopleData as $personID=>$personData) {
-                $personName = $personData["People_name"];
-                $personAddress = $personData["People_address"];
-                $personLicence = $personData["People_licence"];
-                $personDOB = $personData["People_DOB"];
+            foreach($people as $person) {
+                $personID = $person->getID();
+                $personName = $person->getFullName();
+                $personAddress = $person->getAddress();
+                $personLicence = $person->getLicence();
+                $personDOB = $person->getDOB();
                 if (empty($personLicence)) {
                     $personLicence = "<i>NULL</i>";
                 }
@@ -76,8 +121,8 @@
             // Record the audit trial data into the table PeopleSearchAudit inside the database: (not implemented yet)
                 // Officer_ID: $officerID
                 // "search", ""
-            // Return an array of people matches the licence. The length of the array should be 0 or 1.
-            $peopleData = array();
+            // Return an array of person object that matches the licence. The length of the array should be 0 if no match or 1 if matched.
+            $people = array();
             $sql = "SELECT * FROM People WHERE People.People_Licence='".$peopleLicence."';";
 
             debugEcho($sql);
@@ -89,13 +134,16 @@
             } else { // success to connect database
                 debugEcho("MySQL connection OK<br>");
                 $results = mysqli_query($conn, $sql);
+                $index = 0;
                 while ($row = mysqli_fetch_assoc($results)) {
-                    $peopleData[$row["People_ID"]] = $row;
+                    $people[$index] = new Person($row["People_ID"], $row["People_licence"], 
+                    $row["People_address"], $row["People_DOB"], $row["People_name"], $row["People_photoID"]);
+                    $index += 1;
                 }
                 mysqli_close($conn); // disconnect
             }
-            if (count($peopleData))
-            return $peopleData;
+            if (count($people))
+            return $people;
         }
     }
 
@@ -110,41 +158,41 @@
     function testGetPeopleByName($peopleName) {
         $user = new User();
         $peopleDB = new PeopleDB($user->getUsername());
-        $peopleData = $peopleDB->getPeopleByName($peopleName);
+        $people = $peopleDB->getPeopleByName($peopleName);
         
-        debugPrint_r($peopleData);
-        foreach($peopleData as $personData) {
-            print_r ($personData);
+        debugPrint_r($people);
+        foreach($people as $person) {
+            print_r ($person);
             echo "<br>";
         }
     }
 
-    function testRenderPeopleData() {
+    function testRenderPeople() {
         $user = new User();
         $peopleDB = new PeopleDB($user->getUsername());
-        $peopleData = $peopleDB->getPeopleByName("john");
-        $peopleTable = $peopleDB->renderPeopleData($peopleData);
+        $people = $peopleDB->getPeopleByName("john");
+        $peopleTable = $peopleDB->renderPeople($people);
         echo $peopleTable;
         }
 
     function testGetPeopleByLicence($peopleLicence) {
         $user = new User();
         $peopleDB = new PeopleDB($user->getUsername());
-        $peopleData = $peopleDB->getPeopleByLicence($peopleLicence);
-        debugPrint_r($peopleData);
-        foreach($peopleData as $personData) {
-            print_r ($personData);
+        $people = $peopleDB->getPeopleByLicence($peopleLicence);
+        debugPrint_r($people);
+        foreach($people as $person) {
+            print_r ($person);
             echo "<br>";
         }
     }
     
-    function runTests() {
+    function runPeopleTests() {
         require("../head.php");
         session_start();
         require_once("../Accounts/_account.php");
         
         testGetPeopleByName("john");
-        testRenderPeopleData();
+        testRenderPeople();
         testGetPeopleByLicence("MEDORH914ANBB223");
     }
     

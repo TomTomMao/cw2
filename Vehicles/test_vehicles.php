@@ -1,4 +1,3 @@
-<!-- This page use ownership object rather than vehicle object -->
 <?php 
     try { ?>
     <?php $pageTitle = "Lookup Vehicle";
@@ -15,7 +14,8 @@
     ?>
 
     <?php    
-        require_once("_ownership.php");
+        require_once("_vehicles.php");
+        $vehiclesDB = new vehiclesDB($user->getUsername());
     ?>
     <body>
         <div class="navbar">
@@ -28,7 +28,7 @@
         <hr>
         <h1>Look Up Vehicles</h1>
         <hr>
-        <form action="lookup.php" method="post">
+        <form action="test_vehicles.php" method="post">
             <table>
                 <tr>
                     <td>Vehicle Licence:</td>
@@ -37,29 +37,42 @@
                 </tr>
             </table>
         </form>
-        
-        
+
         <?php
             if(!empty($_POST["vehicleLicence"])) {
-                $ownershipDB = new OwnershipDB($user->getUsername());
-                $ownerships = $ownershipDB->getOwnershipsByLicence($_POST["vehicleLicence"]);
+                
+                $vehicles = $vehiclesDB->getVehiclesByLicence($_POST["vehicleLicence"]);
 
                 // check and render the data
                 echo "<hr>";
-                $ownershipDiv = "";
-                foreach ($ownerships as $ownership) {
-                    $ownershipDiv = $ownershipDiv.$ownership->render();
-                }
-                echo $ownershipDiv;
+                    foreach($vehicles as $vehicle) {
+
+                        $vehicleTable = $vehicle->renderHtmlTable();
+                        echo $vehicleTable;
+                    }
 
             } elseif(isset($_POST["vehicleLicence"])) {
                 echo "<p style='color: red'>please enter a licence</p>";
             }
         ?>
+
+        <?php 
+            $newVehicle = new Vehicle("1441443", "Blue", "Ford", "Hourse", NULL);
+            echo $newVehicle->renderHtmlTable();
+            if ($vehiclesDB->insertNewVehicle($newVehicle)) {
+                echo "insert success";
+                $newVehicleID = $vehiclesDB->getVehiclesIDByLicence($newVehicle->getLicence())[0];
+                $newVehicle->setID($newVehicleID);
+                echo $newVehicle->renderHtmlTable();
+            } else {
+                echo "insert failed";
+            }
+        ?>
     
 <?php 
     } catch (Exception $error) {
-        header("location: ../error.php?errorMessage=".$error->getMessage());
+        echo $error->getMessage();
+        // header("location: ../error.php?errorMessage=".$error->getMessage());
     }
 ?>
 </body>

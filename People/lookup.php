@@ -59,7 +59,7 @@
                 if (count($peopleData)<=0) {
                     echo "'".$_POST["peopleName"]."'"." Not found";
                 } else {
-                    $peopleTable = $peopleDB->renderPeopleData($peopleData);
+                    $peopleTable = $peopleDB->renderPeople($peopleData);
                     echo $peopleTable;
                 }
 
@@ -72,7 +72,7 @@
                 if (!$peopleData) {
                     echo "'".$_POST["peopleLicence"]."'"."Not found";
                 } else {
-                    $peopleTable = $peopleDB->renderPeopleData($peopleData);
+                    $peopleTable = $peopleDB->renderPeople($peopleData);
                     echo $peopleTable;
                 }
 

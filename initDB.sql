@@ -45,7 +45,8 @@ ALTER TABLE Accounts
 DROP TABLE IF EXISTS Vehicles;
 CREATE TABLE Vehicles (
   Vehicle_ID int(20) NOT NULL,
-  Vehicle_type varchar(35) DEFAULT NULL,
+  Vehicle_make varchar(20) DEFAULT NULL,
+  Vehicle_model varchar(20) DEFAULT NULL,
   Vehicle_colour varchar(20) DEFAULT NULL,
   Vehicle_licence varchar(7) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -53,17 +54,17 @@ CREATE TABLE Vehicles (
 ALTER TABLE Vehicles
   ADD PRIMARY KEY (Vehicle_ID);
 
-INSERT INTO Vehicles (Vehicle_ID, Vehicle_type, Vehicle_colour, Vehicle_licence) VALUES
-  (12, 'Ford Fiesta', 'Blue', 'LB15AJL'),
-  (13, 'Ferrari 458', 'Red', 'MY64PRE'),
-  (14, 'Vauxhall Astra', 'Silver', 'FD65WPQ'),
-  (15, 'Honda Civic', 'Green', 'FJ17AUG'),
-  (16, 'Toyota Prius', 'Silver', 'FP16KKE'),
-  (17, 'Ford Mondeo', 'Black', 'FP66KLM'),
-  (18, 'Ford Focus', 'White', 'DJ14SLE'),
-  (20, 'Nissan Pulsar', 'Red', 'NY64KWD'),
-  (21, 'Renault Scenic', 'Silver', 'BC16OEA'),
-  (22, 'Hyundai i30', 'Grey', 'AD223NG');
+INSERT INTO Vehicles (Vehicle_ID, Vehicle_make, Vehicle_model, Vehicle_colour, Vehicle_licence) VALUES
+  (12, 'Ford', 'Fiesta', 'Blue', 'LB15AJL'),
+  (13, 'Ferrari', '458', 'Red', 'MY64PRE'),
+  (14, 'Vauxhall', 'Astra', 'Silver', 'FD65WPQ'),
+  (15, 'Honda', 'Civic', 'Green', 'FJ17AUG'),
+  (16, 'Toyota', 'Prius', 'Silver', 'FP16KKE'),
+  (17, 'Ford', 'Mondeo', 'Black', 'FP66KLM'),
+  (18, 'Ford', 'Focus', 'White', 'DJ14SLE'),
+  (20, 'Nissan', 'Pulsar', 'Red', 'NY64KWD'),
+  (21, 'Renault', 'Scenic', 'Silver', 'BC16OEA'),
+  (22, 'Hyundai', 'i30', 'Grey', 'AD223NG');
 
 ALTER TABLE Vehicles
   MODIFY Vehicle_ID int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
