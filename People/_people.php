@@ -39,7 +39,37 @@
             return $this->licence;
         }
         function getPhotoID() {
-            return $this->photoID;
+            return 0;
+        }
+        function getJSONText() {
+            return '{"ID":"'.$this->ID.
+                '","licence":"'.$this->getLicence().
+                '","address":"'.$this->getAddress().
+                '","dateOfBirth":"'.$this->getDOB().
+                '","firstName":"'.$this->getFirstName().
+                '","lastName":"'.$this->getLastName().
+                '","photoID":"'.$this->getPhotoID().'"}';
+        }
+        function render() {
+            echo "<table class='people-table'>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Driving Licence</th>
+                <th>DOB</th>
+                <th>PhotoID</th>
+            </tr>
+            <tr>
+                <td>".$this->getID()."</td>
+                <td>".$this->getFullName()."</td>
+                <td>".$this->getAddress()."</td>
+                <td>".$this->getLicence()."</td>
+                <td>".$this->getDOB()."</td>
+                <td>".$this->getPhotoID()."</td>
+            </tr>
+            </table>
+            ";
         }
     }
     class PeopleDB {
@@ -48,6 +78,10 @@
             $this->username = $username;
         }
         function recordGetPeopleByName(){
+        }
+        function isPersonLicenceInDB($personLicence) {
+            $people = $this->getPeopleByLicence($personLicence);
+            return (!is_null($people));
         }
         function getPeopleByName($peopleName) {
             // Input the partial/full name of a person, matching rule is case insensitive.
@@ -138,12 +172,31 @@
                 while ($row = mysqli_fetch_assoc($results)) {
                     $people[$index] = new Person($row["People_ID"], $row["People_licence"], 
                     $row["People_address"], $row["People_DOB"], $row["People_name"], $row["People_photoID"]);
-                    $index += 1;
+                    $index += 1; // so far so good, in future, change it.
                 }
                 mysqli_close($conn); // disconnect
             }
-            if (count($people))
+            if (count($people)) // not sure why did I typed this, but so far so good, don't delete it!
             return $people;
+        }
+        function getPersonByLicence($licence) {
+            // given licence, return A person that match this licence if matched, otherwise return null;
+            // if returned a person, then the person has ID
+            $people = $this->getPeopleByLicence($licence);
+            if (!is_null($people)) {
+                return $people[0];
+            } else {
+                return NULL;
+            }
+        }
+        function getPersonIDByLicence($licence) {
+            // input licence;
+            // return null if licence not in db.
+            // return A person id correspond to licence if licence exist in the database.
+            $person = $this->getPersonByLicence($licence);
+            if (isset($person)) {
+                return $person->getID();
+            }
         }
     }
 

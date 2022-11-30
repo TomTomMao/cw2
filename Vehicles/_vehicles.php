@@ -66,7 +66,7 @@ class VehiclesDB {
         // return false if doesn't exist
         $sql = "SELECT Vehicle_ID FROM Vehicles WHERE Vehicle_licence ='".$vehicleLicence."';";
         // echo $sql;
-        require_once("../config/db.inc.php");
+        require("../config/db.inc.php");
         $conn = mysqli_connect($servername, $dbUsername, $dbPassword, $dbname);
         if(mysqli_connect_errno()) { // cannot connect database
             debugEcho ("Failed to connect to MySQL: ".mysqli_connect_error()); // for debugging
@@ -97,7 +97,7 @@ class VehiclesDB {
         .$vehicle->getModel()."', '"
         .$vehicle->getColour()."', '"
         .$vehicle->getLicence()."')";
-        echo $sql;
+        // echo $sql;
         require("../config/db.inc.php");
         $conn = mysqli_connect($servername, $dbUsername, $dbPassword, $dbname);
         if(mysqli_connect_errno()) { // cannot connect database

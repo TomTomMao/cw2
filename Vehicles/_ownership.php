@@ -243,6 +243,7 @@
 
         }
         function getVehicleByLicence($vehicleLicence) {
+            // don't use this, use getOwnershipsByLicence instead.
             // Input the licence of a vehicle
             // If found the vehicle, RETURN an array of "ownershipData" that match the licence or an empty array. The key is the ownership_id;
             // If not found the vehicle, RETURN an array of "ownershipData" that the only non-null value is of "Vehicle_Licence", the length must be 1, key is "NULL";
@@ -284,6 +285,7 @@
             return $ownershipsData;
         }
         function renderOwnershipData($ownershipsData) {
+            // don't use this function anymore, use ownership->render()
             // $ownershipsData should be an array of "ownershipData",
             // "ownershipData" should be an array of attritube of one single vehicle,  "Vehicle_ID","Vehicle_licence", "Vehicle_type",
             //   "Vehicle_colour", "People_name", "People_licence", "People_ID", "People_address", "People_DOB" should be in the ownershipData;
@@ -349,6 +351,119 @@
                     ";
             }
             return $obj;
+        }
+        function insertOwnershipWithNewVehicle($vehicle, $person) {
+            // give a vehicle object and a person object
+            // if the vehicle is not new, return false
+            
+            // if the vehicle is new, insert the vehicle into table
+            // if the person is new, insert the person into table
+            // 
+            // echo "flag0";
+            // insert vehicle into vehicle table if no vehicle licence in db match, insert person into people table if no driving licence in db matches
+            require("../config/db.inc.php");
+            $conn = mysqli_connect($servername, $dbUsername, $dbPassword, $dbname);
+            // echo "flag0.1";
+            if(mysqli_connect_errno()) { // cannot connect database
+                // echo "flag0.2";
+                debugEcho ("Failed to connect to MySQL: ".mysqli_connect_error()); // for debugging
+                die();
+            } else { // success to connect database
+                debugEcho("MySQL connection OK<br>");
+                // echo "flag0.3";
+                // check if the licence is in the database
+                $sql = "SELECT Vehicle_ID FROM Vehicles WHERE Vehicle_licence='".$vehicle->getLicence()."';";
+                $results = mysqli_query($conn, $sql);
+                // echo "<hr>";
+                // print_r($results);
+                // echo "<hr>";
+                if ($results->num_rows == 0) {
+                    // echo "flag0.4";
+                    // the vehicle is new
+                    // check if the person has licence
+                        if ($person->getLicence()!=NULL) { // the person has licence
+                            // echo "flag1";
+                            // check if the person licence in the database 
+                            $sql = "SELECT People_ID FROM People WHERE People_licence='".$person->getLicence()."';";
+                            $results = mysqli_query($conn, $sql);
+                            if ($results->num_rows==0) { // the person with licence is not in the database
+                                // insert vehicle and person, and get their id, use this to insert into ownership table.
+                                // echo "flag2";
+                                $sql = "INSERT INTO Vehicles (Vehicle_make, Vehicle_model, Vehicle_colour, Vehicle_licence) VALUES
+                                ('".$vehicle->getMake()."', '"
+                                .$vehicle->getModel()."', '"
+                                .$vehicle->getColour()."', '"
+                                .$vehicle->getLicence()."');";
+                                $results = mysqli_query($conn, $sql); // insert the vehicle
+                                $newVehicleID = mysqli_insert_id($conn); // get the vehicle_id
+                                // echo "flag3";
+                                $sql = "INSERT INTO People (People_name, People_address, People_licence, People_DOB, People_photoID) VALUES
+                                ('".$person->getFullName()."', '"
+                                .$person->getAddress()."', '"
+                                .$person->getLicence()."', '"
+                                .$person->getDOB()."', '"
+                                .$person->getPhotoID()."');";
+                                $results = mysqli_query($conn, $sql); // insert the person
+                                $newPersonID = mysqli_insert_id($conn); // get the person_id
+                                // echo "flag4";
+                                $sql = "INSERT INTO Ownership (People_ID, Vehicle_ID) VALUES
+                                ('".$newPersonID."', '"
+                                .$newVehicleID."');";// insert into ownership table
+
+                                $newOwnershipID = mysqli_insert_id($conn);
+                                mysqli_close($conn);
+                                // echo "flag5";
+                                return $newOwnershipID;
+                            } else { // the person with licence is in the database
+                                // echo "flag6";
+                                $oldPersonID = mysqli_fetch_assoc($results)["People_ID"];
+                                // insert vehicle, and it's id, use the existed person_id and the new vehicle id to insert a ownership into ownership table.
+                                $sql = "INSERT INTO Vehicles (Vehicle_make, Vehicle_model, Vehicle_colour, Vehicle_licence) VALUES
+                                ('".$vehicle->getMake()."', '"
+                                .$vehicle->getModel()."', '"
+                                .$vehicle->getColour()."', '"
+                                .$vehicle->getLicence()."');";
+                                $results = mysqli_query($conn, $sql); // insert the vehicle
+                                $newVehicleID = mysqli_insert_id($conn); // get the vehicle_id
+                                // echo "flag7";
+                                $sql = "INSERT INTO Ownership (People_ID, Vehicle_ID) VALUES
+                                ('".$oldPersonID."', '"
+                                .$newVehicleID."');";// insert into ownership table
+
+                                $newOwnershipID = mysqli_insert_id($conn);
+                                mysqli_close($conn);
+                                return $newOwnershipID;
+                            }
+                        } else { // the person doens't has a licence, not support this now. // return false
+                            // echo "flag8";
+                            return False;
+                        }
+                } elseif ($results->num_rows == 1) {// the vehicle is already in the database // return false
+                    // echo "flag9";
+                    mysqli_close($conn); // disconnect
+                    return False; // failure to insert as the vehicle is not new
+                }
+            } 
+        }
+        function insertOwnershipBothExisted($ownership) {
+            // Assume $ownership->vehicle object has id and in the database.
+            // Assume $ownership->person object has id and in the database.
+            // insert an new entry into ownership table using these IDs.
+            // return the id of the entry inserted in the database.
+            $sql = "INSERT INTO Ownership (Vehicle_ID, People_ID) VALUES ('".$ownership->getVehicleID()."', '".$ownership->getPersonID()."');";
+            echo $sql;
+            require("../config/db.inc.php");
+            $conn = mysqli_connect($servername, $dbUsername, $dbPassword, $dbname);
+            if(mysqli_connect_errno()) { // cannot connect database
+                debugEcho ("Failed to connect to MySQL: ".mysqli_connect_error()); // for debugging
+                die();
+            } else { // success to connect database
+                debugEcho("MySQL connection OK<br>");
+                $results = mysqli_query($conn, $sql);
+                $lastID = mysqli_insert_id($conn);
+                mysqli_close($conn); // disconnect
+                return $lastID;
+            }   
         }
         
         

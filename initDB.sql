@@ -80,7 +80,7 @@ CREATE TABLE People (
   People_ID int(20) NOT NULL,
   People_name varchar(50) NOT NULL,
   People_address varchar(50) DEFAULT NULL,
-  People_licence varchar(16) DEFAULT NULL,
+  People_licence varchar(16) UNIQUE DEFAULT NULL,
   People_DOB date DEFAULT NULL,
   People_photoID int(20) DEFAULT NULL -- prefix of file name
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
