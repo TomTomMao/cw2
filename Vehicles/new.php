@@ -38,6 +38,7 @@
             }
         }
         function displayPerson(person) {
+            // auto fill the input box using person object.
             document.getElementById("personFirstName").value = person.firstName;
             document.getElementById("personLastName").value = person.lastName;
             document.getElementById("personAddress").value = person.address;

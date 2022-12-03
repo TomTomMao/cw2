@@ -48,6 +48,13 @@
             margin: 0.5em auto;
         }
 
+        .feedback-yellow {
+            background-color: #efd73c;
+            width: 100%;
+            border-radius: 0.5em;
+            margin: 0.5em auto;
+        }
+
         .feedback-green {
             background-color: #b7ffb4;
             width: 100%;
@@ -62,7 +69,7 @@
         }
 
         /* for .uneditable, I referenced this: https://developer.mozilla.org/en-US/docs/Web/CSS/pointer-events */
-        .uneditable { 
+        .uneditable {
             pointer-events: none;
             background-color: #dedede;
         }
@@ -74,6 +81,7 @@
         .text-green {
             color: green;
         }
+
         .text-red {
             color: red;
         }

@@ -52,32 +52,31 @@
         <?php
             if(!empty($_POST["peopleName"])) {
                 $peopleDB = new PeopleDB($user->getUsername());
-                $peopleData = $peopleDB->getPeopleByName($_POST["peopleName"]);
+                $people = $peopleDB->getPeopleByName($_POST["peopleName"]);
 
                 // check and render the data
                 echo "<hr>";
-                if (count($peopleData)<=0) {
-                    echo "'".$_POST["peopleName"]."'"." Not found";
+                if (count($people)<=0) {
+                    echo "<div class='feedback-yellow'><div class='feedback-text-line'>".
+                    "'".$_POST["peopleName"]."'"." Not found"."</div></div>";
                 } else {
-                    $peopleTable = $peopleDB->renderPeople($peopleData);
-                    echo $peopleTable;
+                    echo Person::renderPeopleTable($people);
                 }
 
             } elseif(!empty($_POST["peopleLicence"])) {
                 $peopleDB = new PeopleDB($user->getUsername());
-                $peopleData = $peopleDB->getPeopleByLicence($_POST["peopleLicence"]);
+                $people = $peopleDB->getPeopleByLicence($_POST["peopleLicence"]);
 
                 // check and render the data
                 echo "<hr>";
-                if (!$peopleData) {
+                if (!$people) {
                     echo "'".$_POST["peopleLicence"]."'"."Not found";
                 } else {
-                    $peopleTable = $peopleDB->renderPeople($peopleData);
-                    echo $peopleTable;
+                    echo Person::renderPeopleTable($people);
                 }
 
             } elseif(isset($_POST["peopleName"]) || isset($_POST["peopleLicence"])) {
-                echo "<p style='color: red'>please enter a name or licence</p>";
+                echo "<div class='feedback-red'><div class='feedback-text-line'>please enter a name or licence</div></div>";
             }
         ?>
     

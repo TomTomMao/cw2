@@ -50,26 +50,49 @@
                 '","lastName":"'.$this->getLastName().
                 '","photoID":"'.$this->getPhotoID().'"}';
         }
-        function render() {
-            echo "<table class='people-table'>
+        static function renderPeopleTable($people) {
+            // given a array of $personObject
+            
+            // If length of $people > 0: return a html table with all person of people data.
+            // if length of $people ==0: return False;
+            $tableHead = "<table class='people-table'>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Address</th>
+                                <th>Driving Licence</th>
+                                <th>DOB</th>
+                                <th>PhotoID</th>
+                            </tr>";
+            $tableTail = "</table>";
+            $tableBody = "";
+            if ($people) {
+                foreach($people as $person) {
+                    $tableBody = $tableBody.$person->renderRow();
+                }
+                $table = $tableHead.$tableBody.$tableTail;
+                return $table;
+            } else {
+                return false;
+            }
+        }
+        function renderRow() {
+            // render a row of person, if there is a falsy value, use string "null".
+            $personID = $this->getID() !=NULL ? $this->getID() : "null";
+            $personFullName = $this->getFullName() !=NULL ? $this->getFullName() : "null";
+            $personAddress = $this->getAddress() !=NULL ? $this->getAddress() : "null";
+            $personLicence = $this->getLicence() !=NULL ? $this->getLicence() : "null";
+            $personDOB = $this->getDOB() !=NULL ? $this->getDOB() : "null";
+            $personPhotoID = $this->getPhotoID() !=NULL ? $this->getPhotoID() : "null";
+            return "
             <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Address</th>
-                <th>Driving Licence</th>
-                <th>DOB</th>
-                <th>PhotoID</th>
-            </tr>
-            <tr>
-                <td>".$this->getID()."</td>
-                <td>".$this->getFullName()."</td>
-                <td>".$this->getAddress()."</td>
-                <td>".$this->getLicence()."</td>
-                <td>".$this->getDOB()."</td>
-                <td>".$this->getPhotoID()."</td>
-            </tr>
-            </table>
-            ";
+                <td>".$personID."</td>
+                <td>".$personFullName."</td>
+                <td>".$personAddress."</td>
+                <td>".$personLicence."</td>
+                <td>".$personDOB."</td>
+                <td>".$personPhotoID."</td>
+            </tr>";
         }
     }
     class PeopleDB {
@@ -89,6 +112,7 @@
                 // Officer_ID: $officerID
                 // "search", ""
             // Return an array of person object that matches the name.
+            // If not match any people in the database, return an empty array.
             $people = array();
             $sql = "SELECT * FROM People WHERE People.People_name LIKE '"
             .$peopleName." %' OR 
@@ -114,48 +138,14 @@
             }
             return $people;
         }
-        function renderPeople($people) {
-            // input an array of person object, return an html <table>.
-            $peopleTable =  
-                "<table class='people-table'>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Address</th>
-                        <th>Driving Licence</th>
-                        <th>DOB</th>
-                    </tr>";
-            foreach($people as $person) {
-                $personID = $person->getID();
-                $personName = $person->getFullName();
-                $personAddress = $person->getAddress();
-                $personLicence = $person->getLicence();
-                $personDOB = $person->getDOB();
-                if (empty($personLicence)) {
-                    $personLicence = "<i>NULL</i>";
-                }
-                if (empty($personDOB)) {
-                    $personDOB = "<i>NULL</i>";
-                }
-                $peopleTable = $peopleTable. 
-                    "
-                        <tr>
-                            <td class='people-data-id'><a href='detail.php?&id=".$personID."'>".$personID."</a></td>
-                            <td class='people-data-name'>".$personName."</td>
-                            <td class='people-data-address'>".$personAddress."</td>
-                            <td class='people-data-licence'>".$personLicence."</td>
-                            <td class='people-data-dob'>".$personDOB."</td>
-                        </tr>";
-                
-            }
-            return  $peopleTable."</table>";
-        }
+        
         function getPeopleByLicence($peopleLicence) {
             // Input the Licence of a person
             // Record the audit trial data into the table PeopleSearchAudit inside the database: (not implemented yet)
                 // Officer_ID: $officerID
                 // "search", ""
             // Return an array of person object that matches the licence. The length of the array should be 0 if no match or 1 if matched.
+            // Return an empty array, if didn't match.
             $people = array();
             $sql = "SELECT * FROM People WHERE People.People_Licence='".$peopleLicence."';";
 
@@ -199,56 +189,4 @@
             }
         }
     }
-
-
-
-
-
-
-
-    
-    // TEST CODE WHEN DEVELOP
-    function testGetPeopleByName($peopleName) {
-        $user = new User();
-        $peopleDB = new PeopleDB($user->getUsername());
-        $people = $peopleDB->getPeopleByName($peopleName);
-        
-        debugPrint_r($people);
-        foreach($people as $person) {
-            print_r ($person);
-            echo "<br>";
-        }
-    }
-
-    function testRenderPeople() {
-        $user = new User();
-        $peopleDB = new PeopleDB($user->getUsername());
-        $people = $peopleDB->getPeopleByName("john");
-        $peopleTable = $peopleDB->renderPeople($people);
-        echo $peopleTable;
-        }
-
-    function testGetPeopleByLicence($peopleLicence) {
-        $user = new User();
-        $peopleDB = new PeopleDB($user->getUsername());
-        $people = $peopleDB->getPeopleByLicence($peopleLicence);
-        debugPrint_r($people);
-        foreach($people as $person) {
-            print_r ($person);
-            echo "<br>";
-        }
-    }
-    
-    function runPeopleTests() {
-        require("../head.php");
-        session_start();
-        require_once("../Accounts/_account.php");
-        
-        testGetPeopleByName("john");
-        testRenderPeople();
-        testGetPeopleByLicence("MEDORH914ANBB223");
-    }
-    
-    // runTests();
-    
 ?>
