@@ -13,7 +13,7 @@
     // foreach ($ownerships as $ownership) {
     //    echo $ownership->render();
     // }
-    $newVehicle = new Vehicle("1129234", "yellow", "ford", "animal",NULL);
+    $newVehicle = new Vehicle("112923x", "yellow", "ford", "animal",NULL);
     $newPerson = new Person(NULL,"aaaassssddddffff" ,"iddadsfsf asdf sdaf", "1999-10-11", "steve jobs", NULL);
     $newVehicle->renderHtmlTable();
     $newPerson->render();

@@ -1,0 +1,28 @@
+test strategy:
+vehicle licence: invalid, 
+    valid:
+        exists
+        not exists
+
+vehicle colour, make, model: 
+    at least one invalid data:
+        invalid colour,
+        invalid make, 
+        invalde model
+    or all valid
+
+owners' licence:
+    licence: invalid
+        valid:
+            exists
+            not exists
+
+owner's first name, last name, address, dob:
+    at least one invalid data:
+        invalid first name
+        invalid last name
+        invalid address
+        invalid dob
+    or all valid
+
+case 1: invalid 

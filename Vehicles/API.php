@@ -1,12 +1,5 @@
 <?php
-    function isVehicleLicenceExists ($vehicleLicence, $user) {
-        $vehiclesDB = new VehiclesDB($user->getUsername());
-        if ($vehiclesDB->isVehicleExists($vehicleLicence)) {
-            echo "true,".$vehicleLicence." is already in the database";
-        } else {
-            echo "false,".$vehicleLicence." is new";
-        }
-    }
+    
     function isPersonLicenceInDB($personLicence, $user) {
         if (!$personLicence) {
             echo "false,driving licence shouldn't be empty";
@@ -22,6 +15,7 @@
             echo "true,person is not new";
         };
     }
+
 
     function getPersonByLicence($personLicence, $user){
         $peopleDB = new PeopleDB($user->getUsername());
@@ -89,11 +83,26 @@
             echo "false,DOB format incorrect";
         }
     }
-    function isVehicleLicenceValid($licence) {
-        if (strlen($licence) == 7) {
-            echo "true";
+    function isVehicleLicenceValid($vehicleLicence, $user) {
+        function _isVehicleLicenceExists ($vehicleLicence, $user) {
+            $vehiclesDB = new VehiclesDB($user->getUsername());
+            if ($vehiclesDB->isVehicleExists($vehicleLicence)) {
+                return true;
+                // echo "true,".$vehicleLicence." is already in the database";
+            } else {
+                return false;
+                // echo "false,".$vehicleLicence." is new";
+            }
+        }
+
+        if (strlen($vehicleLicence) == 7) {
+            if (_isVehicleLicenceExists($vehicleLicence, $user)) {
+                echo "false,".$vehicleLicence." is already in the database";
+            } else {
+                echo "true,".$vehicleLicence." is new";
+            }
         } else {
-            echo "false";
+            echo "false,Vehicle Licence format incorrect";
         }
     } function createNewVehicleWithOwner($vehicleLicence,$vehicleColour,$vehicleMake,$vehicleModel,
     $personLicence,$personFirstName,$personLastName,$personAddress,$personDOB,$user) {
@@ -101,12 +110,24 @@
         $newVehicle = new Vehicle($vehicleLicence,$vehicleColour,$vehicleMake,$vehicleModel,NULL);
         $person = new Person(NULL,$personLicence,$personAddress,$personDOB,$personFirstName." ".$personLastName,NULL);
         $ownershipDB = new OwnershipDB($user->getUsername());
-        $newOwnershipID = $ownershipDB->insertOwnershipWithNewVehicle($newVehicle,$person);
-        if ($newOwnershipID != False) {
-            echo '{"state":"success","newOwnershipID":"'.$newOwnershipID.'"}';
+        $result = $ownershipDB->insertOwnershipWithNewVehicle($newVehicle,$person);
+        if (!isset($result["state"])) {
+            echo '{"state":"error", "reason":"missing information in insertOwnershipWithNewVehicle()"}';
+            print_r($result);
+        } elseif ($result["state"]=="failed") {
+                echo '{"state":"'.$result["state"].'","reason":"'.$result["reason"].'"}';
+        } elseif ($result["state"]=="success") {
+                echo '{"state":"'.$result["state"]
+                    .'","newOwnershipID":"'.$result["newOwnershipID"]
+                    .'","vehicleID":"'.$result["vehicleID"]
+                    .'","personID":"'.$result["personID"]
+                    .'"}'; 
         } else {
-            echo '{"state":"failed","reason":"unknown"}';
+            echo '{"state":"error", "reason":"unexpected data in the state field"}';
+            print_r($result);
         }
+        
+        
     }
 ?>
 <?php
@@ -120,7 +141,7 @@
         header("location: ../Accounts/notLoginError.html"); // check if logged in
     } else {
         // routing url to the functions
-        sleep(0.5);
+        usleep(rand(10000,500000));
         $functionName = $_GET["function"];
         if ($functionName=="createNewVehicleWithOwner") {
             $vehicleLicence = $_GET["vehicleLicence"];
@@ -134,9 +155,9 @@
             $personDOB = $_GET["personDOB"];
             createNewVehicleWithOwner($vehicleLicence,$vehicleColour,$vehicleMake,$vehicleModel, 
             $personLicence,$personFirstName,$personLastName,$personAddress,$personDOB,$user);
-        } elseif ($functionName=="isVehicleLicenceExists") {
+        } elseif ($functionName=="isVehicleLicenceValid") {
             $vehicleLicence = $_GET["vehicleLicence"];
-            isVehicleLicenceExists($vehicleLicence, $user);
+            isVehicleLicenceValid($vehicleLicence, $user);
         } elseif ($functionName=="isPersonLicenceInDB") {
             $personLicence = $_GET["personLicence"];
             isPersonLicenceInDB($personLicence, $user);

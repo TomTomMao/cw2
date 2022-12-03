@@ -354,8 +354,8 @@
         }
         function insertOwnershipWithNewVehicle($vehicle, $person) {
             // give a vehicle object and a person object
-            // if the vehicle is not new, return false
-            
+            // if the vehicle is not new, return ["state":"failed", "reason":"vehilce already existed"]
+            // if the person don't have licence, return ["state": "failed", "reason":"person don't have driving licence"]
             // if the vehicle is new, insert the vehicle into table
             // if the person is new, insert the person into table
             // 
@@ -379,13 +379,17 @@
                 // echo "<hr>";
                 if ($results->num_rows == 0) {
                     // echo "flag0.4";
-                    // the vehicle is new
+                    // the vehicle licence is new to the database
                     // check if the person has licence
                         if ($person->getLicence()!=NULL) { // the person has licence
                             // echo "flag1";
                             // check if the person licence in the database 
                             $sql = "SELECT People_ID FROM People WHERE People_licence='".$person->getLicence()."';";
                             $results = mysqli_query($conn, $sql);
+                            if ($results->num_rows > 1) {
+                                throw new Exception("Data error: there are more than one entry of data in People share the identical driving licence number".
+                            "SQL query: ".$sql);
+                            }
                             if ($results->num_rows==0) { // the person with licence is not in the database
                                 // insert vehicle and person, and get their id, use this to insert into ownership table.
                                 // echo "flag2";
@@ -409,11 +413,13 @@
                                 $sql = "INSERT INTO Ownership (People_ID, Vehicle_ID) VALUES
                                 ('".$newPersonID."', '"
                                 .$newVehicleID."');";// insert into ownership table
-
+                                $results = mysqli_query($conn, $sql);
                                 $newOwnershipID = mysqli_insert_id($conn);
                                 mysqli_close($conn);
                                 // echo "flag5";
-                                return $newOwnershipID;
+                                return ["state"=>"success", "newOwnershipID"=>$newOwnershipID,
+                                 "vehicleID"=>$newVehicleID, "personID"=>$newPersonID];
+                                // return $newOwnershipID;
                             } else { // the person with licence is in the database
                                 // echo "flag6";
                                 $oldPersonID = mysqli_fetch_assoc($results)["People_ID"];
@@ -429,19 +435,22 @@
                                 $sql = "INSERT INTO Ownership (People_ID, Vehicle_ID) VALUES
                                 ('".$oldPersonID."', '"
                                 .$newVehicleID."');";// insert into ownership table
+                                $results = mysqli_query($conn, $sql);
 
                                 $newOwnershipID = mysqli_insert_id($conn);
                                 mysqli_close($conn);
-                                return $newOwnershipID;
+                                return ["state"=>"success", "newOwnershipID"=>$newOwnershipID,
+                                 "vehicleID"=>$newVehicleID, "personID"=>$oldPersonID];
+                                // return $newOwnershipID;
                             }
                         } else { // the person doens't has a licence, not support this now. // return false
                             // echo "flag8";
-                            return False;
+                            return ["state"=>"failed", "reason"=>"person don't have licence"];
                         }
                 } elseif ($results->num_rows == 1) {// the vehicle is already in the database // return false
                     // echo "flag9";
                     mysqli_close($conn); // disconnect
-                    return False; // failure to insert as the vehicle is not new
+                    return ["state"=>"failed", "reason"=>"vehicle licence already in the database"];
                 }
             } 
         }

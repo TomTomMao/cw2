@@ -46,6 +46,25 @@
         }
         var checkers = []
         // a checker class
+        function showCheckingAllFeedback() {
+            // check if all checker is correct
+            // if the global variable thenSubmit is true, try submit data and show feedback
+            console.log(checkers.map(checker => checker.correct))
+            console.log("52:" + checkers.every(checker => checker.correct))
+            if (checkers.every(checker => checker.correct)) {
+                console.log("rendered all data correct")
+                renderFeedbackText("feedbackBox1", "feedback-green", "all data correct")
+                if (thenSubmit == true) {
+                    submitData()
+                }
+            }
+            else {
+                console.log("rendered some data is wrong")
+                renderFeedbackText("feedbackBox1", "feedback-red", "some data is wrong")
+            }
+        }
+
+
         function Checker(checkingMessage, functionName, attributeName, valueElement, feedbackElement) {
             checkers.push(this);
             this.checkingMessage = checkingMessage;
@@ -54,22 +73,45 @@
             this.valueElement = valueElement;
             this.feedbackElement = feedbackElement;
             this.correct = false;
+            this.isCheckingAll = false;
+            this.isCheckingAllChecked = false;
             this.getValue = function () {
                 return this.valueElement.value;
             }
-            this.checkAndFeedback = function () {
-                changeFeedback(this.feedbackElement, "", this.checkingMessage)
-                this.isValueValid((rsp) => {
-                    if (rsp.value == "true") {
-                        changeFeedback(this.feedbackElement, "green", rsp.detail)
-                        this.correct = true;
-                    } else if (rsp.value == "false") {
-                        changeFeedback(this.feedbackElement, "red", rsp.detail)
-                        this.correct = false;
-                        return false;
+            this.showFeedBack = (rsp) => {
+                if (rsp.value == "true") {
+                    changeFeedback(this.feedbackElement, "green", rsp.detail)
+                    this.correct = true;
+                } else if (rsp.value == "false") {
+                    changeFeedback(this.feedbackElement, "red", rsp.detail)
+                    this.correct = false;
+                }
+                if (this.isCheckingAll) {
+                    console.log("flag1")
+                    console.log(this.attributeName + ": " + this.isCheckingAllChecked)
+                    this.isCheckingAllChecked = true
+                    console.log("flag2")
+                    console.log(this.attributeName + ": " + this.isCheckingAllChecked)
+
+                    // if all elements has been checked, call showCheckingAllFeedback(), and set all checkers' isCheckingAllChecked = false
+                    if (checkers.every(checker => checker.isCheckingAllChecked)) {
+                        console.log("flag3")
+                        showCheckingAllFeedback()
+                        checkers.forEach((checker) => {
+                            console.log("setting all false")
+                            checker.isCheckingAllChecked = false
+                        })
                     }
-                });
+                } else {
+                    renderFeedbackText("feedbackBox1", "", "")
+                }
+            }
+            this.checkAndFeedback = function (isCheckingAll = false) {
+                this.isCheckingAll = isCheckingAll
+                changeFeedback(this.feedbackElement, "", this.checkingMessage)
+                this.isValueValid(this.showFeedBack);
             };
+
             this.isValueValid = function (callback) { // i referenced this ajax example when writing this function: https://www.w3schools.com/xml/ajax_database.asp
                 // use server api to check if the value in 
                 // assume the input is not empty
@@ -77,12 +119,15 @@
                 var xhttp;
                 xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function () {
-                    if (this.readyState = 4 && this.status == 200) {
+                    if (this.readyState = 4 && this.status == 200 && this.responseText) {
                         rsp = parseResponseText(this.responseText);
+                        // console.log("---responsed start---")
+                        // console.log(rsp)
+                        // console.log("---responsed over ---")
                         callback(rsp);
                     }
                 };
-                console.log("API.php?function=" + this.functionName + "&" + this.attributeName + "=" + this.getValue());
+                // console.log("API.php?function=" + this.functionName + "&" + this.attributeName + "=" + this.getValue());
                 xhttp.open("GET", "API.php?function=" + this.functionName + "&" + this.attributeName + "=" + this.getValue());
                 xhttp.send()
             };
@@ -109,61 +154,15 @@
                 <input type="text" id="vehicleLicence"></input>
             </td>
             <td>
-                <button
-                    onclick="checkVehicleLicence(document.getElementById('vehicleLicence').value, document.getElementById('vehicleLicenceFeedback'))">
+                <button onclick="vehicleLicenceChecker.checkAndFeedback(false)">
                     Check
                 </button>
             <td>
                 <span id="vehicleLicenceFeedback"></span>
             </td>
             <script>
-                function checkVehicleLicence(vehicleLicence, feedbackElement) {
-
-                    changeFeedback(feedbackElement, "", "checking Vehicle Licence...")
-                    if (!vehicleLicence) { // check if empty
-                        changeFeedback(feedbackElement, "red", "please enter an vehicle Licence");
-                    } else { // then check if the format is valid
-                        validResult = isVehicleLicenceValid(vehicleLicence)
-                        if (!validResult[0]) {
-                            changeFeedback(feedbackElement, "red", "Invalid licence: " + validResult[1])
-                        } else {
-                            isVehicleLicenceExists(vehicleLicence, (rsp) => { //this would wait server response
-                                if (rsp.value == "true") {
-                                    vehicle_correct = false;
-                                    changeFeedback(feedbackElement, "red", rsp.detail)
-                                } else if (rsp.value == "false") {
-                                    vehicle_correct = true;
-                                    changeFeedback(feedbackElement, "green", rsp.detail)
-                                }
-                            });
-                        }
-                    }
-
-                }
-
-                function isVehicleLicenceValid(vehicleLicence) {
-                    if (vehicleLicence.search(" ") >= 0) {
-                        return [false, "there shouldn't be any space"];
-                    } else if (vehicleLicence.length != 7) {
-                        return [false, "the length of vehicle licence should be 7"];
-                    }
-                    return [true, "the vehicle licence is valid"];
-                }
-
-                function isVehicleLicenceExists(vehicleLicence, callback) { // i referenced this ajax example when writing this function: https://www.w3schools.com/xml/ajax_database.asp
-                    // assume the input is not empty
-                    var xhttp;
-                    xhttp = new XMLHttpRequest();
-                    xhttp.onreadystatechange = function () {
-                        console.assert(vehicleLicence) // check the assumption
-                        if (this.readyState = 4 && this.status == 200) {
-                            rsp = parseResponseText(this.responseText);
-                            callback(rsp);
-                        }
-                    };
-                    xhttp.open("GET", "API.php?function=isVehicleLicenceExists&vehicleLicence=" + vehicleLicence);
-                    xhttp.send()
-                }
+                var vehicleLicenceChecker = new Checker("checking vehicle licence...", "isVehicleLicenceValid", "vehicleLicence",
+                    document.getElementById('vehicleLicence'), document.getElementById('vehicleLicenceFeedback'));
             </script>
         </tr>
         <tr>
@@ -175,7 +174,7 @@
                 <input type="text" id="vehicleColour"></input>
             </td>
             <td>
-                <button onclick="colourChecker.checkAndFeedback()">
+                <button onclick="colourChecker.checkAndFeedback(false)">
                     Check
                 </button>
             </td>
@@ -196,7 +195,7 @@
                 <input type="text" id="vehicleMake"></input>
             </td>
             <td>
-                <button onclick="makeChecker.checkAndFeedback()">
+                <button onclick="makeChecker.checkAndFeedback(false)">
                     Check
                 </button>
             </td>
@@ -217,7 +216,7 @@
                 <input type="text" id="vehicleModel"></input>
             </td>
             <td>
-                <button onclick="modelChecker.checkAndFeedback()">
+                <button onclick="modelChecker.checkAndFeedback(false)">
                     Check
                 </button>
             </td>
@@ -284,7 +283,7 @@
                 <input type="text" id="personFirstName"></input>
             </td>
             <td>
-                <button onclick="personFirstNameChecker.checkAndFeedback()">
+                <button onclick="personFirstNameChecker.checkAndFeedback(false)">
                     Check
                 </button>
             <td>
@@ -303,7 +302,7 @@
                 <input type="text" id="personLastName"></input>
             </td>
             <td>
-                <button onclick="personLastNameChecker.checkAndFeedback()">
+                <button onclick="personLastNameChecker.checkAndFeedback(false)">
                     Check
                 </button>
             <td>
@@ -322,7 +321,7 @@
                 <input type="text" id="personAddress"></input>
             </td>
             <td>
-                <button onclick="personAddressChecker.checkAndFeedback()">
+                <button onclick="personAddressChecker.checkAndFeedback(false)">
                     Check
                 </button>
             <td>
@@ -341,7 +340,7 @@
                 <input type="date" id="personDOB"></input>
             </td>
             <td>
-                <button onclick="personDOBChecker.checkAndFeedback()">
+                <button onclick="personDOBChecker.checkAndFeedback(false)">
                     Check
                 </button>
             <td>
@@ -356,33 +355,30 @@
     <hr>
     <script>
 
-        function checkAll() {
-            checkVehicleLicence(document.getElementById('vehicleLicence').value, document.getElementById('vehicleLicenceFeedback'))
+        function checkAll(submit = false) {
+            // check all data, and give feed back
+            // if submit==true: change global variable thenSubmit,
+            // and then after all value checked correct, the it would try to create the vehicle
+
+
+            // initialize data and views
+            thenSubmit = submit
+            renderFeedbackText("feedbackBox1", "", "")
+            document.getElementById("feedbackBox1").innerText = ""
+            document.getElementById("feedbackBox1").classList = []
             for (checker of checkers) {
-                checker.checkAndFeedback();
+                checker.isCheckingAllChecked = false
+                checker.correct = false
             }
 
-            // wait for 2 second check status, should use aysnc way to wait all checkAndFeedback down
-            renderFeedbackText("feedbackBox1", "feedback-green", "Please Waiting...");
-            setTimeout(() => {
-
-                var correct = vehicle_correct;
-                for (checker of checkers) {
-                    correct = checker.correct && correct
-                    if (!checker.correct) {
-                        renderFeedbackText("feedbackBox1", "feedback-red", "Please check the input");
-                    }
-                }
-                if (correct && document.getElementById("feedbackBox1").innerText != "Create Vehicle Success.") {
-                    renderFeedbackText("feedbackBox1", "feedback-green", "all correct");
-                } else {
-                    renderFeedbackText("feedbackBox1", "feedback-red", "Please check the input");
-                }
-            }, 2000)
+            for (checker of checkers) {
+                checker.checkAndFeedback(isCheckingAll = true);
+            }
 
         }
-        async function submitData(callback) {
-            
+        let thenSubmit = false;
+        async function submitData() {
+
             var vehicleLicence = document.getElementById("vehicleLicence").value;
             var vehicleColour = document.getElementById("vehicleColour").value;
             var vehicleMake = document.getElementById("vehicleMake").value;
@@ -398,11 +394,11 @@
             var xhttp;
             xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
-                if (this.readyState = 4 && this.status == 200) {
+                if (this.readyState = 4 && this.status == 200 && this.responseText) {
                     try {
                         insertResult = JSON.parse(this.responseText);
                         console.log(insertResult);
-                        callback(insertResult);
+                        submitCallback(insertResult);
                     } catch (error) {
                         console.log(error);
                     }
@@ -421,9 +417,12 @@
             xhttp.open("GET", "API.php?" + parameters);
             xhttp.send()
         };
-        function sumbitCallBack(data) {
+        function submitCallback(data) {
             if (data.state == "success") {
-                renderFeedbackText("feedbackBox1", "feedback-green", "Create Vehicle Success.");
+                renderFeedbackText("feedbackBox1", "feedback-green", "Create Vehicle Success." +
+                    "new ownership id: " + data.newOwnershipID +
+                    "new vehicle id:" + data.vehicleID +
+                    "person id:" + data.personID);
             } else if (data.state == "failed") {
                 renderFeedbackText("feedbackBox1", "feedback-red", "Failed. Reason: " + data.reason);
             }
@@ -431,7 +430,7 @@
 
     </script>
     <button onclick="checkAll()">Check All</button>
-    <button onclick="checkAll();submitData(sumbitCallBack);">Submit</button>
+    <button onclick="checkAll(true);">Submit</button>
     <div class="" id="feedbackBox1"></div>
 </body>
 
