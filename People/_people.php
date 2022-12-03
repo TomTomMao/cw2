@@ -97,8 +97,9 @@
     }
     class PeopleDB {
         // this is a class for handling data about people
-        function __construct($username){
+        function __construct($username, $conn){
             $this->username = $username;
+            $this->conn = $conn;
         }
         function recordGetPeopleByName(){
         }
@@ -113,28 +114,20 @@
                 // "search", ""
             // Return an array of person object that matches the name.
             // If not match any people in the database, return an empty array.
+            $conn = $this->conn;
             $people = array();
             $sql = "SELECT * FROM People WHERE People.People_name LIKE '"
             .$peopleName." %' OR 
             People.People_name LIKE '% ".$peopleName."' OR 
             People.People_name='".$peopleName."';";
 
-            debugEcho($sql);
-            require("../config/db.inc.php");
-            $conn = mysqli_connect($servername, $dbUsername, $dbPassword, $dbname);
-            if(mysqli_connect_errno()) { // cannot connect database
-                debugEcho ("Failed to connect to MySQL: ".mysqli_connect_error()); // for debugging
-                die();
-            } else { // success to connect database
-                debugEcho("MySQL connection OK<br>");
-                $results = mysqli_query($conn, $sql);
-                $index = 0;
-                while ($row = mysqli_fetch_assoc($results)) {
-                    $people[$index] = new Person($row["People_ID"], $row["People_licence"], 
-                    $row["People_address"], $row["People_DOB"], $row["People_name"], $row["People_photoID"]);
-                    $index += 1;
-                }
-                mysqli_close($conn); // disconnect
+            $results = mysqli_query($conn, $sql);
+            $index = 0;
+            while ($row = mysqli_fetch_assoc($results)) {
+                $people[$index] = new Person($row["People_ID"], $row["People_licence"], 
+                $row["People_address"], $row["People_DOB"], $row["People_name"], $row["People_photoID"]);
+                $index += 1;
+                
             }
             return $people;
         }
@@ -146,26 +139,20 @@
                 // "search", ""
             // Return an array of person object that matches the licence. The length of the array should be 0 if no match or 1 if matched.
             // Return an empty array, if didn't match.
+            $conn = $this->conn;
             $people = array();
             $sql = "SELECT * FROM People WHERE People.People_Licence='".$peopleLicence."';";
 
             debugEcho($sql);
-            require("../config/db.inc.php");
-            $conn = mysqli_connect($servername, $dbUsername, $dbPassword, $dbname);
-            if(mysqli_connect_errno()) { // cannot connect database
-                debugEcho ("Failed to connect to MySQL: ".mysqli_connect_error()); // for debugging
-                die();
-            } else { // success to connect database
-                debugEcho("MySQL connection OK<br>");
-                $results = mysqli_query($conn, $sql);
-                $index = 0;
-                while ($row = mysqli_fetch_assoc($results)) {
-                    $people[$index] = new Person($row["People_ID"], $row["People_licence"], 
-                    $row["People_address"], $row["People_DOB"], $row["People_name"], $row["People_photoID"]);
-                    $index += 1; // so far so good, in future, change it.
-                }
-                mysqli_close($conn); // disconnect
+             // success to connect database
+            $results = mysqli_query($conn, $sql);
+            $index = 0;
+            while ($row = mysqli_fetch_assoc($results)) {
+                $people[$index] = new Person($row["People_ID"], $row["People_licence"], 
+                $row["People_address"], $row["People_DOB"], $row["People_name"], $row["People_photoID"]);
+                $index += 1; // so far so good, in future, change it.
             }
+            
             if (count($people)) // not sure why did I typed this, but so far so good, don't delete it!
             return $people;
         }

@@ -1,3 +1,4 @@
+
 <?php 
     try { ?>
     <?php $pageTitle = "Lookup People";
@@ -50,27 +51,29 @@
         </form>
         
         <?php
+            require("../reuse/_dbConnect.php");
+            $conn = connectDB();
+            $peopleDB = new PeopleDB($user->getUsername(), $conn);
+
             if(!empty($_POST["peopleName"])) {
-                $peopleDB = new PeopleDB($user->getUsername());
                 $people = $peopleDB->getPeopleByName($_POST["peopleName"]);
 
                 // check and render the data
                 echo "<hr>";
                 if (count($people)<=0) {
                     echo "<div class='feedback-yellow'><div class='feedback-text-line'>".
-                    "'".$_POST["peopleName"]."'"." Not found"."</div></div>";
+                    "Person with name: '".$_POST["peopleName"]."'"." Not found"."</div></div>";
                 } else {
                     echo Person::renderPeopleTable($people);
                 }
 
             } elseif(!empty($_POST["peopleLicence"])) {
-                $peopleDB = new PeopleDB($user->getUsername());
                 $people = $peopleDB->getPeopleByLicence($_POST["peopleLicence"]);
 
                 // check and render the data
                 echo "<hr>";
                 if (!$people) {
-                    echo "'".$_POST["peopleLicence"]."'"."Not found";
+                    echo "Person with driving licence: '".$_POST["peopleLicence"]."'"."Not found";
                 } else {
                     echo Person::renderPeopleTable($people);
                 }
@@ -78,6 +81,8 @@
             } elseif(isset($_POST["peopleName"]) || isset($_POST["peopleLicence"])) {
                 echo "<div class='feedback-red'><div class='feedback-text-line'>please enter a name or licence</div></div>";
             }
+            
+            mysqli_close($conn); // disconnect
         ?>
     
 <?php 

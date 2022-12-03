@@ -1,13 +1,13 @@
 <?php
     
-    function isPersonLicenceInDB($personLicence, $user) {
+    function isPersonLicenceInDB($personLicence, $user, $conn) {
         if (!$personLicence) {
             echo "false,driving licence shouldn't be empty";
             return;
         } elseif(strlen($personLicence) != 16) {
             echo "false,driving licence must be 16 length";
         }
-        $peopleDB = new PeopleDB($user->getUsername());
+        $peopleDB = new PeopleDB($user->getUsername(), $conn);
         $people = $peopleDB->getPeopleByLicence($personLicence);
         if (is_null($people)){
             echo "true,person is new";
@@ -17,8 +17,8 @@
     }
 
 
-    function getPersonByLicence($personLicence, $user){
-        $peopleDB = new PeopleDB($user->getUsername());
+    function getPersonByLicence($personLicence, $user, $conn){
+        $peopleDB = new PeopleDB($user->getUsername(), $conn);
         $person = $peopleDB->getPersonByLicence($personLicence);
         if ($person != NULL) {
             echo $person->getJSONText();
@@ -136,6 +136,7 @@
     require("../Vehicles/_vehicles.php");
     require("../Vehicles/_ownership.php");
     require("../People/_people.php");
+    require("../reuse/_dbConnect.php");
     $user = new User();
     if (!$user->isLoggedIn()) {
         header("location: ../Accounts/notLoginError.html"); // check if logged in
@@ -159,8 +160,10 @@
             $vehicleLicence = $_GET["vehicleLicence"];
             isVehicleLicenceValid($vehicleLicence, $user);
         } elseif ($functionName=="isPersonLicenceInDB") {
+            $conn = connectDB();
             $personLicence = $_GET["personLicence"];
-            isPersonLicenceInDB($personLicence, $user);
+            isPersonLicenceInDB($personLicence, $user, $conn);
+            mysqli_close($conn);
         } elseif ($functionName=="isColourValid") {
             $colour = $_GET["colour"];
             isColourValid($colour);
@@ -183,8 +186,10 @@
             $DOB = $_GET["DOB"];
             isDOBValid($DOB);
         } elseif ($functionName=="getPersonByLicence") {
+            $conn = connectDB();
             $personLicence = $_GET["personLicence"];
-            getPersonByLicence($personLicence, $user);
+            getPersonByLicence($personLicence, $user, $conn);
+            mysqli_close($conn);
         }
     }
 ?>

@@ -80,6 +80,10 @@
                 return this.valueElement.value;
             }
             this.showFeedBack = (rsp) => {
+                console.log("=-=-=-=-=-=-=-=-")
+                console.log("entered:" + this.valueElement.id + ".showFeedBack") // debug
+                console.log("rsp:" + rsp.value)
+                console.log("=-=-=-=-=-=-=-=-")
                 if (rsp.value == "true") {
                     changeFeedback(this.feedbackElement, "green", rsp.detail)
                     this.correct = true;
