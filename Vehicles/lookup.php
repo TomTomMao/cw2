@@ -16,6 +16,7 @@
 
     <?php    
         require_once("_ownership.php");
+        require("../reuse/_dbConnect.php");
     ?>
     <body>
         <div class="navbar">
@@ -41,7 +42,8 @@
         
         <?php
             if(!empty($_POST["vehicleLicence"])) {
-                $ownershipDB = new OwnershipDB($user->getUsername());
+                $conn = connectDB();
+                $ownershipDB = new OwnershipDB($user->getUsername(),$conn);
                 $ownerships = $ownershipDB->getOwnershipsByLicence($_POST["vehicleLicence"]);
 
                 // check and render the data
@@ -51,7 +53,7 @@
                     $ownershipDiv = $ownershipDiv.$ownership->render();
                 }
                 echo $ownershipDiv;
-
+                mysqli_close($conn);
             } elseif(isset($_POST["vehicleLicence"])) {
                 echo "<p style='color: red'>please enter a licence</p>";
             }

@@ -83,9 +83,10 @@
             echo "false,DOB format incorrect";
         }
     }
-    function isVehicleLicenceValid($vehicleLicence, $user) {
-        function _isVehicleLicenceExists ($vehicleLicence, $user) {
-            $vehiclesDB = new VehiclesDB($user->getUsername());
+    function isVehicleLicenceValid($vehicleLicence, $user, $conn) {
+        // echo "called isvehicleLicenceValide in API.php";
+        function _isVehicleLicenceExists ($vehicleLicence, $user, $conn) {
+            $vehiclesDB = new VehiclesDB($user->getUsername(), $conn);
             if ($vehiclesDB->isVehicleExists($vehicleLicence)) {
                 return true;
                 // echo "true,".$vehicleLicence." is already in the database";
@@ -96,7 +97,7 @@
         }
 
         if (strlen($vehicleLicence) == 7) {
-            if (_isVehicleLicenceExists($vehicleLicence, $user)) {
+            if (_isVehicleLicenceExists($vehicleLicence, $user, $conn)) {
                 echo "false,".$vehicleLicence." is already in the database";
             } else {
                 echo "true,".$vehicleLicence." is new";
@@ -105,12 +106,12 @@
             echo "false,Vehicle Licence format incorrect";
         }
     } function createNewVehicleWithOwner($vehicleLicence,$vehicleColour,$vehicleMake,$vehicleModel,
-    $personLicence,$personFirstName,$personLastName,$personAddress,$personDOB,$user) {
+    $personLicence,$personFirstName,$personLastName,$personAddress,$personDOB,$user,$conn) {
         // get data of vehicle and person, create it , used for creating new vehicle with an exist or non exist owner.
         $newVehicle = new Vehicle($vehicleLicence,$vehicleColour,$vehicleMake,$vehicleModel,NULL);
         $person = new Person(NULL,$personLicence,$personAddress,$personDOB,$personFirstName." ".$personLastName,NULL);
-        $ownershipDB = new OwnershipDB($user->getUsername());
-        $result = $ownershipDB->insertOwnershipWithNewVehicle($newVehicle,$person);
+        $ownershipDB = new OwnershipDB($user->getUsername(),$conn);
+        $result = $ownershipDB->insertOwnershipWithNewVehicle($newVehicle,$person,$conn);
         if (!isset($result["state"])) {
             echo '{"state":"error", "reason":"missing information in insertOwnershipWithNewVehicle()"}';
             print_r($result);
@@ -144,6 +145,7 @@
         // routing url to the functions
         usleep(rand(10000,500000));
         $functionName = $_GET["function"];
+        $conn = connectDB(); // connect to db
         if ($functionName=="createNewVehicleWithOwner") {
             $vehicleLicence = $_GET["vehicleLicence"];
             $vehicleColour = $_GET["vehicleColour"];
@@ -155,15 +157,13 @@
             $personAddress = $_GET["personAddress"];
             $personDOB = $_GET["personDOB"];
             createNewVehicleWithOwner($vehicleLicence,$vehicleColour,$vehicleMake,$vehicleModel, 
-            $personLicence,$personFirstName,$personLastName,$personAddress,$personDOB,$user);
+            $personLicence,$personFirstName,$personLastName,$personAddress,$personDOB,$user,$conn);
         } elseif ($functionName=="isVehicleLicenceValid") {
             $vehicleLicence = $_GET["vehicleLicence"];
-            isVehicleLicenceValid($vehicleLicence, $user);
+            isVehicleLicenceValid($vehicleLicence, $user, $conn);
         } elseif ($functionName=="isPersonLicenceInDB") {
-            $conn = connectDB();
             $personLicence = $_GET["personLicence"];
             isPersonLicenceInDB($personLicence, $user, $conn);
-            mysqli_close($conn);
         } elseif ($functionName=="isColourValid") {
             $colour = $_GET["colour"];
             isColourValid($colour);
@@ -186,10 +186,9 @@
             $DOB = $_GET["DOB"];
             isDOBValid($DOB);
         } elseif ($functionName=="getPersonByLicence") {
-            $conn = connectDB();
             $personLicence = $_GET["personLicence"];
             getPersonByLicence($personLicence, $user, $conn);
-            mysqli_close($conn);
         }
+        mysqli_close($conn);
     }
 ?>

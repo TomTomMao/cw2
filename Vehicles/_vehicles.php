@@ -57,8 +57,9 @@ class Vehicle {
         }
     }
 class VehiclesDB {
-    function __construct($username) {
-        $this->username=$username;
+    function __construct($username, $conn) {
+        $this->username = $username;
+        $this->conn = $conn;
     }
     function isVehicleExists($vehicleLicence) {
         // given vehicleLicence, check if it is in the database.
@@ -66,20 +67,12 @@ class VehiclesDB {
         // return false if doesn't exist
         $sql = "SELECT Vehicle_ID FROM Vehicles WHERE Vehicle_licence ='".$vehicleLicence."';";
         // echo $sql;
-        require("../config/db.inc.php");
-        $conn = mysqli_connect($servername, $dbUsername, $dbPassword, $dbname);
-        if(mysqli_connect_errno()) { // cannot connect database
-            debugEcho ("Failed to connect to MySQL: ".mysqli_connect_error()); // for debugging
-            die();
-        } else { // success to connect database
-            debugEcho("MySQL connection OK<br>");
-            $results = mysqli_query($conn, $sql);
-            mysqli_close($conn); // disconnect
-            if (mysqli_num_rows($results) == 0) {
-                return false;
-            } else {
-                return true;
-            }
+        $conn = $this->conn;
+        $results = mysqli_query($conn, $sql);
+        if (mysqli_num_rows($results) == 0) {
+            return false;
+        } else {
+            return true;
         }
             
     }
@@ -98,36 +91,22 @@ class VehiclesDB {
         .$vehicle->getColour()."', '"
         .$vehicle->getLicence()."')";
         // echo $sql;
-        require("../config/db.inc.php");
-        $conn = mysqli_connect($servername, $dbUsername, $dbPassword, $dbname);
-        if(mysqli_connect_errno()) { // cannot connect database
-            debugEcho ("Failed to connect to MySQL: ".mysqli_connect_error()); // for debugging
-            die();
-        } else { // success to connect database
+        $conn = $this->conn;
             debugEcho("MySQL connection OK<br>");
             $results = mysqli_query($conn, $sql);
-            mysqli_close($conn); // disconnect
             return true;
-        }
     }
     function getVehiclesByLicence ($vehicleLicence) {
         // given an vehicle licence number, return an array of vehicle(s) object
-        $sql = "SELECT Vehicle_ID, Vehicle_licence, Vehicle_colour, Vehicle_make, Vehicle_model FROM Vehicles WHERE Vehicle_licence ='".$vehicleLicence."';";
+        $sql = "SELECT Vehicle_ID, Vehicle_licence, Vehicle_colour, Vehicle_make, Vehicle_model FROM Vehicles WHERE Vehicle_licence ='"
+        .$vehicleLicence."';";
         $vehicles = array();
 
-        require("../config/db.inc.php");
-        $conn = mysqli_connect($servername, $dbUsername, $dbPassword, $dbname);
-        if(mysqli_connect_errno()) { // cannot connect database
-            debugEcho ("Failed to connect to MySQL: ".mysqli_connect_error()); // for debugging
-            die();
-        } else { // success to connect database
-            debugEcho("MySQL connection OK<br>");
-            $results = mysqli_query($conn, $sql);
-            while ($row = mysqli_fetch_assoc($results)) {
-                array_push($vehicles,new Vehicle($row["Vehicle_licence"], $row["Vehicle_colour"], $row["Vehicle_make"], $row["Vehicle_model"], $row["Vehicle_ID"]));
-            } 
-            mysqli_close($conn); // disconnect
-        }
+        $conn = $this->conn; 
+        $results = mysqli_query($conn, $sql);
+        while ($row = mysqli_fetch_assoc($results)) {
+            array_push($vehicles,new Vehicle($row["Vehicle_licence"], $row["Vehicle_colour"], $row["Vehicle_make"], $row["Vehicle_model"], $row["Vehicle_ID"]));
+        } 
         return $vehicles;
     }
     function getVehiclesIDByLicence ($vehicleLicence) {
@@ -136,18 +115,10 @@ class VehiclesDB {
         // return false if the vehicle doesn't exist.
         $sql = "SELECT Vehicle_ID FROM Vehicles WHERE Vehicle_licence ='".$vehicleLicence."';";
         $vehiclesID = array();
-        require("../config/db.inc.php");
-        $conn = mysqli_connect($servername, $dbUsername, $dbPassword, $dbname);
-        if(mysqli_connect_errno()) { // cannot connect database
-            debugEcho ("Failed to connect to MySQL: ".mysqli_connect_error()); // for debugging
-            die();
-        } else { // success to connect database
-            debugEcho("MySQL connection OK<br>");
-            $results = mysqli_query($conn, $sql);
-            while ($row = mysqli_fetch_assoc($results)) {
-                array_push($vehiclesID, $row["Vehicle_ID"]);
-            }
-            mysqli_close($conn); // disconnect
+        $conn = $this->conn;
+        $results = mysqli_query($conn, $sql);
+        while ($row = mysqli_fetch_assoc($results)) {
+            array_push($vehiclesID, $row["Vehicle_ID"]);
         }
         return $vehiclesID;
     }
