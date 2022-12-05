@@ -12,7 +12,7 @@
         <a href="../Accounts/home.php">My Account</a>
     </div>
     <hr>
-    <h1>Create New Report(Vehicle involved)</h1>
+    <h1>Create New Report</h1>
     <hr>
     <form action="newSubmit.php" method="post">
         <div>
@@ -43,6 +43,7 @@
             <div>
                 *Colour:
                 <select name="vehicleColour" id="vehicleColour">
+                    <option value=""></option>
                     <option value="white">white</option>
                     <option value="blue">blue</option>
                     <option value="green">green</option>

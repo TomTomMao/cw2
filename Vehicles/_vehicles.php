@@ -29,7 +29,7 @@ class Vehicle {
         }
         function renderHtmlTable() {
             $ID = ($this->ID ? $this->ID : "NULL");
-            echo "
+            return "
                 <table>
                     <tr>
                         <td>ID</td>
@@ -70,16 +70,19 @@ class VehiclesDB {
         $conn = $this->conn;
         $results = mysqli_query($conn, $sql);
         if (mysqli_num_rows($results) == 0) {
+            echo "results length is 0 (VehiclesDB->isVehicleExists) (false)"; // debugging
             return false;
         } else {
+            echo "results length is not 0 (VehiclesDB->isVehicleExists) (true)"; // debugging
             return true;
         }
             
     }
     function insertNewVehicle($vehicle) {
+        // hasn't been well tested!
         // given an vehicle object, insert it into the database, assume the vehicle's data are valid
         // if the vehicle licence is already in the database, return the false
-        // if the vehicle licence is new in the database, return true
+        // if the vehicle licence is new in the database, return the vehicle id
         
         if ($this->isVehicleExists($vehicle->getLicence())) {
             return false;
@@ -92,9 +95,13 @@ class VehiclesDB {
         .$vehicle->getLicence()."')";
         // echo $sql;
         $conn = $this->conn;
-            debugEcho("MySQL connection OK<br>");
-            $results = mysqli_query($conn, $sql);
-            return true;
+        $results = mysqli_query($conn, $sql);
+        $newVehicleID = mysqli_insert_id($conn);
+        if ($newVehicleID) {
+            return $newVehicleID;
+        } else {
+            throw new Exception("there must be an error here (VehicleDB->insertNewVehicle())");
+        }
     }
     function getVehiclesByLicence ($vehicleLicence) {
         // given an vehicle licence number, return an array of vehicle(s) object
