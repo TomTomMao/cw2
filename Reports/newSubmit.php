@@ -86,6 +86,15 @@ try{
 
             return ["allValid"=>true];
         }
+        function isOwnerFormValid($post) {
+            // assume there is a owner form
+            // return an associative array:
+            // ["allValid"=>true/false, "detail"=>["ownerField1"=>"valid/invalid hint", "ownerField2"=>"valid/invalid hint", ...]]
+            // Return True if the format of all the field of owner is valid.
+            // Return An associative array whose key is field name of owner form, and value is "correct" 
+
+            return ["allValid"=>true];
+        }
 
         // check report type, and set $hasVehicleForm, $hasOwnerForm, $hasOffenderForm to be true/false;
         require("acceptableForms.php");
@@ -185,6 +194,7 @@ try{
                     die();
                 } else {
                     echo "GOOD GOOD GOOD for the vehicle form!<hr>";
+                    $vehicleID = $oldVehicleFromDB->getID();
                     // return something if in future refactor these code into a function.
                 }
             }
@@ -200,6 +210,155 @@ try{
 
         // TODO:
         // processing the {owner form} -> {$ownerID, database change}
+        $ownerID = "NULL";
+        if ($hasOwnerForm==false) {
+            $ownerID = "NULL";            
+
+            // case that the fields of owner form is invalid (function is not implemented yet, always valid) : give error feedback
+        } elseif($hasOwnerForm && isOwnerFormValid($_POST)['allValid']==false) {
+            echo "<hr>";
+            echo "owner Information is not valid:";
+            $hint = isOwnerFormValid($_POST)['detail'];
+            print_r($hint);
+            echo "<hr>";
+            mysqli_close($conn);
+            die();
+            
+            // valid:
+        } elseif($hasOwnerForm && isOwnerFormValid($_POST)['allValid']==true) {
+            // sudo-code:
+            // case 1: the owner has a licence:
+                // search licence
+                    // if licence in db (not a new owner):
+                        // if form not match the db:
+                            // feedback these difference and die();
+                        // if form match the db:
+                            // get the owner id
+                            // set the owner id on $ownerID;
+                    // if licence not in db (new):
+                        // insert this owner, get owner id
+                        // set the owner id on $ownerID;
+            // case 2: the owner doesn't have a licence:
+                // if there are given name, dob, address in the form:
+                    // use these 3 data as unique key to search the database
+                    // if match one:
+                        // get the id of the data in database
+                        // set the owner id on $ownerID
+                    // else:
+                        // insert new data with name, dob, address
+                        // get id of the newly-inserted owner
+                        // set the owner id on $ownerID
+                // else:
+                    // feedback these missing field and die();
+            
+            // implementation:
+
+            // case1: has licence info
+            if (!empty($_POST['ownerLicence'])) {
+                // licence in db
+                if ($peopleDB->isPersonLicenceInDB($_POST['ownerLicence'])){
+                    echo "owner is in the database";
+
+                    $ownerFromDB = $peopleDB->getPersonByLicence($_POST['ownerLicence']);
+                    echo "owner from database:<br>".$ownerFromDB->renderRow()."<hr>";
+                    // assume ownerFromDB is not empty
+                    if (empty($ownerFromDB)) {
+                        throw new Exception("vehicle licence is not in database, but it should be in the database as it was checked by $peopleDB->isPersonLicenceInDB");
+                    }
+                    $ownerFromForm = new Person("NULL", $_POST['ownerLicence'], $_POST['ownerAddress'], 
+                                                $_POST["ownerDOB"], $_POST["ownerFirstName"]." ".$_POST["ownerLastName"], "NULL");
+                    echo "owner from the form:<br>".$ownerFromForm->renderRow()."<hr>";
+
+                    // get error state, and give feed back.
+                    $oldOwnerSame = true;
+                    if ($ownerFromDB->getLicence()!=$ownerFromForm->getLicence()) {
+                        echo "although owner licence is in the database, but the licence is not the same with the owner with the licence in the database<hr>";
+                        $oldOwnerSame = false;
+                    }
+                    if ($ownerFromDB->getAddress()!=$ownerFromForm->getAddress()) {
+                        echo "although owner licence is in the database, but the address is not the same with the owner with the address in the database<hr>";
+                        $oldOwnerSame = false;
+                    }
+                    if ($ownerFromDB->getDOB()!=$ownerFromForm->getDOB()) {
+                        echo "although owner licence is in the database, but the DOB is not the same with the owner with the DOB in the database<hr>";
+                        $oldOwnerSame = false;
+                    }
+                    if ($ownerFromDB->getFirstName()!=$ownerFromForm->getFirstName()) {
+                        echo "although owner licence is in the database, but the first name is not the same with the owner with the first name in the database<hr>";
+                        $oldOwnerSame = false;
+                    }
+                    if ($ownerFromDB->getLastName()!=$ownerFromForm->getLastName()) {
+                        echo "although owner licence is in the database, but the last name is not the same with the owner with the last name in the database<hr>";
+                        $oldOwnerSame = false;
+                    }
+                    
+                    if ($oldOwnerSame) {
+                        // if form match the db:
+                            // get the owner id
+                            // set the owner id on $ownerID;
+                        echo "GOOD GOOD GOOD for the owner form!<hr>";
+                        $ownerID = $ownerFromDB->getID();
+                    } else {
+                        // if form not match the db:
+                            // feedback these difference and die():
+                        echo "Please Check your owner data<hr>";
+                        die();
+                    }
+                
+                    // licence not in db
+                } else {
+                    // owner is new, then insert this owner into the database
+                    $ownerFromForm = new Person("NULL", $_POST['ownerLicence'], $_POST['ownerAddress'], 
+                                                $_POST["ownerDOB"], $_POST["ownerFirstName"]." ".$_POST["ownerLastName"], "NULL");
+                    
+                    $ownerID = $peopleDB->insertNewPerson($ownerFromForm); // id set
+                    $newOwnerFromDB = $peopleDB->getPersonByLicence($ownerFromForm->getLicence());
+                    echo "new owner:<br>".$newOwnerFromDB->renderRow()."<hr>";
+                }
+                
+                
+            } 
+            // case 2: has no licence info
+            else {
+
+                // if has empty data of these, feedback error.
+                if(!empty($_POST["ownerAddress"]) || !empty($_POST["ownerFirstName"]) || !empty($_POST["ownerLastName"]) || !empty($_POST["ownerDOB"])) {
+                    echo "missed some data of ownerAddress, ownerFirstName, ownerLastName, ownerDOB<hr>";
+                    die();
+                } 
+                // else: name, dob, address is given
+                else {
+                    $ownerWithoutLicenceFromForm = new Person("NULL", "NULL",$_POST["ownerAddress"],$_POST["ownerDOB"],$_POST["ownerFirstName"]." ".$_POST["ownerLastName"], "NULL");
+                    echo "owner without licence from the form: <br>".$ownerWithoutLicenceFromForm->renderRow()."<hr>";
+
+                    // match one
+                    if ($peopleDB->isPersonDetailInDB($ownerWithoutLicenceFromForm)) {
+                        $ownerWithoutLicenceFromDB = $peopleDB->getPersonByDetail($ownerWithoutLicenceFromForm);
+                        // no need to compare the db person and the form person.
+                        $ownerID = $ownerWithoutLicenceFromDB->getID(); // set id
+                        echo "owner without licence from the database: <br>".$ownerWithoutLicenceFromDB->renderRow()."<hr>";
+                        
+                    }
+                    // not match one
+                    else {
+                        // insert new data with name, dob, address
+                        // get id of the newly-inserted owner
+                        // set the owner id on $ownerID
+                        $ownerID = $peopleDB->insertNewPerson($ownerWithoutLicenceFromForm);
+                        $ownerWithoutLicenceFromDB = $peopleDB->getPersonByDetail($ownerWithoutLicenceFromForm);
+
+                        echo "\$ownerID: ".$ownerID."<hr>";
+                        echo "ownerWithoutLicenceFromForm: ".$ownerWithoutLicenceFromForm->getID()."<hr>";
+                        echo "ownerWithoutLicenceFromDB: ".$ownerWithoutLicenceFromDB->getID()."<hr>";
+                        echo "owner without licence from the database: <br>".$ownerWithoutLicenceFromDB->renderRow()."<hr>";
+                    }
+                }
+            }
+        } 
+
+        echo "<hr>---------------------Processing owner form done---------------------<hr>";
+        // to do
+        // test owner form
         // processing the {offender form} -> {$offenderID, database change}
         // using {vehicleID, ownerID} -> {$ownershipID, database change} 
         // using {ownership, offenderID, report general data form} -> {reportID, database change}

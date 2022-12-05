@@ -39,7 +39,7 @@
             return $this->licence;
         }
         function getPhotoID() {
-            return 0;
+            return "NULL";
         }
         function getJSONText() {
             return '{"ID":"'.$this->ID.
@@ -173,6 +173,98 @@
             $person = $this->getPersonByLicence($licence);
             if (isset($person)) {
                 return $person->getID();
+            }
+        }
+        function getPersonByDetail($person) {
+            // given $person, return A person that match this licence if matched (dob, name, address), otherwise return null;
+            // if returned a person, then the person has ID
+            $people = $this->getPeopleByDetail($person);
+            if (!is_null($people)) {
+                return $people[0];
+            } else {
+                return NULL;
+            }
+        }
+        function getPeopleByDetail($person) {
+            // $person: person object with mandatory data: name, dob, address
+            // return an array of person object, the array would be empty if no data matched.
+            $conn = $this->conn;
+            $sql = "SELECT * FROM People WHERE People_name='".$person->getFullName().
+                "', People_DOB='".$person->getDOB()."', People_address='".$person->getAddress()."';";
+            $results = mysqli_query($sql);
+            $people = array();
+            while($row = mysqli_fetch_assoc($results)) {
+                array_push(new Person($row["People_ID"], $row["People_licence"], 
+                                        $row["People_address"], $row["People_DOB"], $row["People_name"], $row["People_photoID"]));
+                //
+            }
+            return $people;
+        }
+
+
+        function isPersonDetailInDB($person) {
+            // $person: person object with mandatory data: name, dob, address
+            // USE name, dob, address TO QUERY DATA
+            // return true if person is in db.
+            // otherwise return false;
+            $people = $this->getPeopleByDetail($person);
+            if (empty($people)) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        function insertNewPerson($person) {
+            // hasn't been well tested!
+            // given an person object, insert it into the database, assume the person's data are valid and person is new
+            // person data: ID(optional), firstname(mandatory), lastname(mandatory), dob(mandatory), address(mandatory), photoid(optional), licence(optional)
+            // if the person licence is already in the database, return the false
+            // if the person licence is new in the database, return the person id
+            // if the person don't have a licence and the comb of these values are new to the database.
+                // using dob, address to insert the person, and return person id
+            // else :
+                // return false;
+
+            $conn = $this->conn;
+
+            // person has licence
+            if ($person->getLicence()!="NULL") {
+                if ($this->isPersonLicenceInDB($person->getLicence())) {
+                    return false; // person already exist, false
+                } else {
+                    // person is new and with licence.
+                    $sql = "INSERT INTO People (People_name, People_address, People_licence, People_DOB) VALUES
+                    ('".$person->getFullName()."', '"
+                    .$person->getAddress()."', '"
+                    .$person->getLicence()."', '"
+                    .$person->getDOB()."')";
+                    echo $sql."from : peopleDB->insertNewPerson";
+                    $result = mysqli_query($sql);
+                    $lastID = mysqli_insert_id($conn);
+                    return $lastID;
+                }
+
+                // person doesn't have a licence and in db
+            } elseif ($this->isPersonDetailInDB($person)) {
+                // return false
+                // echo "Person already In the database!";
+                return false;
+
+                // person doesn't have a licence and new to db.
+            } else {
+                // insert the person, and return the id of the new person.
+                
+                $personID = null;
+                
+                $sql = "INSERT INTO People (People_name, People_address, People_DOB) VALUES
+                    ('".$person->getFullName()."', '"
+                    .$person->getAddress()."', '"
+                    .$person->getDOB()."')";
+                $result = mysqli_query($sql);
+                $lastID = mysqli_insert_id($conn);
+                return $lastID;
+
             }
         }
     }
