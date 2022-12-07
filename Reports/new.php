@@ -1,8 +1,29 @@
 <?php $pageTitle = "New Report";
     require("../head.php");
-    print_r ($_POST);
-?>
+    session_start();
+        require("../Accounts/_account.php");// there is a User class
+        
+        $user = new User();
+        if (!$user->isLoggedIn()) {
+            header("location: ../Accounts/notLoginError.html"); // check if logged in
+        }
+        require("../head.php");
 
+
+
+?>
+<?php 
+                    require("../reuse/_dbConnect.php");
+                    $conn = connectDB();
+                    $sql = "SELECT Offence_ID, Offence_description, Offence_maxFine, Offence_maxPoints FROM offence;";
+                    $offencesResults = mysqli_query($conn, $sql);
+                    echo $sql;
+                    $offences = array();
+                    while ($row = mysqli_fetch_assoc($offencesResults)) {
+                        array_push($offences, $row);
+                    }
+                    mysqli_close($conn);
+                ?>
 <body>
     <div class="navbar">
         <a href="../People/lookup.php">Lookup People</a>
@@ -26,11 +47,17 @@
             </div>
             <div>
                 *Offence:
+                
                 <select name="reportOffence" id="reportOffence">
-                    <option value="$offenceId1">$offenceName1</option>
-                    <option value="$offenceId2">$offenceName2</option>
-                    <option value="$offenceId3">$offenceName3</option>
-                    <option value="$offenceId4">$offenceName4</option>
+                    <?php 
+                        foreach ($offences as $offence) {
+                            $offenceID = $offence["Offence_ID"];
+                            $offenceDescription = $offence["Offence_description"];
+                            $offenceMaxFine = $offence["Offence_maxFine"];
+                            $offenceMaxPoints = $offence["Offence_maxPoints"];
+                            echo '<option value="'.$offenceID.'">'.'(Max Fine:'.$offenceMaxFine.'; Max Panelty Points:'.$offenceMaxPoints.') '.$offenceDescription.'</option>';
+                        }
+                    ?>
                 </select>
             </div>
         </div>
@@ -42,18 +69,8 @@
             </div>
             <div>
                 *Colour:
-                <select name="vehicleColour" id="vehicleColour">
-                    <option value=""></option>
-                    <option value="white">white</option>
-                    <option value="blue">blue</option>
-                    <option value="green">green</option>
-                    <option value="yellow">yellow</option>
-                    <option value="red">red</option>
-                    <option value="purple">purple</option>
-                    <option value="black">black</option>
-                    <option value="orange">orange</option>
-                    <option value="silver">silver</option>
-                </select>
+                <input type="text" name="vehicleColour" id="vehicleColour">
+
             </div>
             <div>
                 *Maker:

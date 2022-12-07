@@ -6,6 +6,7 @@
     ?>
 
     <?php // handle not login error
+    
         session_start();
         require("../Accounts/_account.php");// there is a User class
         $user = new User();

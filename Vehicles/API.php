@@ -108,8 +108,8 @@
     } function createNewVehicleWithOwner($vehicleLicence,$vehicleColour,$vehicleMake,$vehicleModel,
     $personLicence,$personFirstName,$personLastName,$personAddress,$personDOB,$user,$conn) {
         // get data of vehicle and person, create it , used for creating new vehicle with an exist or non exist owner.
-        $newVehicle = new Vehicle($vehicleLicence,$vehicleColour,$vehicleMake,$vehicleModel,NULL);
-        $person = new Person(NULL,$personLicence,$personAddress,$personDOB,$personFirstName." ".$personLastName,NULL);
+        $newVehicle = new Vehicle($vehicleLicence,$vehicleColour,$vehicleMake,$vehicleModel,"NULL");
+        $person = new Person("NULL",$personLicence,$personAddress,$personDOB,$personFirstName." ".$personLastName,"NULL");
         $ownershipDB = new OwnershipDB($user->getUsername(),$conn);
         $result = $ownershipDB->insertOwnershipWithNewVehicle($newVehicle,$person,$conn);
         if (!isset($result["state"])) {

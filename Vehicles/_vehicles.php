@@ -1,7 +1,7 @@
 <?php
     $debugOn=false;
     require_once("../config/debug.php");
-class Vehicle {
+    class Vehicle {
         function __construct($licence, $colour, $make, $model, $ID) {
             $this->ID = $ID; 
             $this->licence = $licence;
@@ -56,7 +56,7 @@ class Vehicle {
                 ";
         }
     }
-class VehiclesDB {
+    class VehiclesDB {
     function __construct($username, $conn) {
         $this->username = $username;
         $this->conn = $conn;
@@ -70,10 +70,10 @@ class VehiclesDB {
         $conn = $this->conn;
         $results = mysqli_query($conn, $sql);
         if (mysqli_num_rows($results) == 0) {
-            echo "results length is 0 (VehiclesDB->isVehicleExists) (false)"; // debugging
+            // echo "results length is 0 (VehiclesDB->isVehicleExists) (false)"; // debugging
             return false;
         } else {
-            echo "results length is not 0 (VehiclesDB->isVehicleExists) (true)"; // debugging
+            // echo "results length is not 0 (VehiclesDB->isVehicleExists) (true)"; // debugging
             return true;
         }
             

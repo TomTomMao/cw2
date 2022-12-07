@@ -339,10 +339,10 @@
                 // echo "flag0.4";
                 // the vehicle licence is new to the database
                 // check if the person has licence
-                if ($person->getLicence()==NULL) { // the person doens't has a licence, not support this now. // return array
+                if ($person->getLicence()=="NULL") { // the person doens't has a licence, not support this now. // return array
                     // echo "flag8";
                     return ["state"=>"failed", "reason"=>"person don't have licence"];
-                } elseif ($person->getLicence()!=NULL) { // the person has licence
+                } elseif ($person->getLicence()!="NULL") { // the person has licence
                     // echo "flag1";
                     // check if the person licence in the database 
                     $sql = "SELECT People_ID FROM People WHERE People_licence='".$person->getLicence()."';";
@@ -409,21 +409,237 @@
              
         }
         function insertOwnershipBothExisted($ownership) {
-            // Assume $ownership->vehicle object has id and in the database.
-            // Assume $ownership->person object has id and in the database.
+            // Assume $ownership->vehicle object has id and the id is in the database.
+            // Assume $ownership->person object has id and the id is in the database or the id="NULL".
             // insert an new entry into ownership table using these IDs.
             // return the id of the entry inserted in the database.
-            $sql = "INSERT INTO Ownership (Vehicle_ID, People_ID) VALUES ('".$ownership->getVehicleID()."', '".$ownership->getPersonID()."');";
-            echo $sql;
+            if ($ownership->getPersonID()=="NULL") {
+                $People_ID = $ownership->getPersonID();
+            }
+            $People_ID = "'".$ownership->getPersonID()."'";
+
+            $sql = "INSERT INTO Ownership (Vehicle_ID, People_ID) VALUES ('".$ownership->getVehicleID()."', ".$ownership->getPersonID().");";
+            // echo $sql; //debugging
             $conn = $this->conn; 
             $results = mysqli_query($conn, $sql);
             $lastID = mysqli_insert_id($conn);
-            mysqli_close($conn); // disconnect
             return $lastID;
                
         }
-        
-        
+        function isOwnershipInDB(Ownership $ownership) {
+            // Given an ownership object, which has NON-NULL value for vehicleID and peopleID,
+            // search this ownership using the combination of vehicleID and peopleID.
+            // Return the Ownership_ID if there is such an ownership in the database,
+            // Return false if such ownership doesn't exist in the database.
+
+            if ($ownership->getPersonID() == "NULL") {
+                throw new Exception("Error: Ownership's person has a null value.");
+            } elseif ($ownership->getVehicleID() == "NULL") {
+                throw new Exception("Error: Ownership's vehicle has a null value.");
+            }
+            $conn = $this->conn;
+            $sql = "SELECT Ownership_ID FROM Ownership WHERE People_ID='"
+            .$ownership->getPersonID()."' AND Vehicle_ID='".$ownership->getVehicleID()."';";
+            // echo "<hr>"."ownershipDB->isOwnershipInDB: ".$sql."<hr>"; //debugging
+
+            $result = mysqli_query($conn, $sql);
+            $ownershipIDs = array();
+            while($row = mysqli_fetch_assoc($result)) {
+                array_push($ownershipIDs, $row["Ownership_ID"]);
+            }
+
+            if (empty($ownershipIDs)) {
+                // echo "return value from ownership->isOwnershipInDB: false<br>";//debugging
+                return false;
+            } elseif (count($ownershipIDs) == 1) {
+                // echo "return value from ownership->isOwnershipInDB:".$ownershipIDs[0]." <br>";//debugging
+                return $ownershipIDs[0];
+            } else {
+                $msg = "[";
+                foreach ($ownershipIDs as $ownershipID){
+                    $msg = $msg.$ownershipID;
+                }
+                $msg = $msg."]";
+                throw new Exception("Error: There is redundancy in ownership table! \$ownershipIDs=$msg");
+            }
+        }
+        function isOwnershipInDBPersonNull($ownership) {
+            // Given an ownership object, which has NON-NULL value for vehicleID and a NULL value for peopleID,
+            // search this ownership using the combination of vehicleID and NULL peopleID.
+            // Return the Ownership_ID if there is such an ownership in the database,
+            // Return false if such ownership doesn't exist in the database.
+            if ($ownership->getVehicleID() == "NULL") {
+                throw new Exception("Error: Ownership's vehicle has a null value.");
+            } elseif ($ownership->getPersonID() != "NULL") {
+                throw new Exception("Error: Ownership's person has a non-null value.");
+            } 
+            $conn = $this->conn;
+            $sql = "SELECT Ownership_ID FROM Ownership WHERE People_ID IS NULL AND Vehicle_ID='".$ownership->getVehicleID()."';";
+            echo "<hr>"."ownershipDB->isOwnershipInDB: ".$sql."<hr>";
+
+            $result = mysqli_query($conn, $sql);
+            $ownershipIDs = array();
+            while($row = mysqli_fetch_assoc($result)) {
+                array_push($ownershipIDs, $row["Ownership_ID"]);
+            }
+
+            if (empty($ownershipIDs)) {
+                echo "return value from ownership->isOwnershipInDB: false<br>";
+                return false;
+            } elseif (count($ownershipIDs) == 1) {
+                echo "return value from ownership->isOwnershipInDB:".$ownershipIDs[0]." <br>";
+                return $ownershipIDs[0];
+            } else {
+                $msg = "[";
+                foreach ($ownershipIDs as $ownershipID){
+                    $msg = $msg.$ownershipID;
+                }
+                $msg = $msg."]";
+                throw new Exception("Error: There is redundancy in ownership table! \$ownershipIDs=$msg");
+            }
+        }
     }
 
+?>
+<?php 
+    // session_start();
+    // // require_once("../../Vehicles/_ownership.php");
+    // require_once("../Vehicles/_vehicles.php");
+    // require_once("../People/_people.php");
+    // require_once("../reuse/_dbConnect.php");
+    // require_once("../Accounts/_account.php");
+    // $user = new User();
+    // if (!$user->isLoggedIn()) {
+    //     header("location: ../Accounts/notLoginError.html"); // check if logged in
+    // }
+    // $conn = connectDB();
+    // $ownershipDB = new OwnershipDB($user, $conn);
+    // function testInsertOwnershipBothExisted_Trivial($ownershipDB){
+    //     $vehicle = new Vehicle("NULL", "NULL", "NULL", "NULL","12");
+    //     $person = new Person("1", "NULL", "NULL","NULL", "NULL","NULL");
+    //     $ownership = new Ownership($vehicle, $person, "NULL");
+    //     $actualValue = $ownershipDB->insertOwnershipBothExisted($ownership);
+    //     $expectedValue = "11";
+    //     if ($actualValue==$expectedValue) {
+    //         echo "<hr>test testInsertOwnershipBothExisted_Trivial() passed!<hr>";
+    //         return true;
+    //     } else {
+    //         echo "<hr>test testInsertOwnershipBothExisted_Trivial() failed!
+    //         <br>expected value: $expectedValue
+    //         <br>actual value: $actualValue<hr>";
+    //         return false;
+    //     }
+    // }
+    // function testIsOwnershipInDB_Exists($ownershipDB) {
+    //     try {
+    //         $vehicle = new Vehicle("NULL", "NULL", "NULL", "NULL", "12");
+    //         $person = new Person("3", "NULL", "NULL", "NULL", "NULL", "NULL");
+    //         $ownership = new Ownership($vehicle, $person, "NULL");
+    //         $actualValue = $ownershipDB->isOwnershipInDB($ownership);
+    //         $expectedValue = "1";
+    //         if ($actualValue==$expectedValue) {
+    //             echo "<hr>test testIsOwnershipInDB_Exists() passed!<hr>";
+    //             return true;
+    //         } else {
+    //             echo "<hr>test testIsOwnershipInDB_Exists() failed!
+    //             <br>expected value: $expectedValue
+    //             <br>actual value: $actualValue<hr>";
+    //             return false;
+    //         }
+    //     } catch (Exception $error) {
+    //         echo "<hr>test testIsOwnershipInDB_Exists() failed!
+    //             <br>error message: ".$error->getMessage()."<hr>";
+    //         return false;
+    //     }
+    // }
+    // function testIsOwnershipInDB_New($ownershipDB) {
+    //     try {
+    //         $vehicle = new Vehicle("NULL", "NULL", "NULL", "NULL", "1");
+    //         $person = new Person("1", "NULL", "NULL", "NULL", "NULL", "NULL");
+    //         $ownership = new Ownership($vehicle, $person, "NULL");
+    //         $actualValue = $ownershipDB->isOwnershipInDB($ownership);
+    //         $expectedValue = false;
+    //         if ($actualValue==$expectedValue) {
+    //             echo "<hr>test testIsOwnershipInDB_New() passed!<hr>";
+    //             return true;
+    //         } else {
+    //             echo "<hr>test testIsOwnershipInDB_New() failed!
+    //             <br>expected value: $expectedValue
+    //             <br>actual value: $actualValue<hr>";
+    //             return false;
+    //         }
+    //     } catch (Exception $error) {
+    //         echo "<hr>test testIsOwnershipInDB_New() failed!
+    //             <br>error message: ".$error->getMessage()."<hr>";
+    //         return false;
+    //     }
+    // }
+
+    // function isOwnershipInDBPersonNull_Exists($ownershipDB) {
+    //     try {
+    //         $vehicle = new Vehicle("NULL", "NULL", "NULL", "NULL", "22");
+    //         $person = new Person("NULL", "NULL", "NULL", "NULL", "NULL", "NULL");
+    //         $ownership = new Ownership($vehicle, $person, "NULL");
+    //         $actualValue = $ownershipDB->isOwnershipInDBPersonNull($ownership);
+    //         $expectedValue = "10";
+    //         if ($actualValue==$expectedValue) {
+    //             echo "<hr>test isOwnershipInDBPersonNull_Exists() passed!<hr>";
+    //             return true;
+    //         } else {
+    //             echo "<hr>test isOwnershipInDBPersonNull_Exists() failed!
+    //             <br>expected value: $expectedValue
+    //             <br>actual value: $actualValue<hr>";
+    //             return false;
+    //         }
+    //     } catch (Exception $error) {
+    //         echo "<hr>test isOwnershipInDBPersonNull_Exists() failed!
+    //             <br>error message: ".$error->getMessage()."<hr>";
+    //         return false;
+    //     }
+    // }
+
+    // function isOwnershipInDBPersonNull_New($ownershipDB) {
+    //     try {
+    //         $vehicle = new Vehicle("21", "NULL", "NULL", "NULL", "1");
+    //         $person = new Person("NULL", "NULL", "NULL", "NULL", "NULL", "NULL");
+    //         $ownership = new Ownership($vehicle, $person, "NULL");
+    //         $actualValue = $ownershipDB->isOwnershipInDB($ownership);
+    //         $expectedValue = false;
+    //         if ($actualValue==$expectedValue) {
+    //             echo "<hr>test isOwnershipInDBPersonNull_New() passed!<hr>";
+    //             return true;
+    //         } else {
+    //             echo "<hr>test isOwnershipInDBPersonNull_New() failed!
+    //             <br>expected value: $expectedValue
+    //             <br>actual value: $actualValue<hr>";
+    //             return false;
+    //         }
+    //     } catch (Exception $error) {
+    //         echo "<hr>test isOwnershipInDBPersonNull_New() failed!
+    //             <br>error message: ".$error->getMessage()."<hr>";
+    //         return false;
+    //     }
+    // }
+
+    // function runAllTest($testFunctions, $ownershipDB) {
+    //     $results = array(); // true or false;
+    //     foreach($testFunctions as $testFunction) {
+    //         echo "<h3>test: $testFunction</h3>";
+    //         array_push($results, call_user_func($testFunction,$ownershipDB));
+    //     }
+    //     $allPass = true;
+    //     foreach($results as $result) {
+    //         $allPass = $allPass && $result;
+    //     }
+    //     if ($allPass == true) {
+    //         echo "<h1><b>All Test Case Passed!</b></h1>";
+    //     } else {
+    //         echo "<h1><b>Some Test Case Failed!</b></h1>";
+    //     }
+    // }
+
+    // $testFunctions = ["testInsertOwnershipBothExisted_Trivial","testIsOwnershipInDB_Exists","testIsOwnershipInDB_New","isOwnershipInDBPersonNull_Exists"];
+    // runAllTest($testFunctions,$ownershipDB);
+    // // please manual reset the data base after run all the test.
+    // mysqli_close($conn);
 ?>

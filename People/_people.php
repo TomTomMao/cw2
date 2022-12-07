@@ -76,15 +76,31 @@
                 return false;
             }
         }
-        function renderRow() {
+
+        function renderRow($showTable = false) {
+            if ($showTable) {
+                $tableHead = "<table class='people-table'>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th>Driving Licence</th>
+                    <th>DOB</th>
+                    <th>PhotoID</th>
+                </tr>";
+                $tableTail = "</table>";
+            } else {
+                $tableHead = "";
+                $tableTail = "";
+            }
             // render a row of person, if there is a falsy value, use string "null".
-            $personID = $this->getID() !=NULL ? $this->getID() : "null";
-            $personFullName = $this->getFullName() !=NULL ? $this->getFullName() : "null";
-            $personAddress = $this->getAddress() !=NULL ? $this->getAddress() : "null";
-            $personLicence = $this->getLicence() !=NULL ? $this->getLicence() : "null";
-            $personDOB = $this->getDOB() !=NULL ? $this->getDOB() : "null";
-            $personPhotoID = $this->getPhotoID() !=NULL ? $this->getPhotoID() : "null";
-            return "
+            $personID = $this->getID() !=NULL ? $this->getID() : "NULL";
+            $personFullName = $this->getFullName() !=NULL ? $this->getFullName() : "NULL";
+            $personAddress = $this->getAddress() !=NULL ? $this->getAddress() : "NULL";
+            $personLicence = $this->getLicence() !=NULL ? $this->getLicence() : "NULL";
+            $personDOB = $this->getDOB() !=NULL ? $this->getDOB() : "NULL";
+            $personPhotoID = $this->getPhotoID() !=NULL ? $this->getPhotoID() : "NULL";
+            return $tableHead."
             <tr>
                 <td>".$personID."</td>
                 <td>".$personFullName."</td>
@@ -92,7 +108,7 @@
                 <td>".$personLicence."</td>
                 <td>".$personDOB."</td>
                 <td>".$personPhotoID."</td>
-            </tr>";
+            </tr>".$tableTail;
         }
     }
     class PeopleDB {
@@ -141,9 +157,9 @@
             // Return an empty array, if didn't match.
             $conn = $this->conn;
             $people = array();
-            $sql = "SELECT * FROM People WHERE People.People_Licence='".$peopleLicence."';";
-
-            debugEcho($sql);
+            $sql = "SELECT * FROM People WHERE People.People_licence='".$peopleLicence."';";
+            
+            // echo $sql;
              // success to connect database
             $results = mysqli_query($conn, $sql);
             $index = 0;
@@ -190,11 +206,12 @@
             // return an array of person object, the array would be empty if no data matched.
             $conn = $this->conn;
             $sql = "SELECT * FROM People WHERE People_name='".$person->getFullName().
-                "', People_DOB='".$person->getDOB()."', People_address='".$person->getAddress()."';";
-            $results = mysqli_query($sql);
+                "'AND People_DOB='".$person->getDOB()."'AND People_address='".$person->getAddress()."';";
+            // echo $sql."<hr>";
+            $results = mysqli_query($conn, $sql);
             $people = array();
             while($row = mysqli_fetch_assoc($results)) {
-                array_push(new Person($row["People_ID"], $row["People_licence"], 
+                array_push($people, new Person($row["People_ID"], $row["People_licence"], 
                                         $row["People_address"], $row["People_DOB"], $row["People_name"], $row["People_photoID"]));
                 //
             }
@@ -240,7 +257,7 @@
                     .$person->getLicence()."', '"
                     .$person->getDOB()."')";
                     echo $sql."from : peopleDB->insertNewPerson";
-                    $result = mysqli_query($sql);
+                    $result = mysqli_query($conn, $sql);
                     $lastID = mysqli_insert_id($conn);
                     return $lastID;
                 }
@@ -261,7 +278,7 @@
                     ('".$person->getFullName()."', '"
                     .$person->getAddress()."', '"
                     .$person->getDOB()."')";
-                $result = mysqli_query($sql);
+                $result = mysqli_query($conn, $sql);
                 $lastID = mysqli_insert_id($conn);
                 return $lastID;
 

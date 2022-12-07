@@ -5,6 +5,7 @@ try{
 <?php // handle not login error
         session_start();
         require("../Accounts/_account.php");// there is a User class
+        $pageTitle = "submit report";
         require("../head.php");
         $user = new User();
         if (!$user->isLoggedIn()) {
@@ -72,7 +73,7 @@ try{
                 if ($allFieldSatisfy) {
                     return $acceptableForm["reportType"];
                 } else {
-                    // check next one if exists.
+                    // do nothing, go to next loop of the outer loop, check next one if exists.
                 }
             }
             return "invalid form";
@@ -96,7 +97,7 @@ try{
             return ["allValid"=>true];
         }
 
-        // check report type, and set $hasVehicleForm, $hasOwnerForm, $hasOffenderForm to be true/false;
+    // TODO: check report type, and set $hasVehicleForm, $hasOwnerForm, $hasOffenderForm to be true/false;
         require("acceptableForms.php");
         $acceptableForms = [$acceptableForm1,$acceptableForm2,$acceptableForm3,$acceptableForm4,$acceptableForm5];
         $reportType = getReportType($acceptableForms, $_POST);
@@ -104,6 +105,9 @@ try{
         $hasVehicleForm = null;
         $hasOwnerForm = null;
         $hasOffenderForm = null;
+        if ($reportType == "invalid form") {
+            die();
+        }
         if ($reportType == "known vehicle only") {
            $hasVehicleForm = true;
            $hasOwnerForm = false;
@@ -127,9 +131,11 @@ try{
         }
 
 
-        // processing vehicle form. If the all the data in the form that is related to vehicle is valid,
+    // TODO: processing vehicle form. {vehicle form} -> {vehicleID, database change}
+        // If the all the data in the form that is related to vehicle is valid,
         // These code would set a $vehicleID, either NULL, new one, or old one (from db);
         // These code would also set a $isVehicleNew:
+        // These code would insert a new vehicle if there is a vehicle in the post form and valid and new.
 
         // no vehicle form, use "NULL" as id
         $vehicleID = "NULL";
@@ -193,8 +199,8 @@ try{
                     echo "Please Check your vehicle data<hr>";
                     die();
                 } else {
-                    echo "GOOD GOOD GOOD for the vehicle form!<hr>";
                     $vehicleID = $oldVehicleFromDB->getID();
+                    echo "GOOD GOOD GOOD for the vehicle form!<br>vehicle id=$vehicleID<hr>";
                     // return something if in future refactor these code into a function.
                 }
             }
@@ -208,8 +214,7 @@ try{
         echo "<hr>---------------------Processing vehicle form done---------------------<hr>";
 
 
-        // TODO:
-        // processing the {owner form} -> {$ownerID, database change}
+    // TODO: processing the {owner form} -> {$ownerID, database change}
         $ownerID = "NULL";
         if ($hasOwnerForm==false) {
             $ownerID = "NULL";            
@@ -230,18 +235,23 @@ try{
             // case 1: the owner has a licence:
                 // search licence
                     // if licence in db (not a new owner):
-                        // if form not match the db:
+                        // if form detail not match the db:
                             // feedback these difference and die();
-                        // if form match the db:
+                        // if form detial match the db:
                             // get the owner id
                             // set the owner id on $ownerID;
                     // if licence not in db (new):
+                        // if the combination of (name, address, dob) match some data in the database, 
+                            // feedback this problem.
+                            // die();
                         // insert this owner, get owner id
                         // set the owner id on $ownerID;
             // case 2: the owner doesn't have a licence:
                 // if there are given name, dob, address in the form:
                     // use these 3 data as unique key to search the database
                     // if match one:
+                        // if the one has licence:
+                            // feed back this problem and die()
                         // get the id of the data in database
                         // set the owner id on $ownerID
                     // else:
@@ -260,14 +270,14 @@ try{
                     echo "owner is in the database";
 
                     $ownerFromDB = $peopleDB->getPersonByLicence($_POST['ownerLicence']);
-                    echo "owner from database:<br>".$ownerFromDB->renderRow()."<hr>";
+                    echo "<hr>owner from database:<br>".$ownerFromDB->renderRow(true)."<hr>";
                     // assume ownerFromDB is not empty
                     if (empty($ownerFromDB)) {
                         throw new Exception("vehicle licence is not in database, but it should be in the database as it was checked by $peopleDB->isPersonLicenceInDB");
                     }
                     $ownerFromForm = new Person("NULL", $_POST['ownerLicence'], $_POST['ownerAddress'], 
                                                 $_POST["ownerDOB"], $_POST["ownerFirstName"]." ".$_POST["ownerLastName"], "NULL");
-                    echo "owner from the form:<br>".$ownerFromForm->renderRow()."<hr>";
+                    echo "<hr>owner from the form:<br>".$ownerFromForm->renderRow(true)."<hr>";
 
                     // get error state, and give feed back.
                     $oldOwnerSame = true;
@@ -296,24 +306,36 @@ try{
                         // if form match the db:
                             // get the owner id
                             // set the owner id on $ownerID;
-                        echo "GOOD GOOD GOOD for the owner form!<hr>";
+                        echo "GOOD GOOD GOOD for the owner form!<br>";
                         $ownerID = $ownerFromDB->getID();
+                        echo "Owner already in database:owner id=".$ownerID;
                     } else {
                         // if form not match the db:
                             // feedback these difference and die():
-                        echo "Please Check your owner data<hr>";
+                        echo "The owner information you entered is not the same as the one in the database.<br> Please Check your owner data<hr>";
                         die();
                     }
                 
                     // licence not in db
                 } else {
-                    // owner is new, then insert this owner into the database
                     $ownerFromForm = new Person("NULL", $_POST['ownerLicence'], $_POST['ownerAddress'], 
                                                 $_POST["ownerDOB"], $_POST["ownerFirstName"]." ".$_POST["ownerLastName"], "NULL");
+
+                    // if the combination of (name, dob, address) matches data, feedback this error.
+                    if ($peopleDB->isPersonDetailInDB($ownerFromForm)) {
+                        echo "<hr><b>The owner you typed is already in database, please enter correct information: </b><br>";
+                        echo "your data:".$ownerFromForm->renderRow(true)."<br>";
+                        $ownerFromDB = $peopleDB->getPersonByDetail($ownerFromForm);
+                        echo "database data:".$ownerFromDB->renderRow(true)."<br>";
+                        die();
+                    }
+
+                    // owner is new, then insert this owner into the database
+                    
                     
                     $ownerID = $peopleDB->insertNewPerson($ownerFromForm); // id set
                     $newOwnerFromDB = $peopleDB->getPersonByLicence($ownerFromForm->getLicence());
-                    echo "new owner:<br>".$newOwnerFromDB->renderRow()."<hr>";
+                    echo "new owner:<br>".$newOwnerFromDB->renderRow(true)."<hr>";
                 }
                 
                 
@@ -322,22 +344,31 @@ try{
             else {
 
                 // if has empty data of these, feedback error.
-                if(!empty($_POST["ownerAddress"]) || !empty($_POST["ownerFirstName"]) || !empty($_POST["ownerLastName"]) || !empty($_POST["ownerDOB"])) {
+                if(empty($_POST["ownerAddress"]) || empty($_POST["ownerFirstName"]) || empty($_POST["ownerLastName"]) || empty($_POST["ownerDOB"])) {
                     echo "missed some data of ownerAddress, ownerFirstName, ownerLastName, ownerDOB<hr>";
                     die();
                 } 
                 // else: name, dob, address is given
                 else {
                     $ownerWithoutLicenceFromForm = new Person("NULL", "NULL",$_POST["ownerAddress"],$_POST["ownerDOB"],$_POST["ownerFirstName"]." ".$_POST["ownerLastName"], "NULL");
-                    echo "owner without licence from the form: <br>".$ownerWithoutLicenceFromForm->renderRow()."<hr>";
+                    echo "owner without licence from the form: <br>".$ownerWithoutLicenceFromForm->renderRow(true)."<hr>";
 
                     // match one
                     if ($peopleDB->isPersonDetailInDB($ownerWithoutLicenceFromForm)) {
                         $ownerWithoutLicenceFromDB = $peopleDB->getPersonByDetail($ownerWithoutLicenceFromForm);
-                        // no need to compare the db person and the form person.
+
+                        // check if the owner from db has no licence, if it has licence, feedback this error and die()
                         $ownerID = $ownerWithoutLicenceFromDB->getID(); // set id
-                        echo "owner without licence from the database: <br>".$ownerWithoutLicenceFromDB->renderRow()."<hr>";
-                        
+                        if (empty($ownerWithoutLicenceFromDB->getLicence())) {
+                            echo "GOOD, owner licence from db is empty:'".$ownerWithoutLicenceFromDB->getLicence()."'<hr>"; // debugging
+                        } else {
+                            // the one in db have a licence, error.
+                            throw new Exception("Owner licence from db is not empty:</b>'".$ownerWithoutLicenceFromDB->getLicence()."'<br>");
+                            // echo "<b>Error: owner licence from db is not empty:</b>'".$ownerWithoutLicenceFromDB->getLicence()."'<hr>";
+                            die();
+                        }
+
+                        echo "<b>Uses exists owner in database:</b> <br>".$ownerWithoutLicenceFromDB->renderRow(true)."<hr>";
                     }
                     // not match one
                     else {
@@ -346,23 +377,217 @@ try{
                         // set the owner id on $ownerID
                         $ownerID = $peopleDB->insertNewPerson($ownerWithoutLicenceFromForm);
                         $ownerWithoutLicenceFromDB = $peopleDB->getPersonByDetail($ownerWithoutLicenceFromForm);
-
-                        echo "\$ownerID: ".$ownerID."<hr>";
-                        echo "ownerWithoutLicenceFromForm: ".$ownerWithoutLicenceFromForm->getID()."<hr>";
-                        echo "ownerWithoutLicenceFromDB: ".$ownerWithoutLicenceFromDB->getID()."<hr>";
-                        echo "owner without licence from the database: <br>".$ownerWithoutLicenceFromDB->renderRow()."<hr>";
+                        
+                        // echo "\$ownerID: ".$ownerID."<hr>";
+                        echo "ownerWithoutLicenceFromForm id: ".$ownerWithoutLicenceFromForm->getID()."<hr>";
+                        echo "ownerWithoutLicenceFromDB id: ".$ownerWithoutLicenceFromDB->getID()."<hr>";
+                        echo "<b>owner without licence is new, created:</b> <br>".$ownerWithoutLicenceFromDB->renderRow(true)."<hr>";
                     }
                 }
             }
         } 
-
+        
         echo "<hr>---------------------Processing owner form done---------------------<hr>";
-        // to do
-        // test owner form
-        // processing the {offender form} -> {$offenderID, database change}
-        // using {vehicleID, ownerID} -> {$ownershipID, database change} 
+        // test owner form (done)
+        
+
+
+    // TODO: processing the {offender form} -> {$offenderID, database change} (not done)
+
+    // TODO: using {vehicleID, ownerID} -> {$ownershipID, database change} 
+        // result: $ownershipID would be null or an id in the database
+        // sudo:
+            // if no vehicle involved:
+                // set $ownershipID null;
+            // if there is a vehicle involved:
+                // create a vehicle and owner object using $vehicleID and $ownershipID
+                // create a $ownership object
+                // if $ownership contain null person id, insert new one, get new ownership id.(this is convenient for update report)
+                // elseif $ownership is not new, get existed ownership id.
+                // elseif $ownership is new, use ownershipDB->insertOwnershipBothExisted($ownership), get new ownership id.
+        
+        // if no vehicle involved:
+        if ($vehicleID == "NULL") {
+            $ownershipID = "NULL"; // set $ownershipID null;
+        } 
+        // if there is a vehicle involved:
+        else {
+
+            // create a vehicle and owner object using $vehicleID and $ownershipID
+            // create a $ownership object
+            $ownership = new Ownership(new Vehicle("NULL", "NULL", "NULL", "NULL", $vehicleID), new Person($ownerID, "NULL", "NULL", "NULL","NULL", "NULL"), "NULL");
+            echo "<p></p>".$ownership->render()."<hr>"; // debugging
+            
+            // if $ownership contain null person id, insert new one, get new ownership id.(this is convenient for update report)
+            if ($ownership->getPersonID() == "NULL" && $ownerID == "NULL") { // double checking for reducing potential bug!
+                $ownershipID = $ownershipDB->insertOwnershipBothExisted($ownership);
+            } 
+            // elseif $ownership is not new, get existed ownership id.
+            elseif($ownershipDB->isOwnershipInDB($ownership)!=false) {
+                $ownershipID = $ownershipDB->isOwnershipInDB($ownership);
+            }
+            // elseif $ownership is new, use ownershipDB->insertOwnershipBothExisted($ownership), get new ownership id.
+            elseif($ownershipDB->isOwnershipInDB($ownership)==false) {
+                $ownershipID = $ownershipDB->insertOwnershipBothExisted($ownership);
+            }
+            // undifined error
+            else {
+                throw new Exception("Undefined behaviour for getting ownership id");
+            }
+        }
+        echo "<h3>ownershipID:$ownershipID</h3>";
+
+
+        // to do:
         // using {ownership, offenderID, report general data form} -> {reportID, database change}
     }
+
+    // TODO: test the ownership insert module:
+        // note: 'new+licence' means new with a licence, '-' means without
+        // Restart the database firstly!
+        // test case 1 to 10 are inserting new ownership.
+        // test cases1: Test the form with vehicle:new, owner: new+licence
+            // vehicle licence: test001; 
+            // vehicle colour: test; 
+            // vehicle Make: test; 
+            // vehicle model: test;
+            // owner licence: testtesttest0001;
+            // owner fname: fname1;
+            // owner lname: lname1;
+            // owner address: test center;
+            // owner dob: today;
+            // RESULTS1: NEW vehicle added into vehicle table
+            // RESULTS2: NEW person add into people table
+            // RESULTS3: NEW ownership add into people table
+            // RESULTS4: Print the correct id of the ownership.
+
+        // test cases2: Test the form with vehicle:new, owner: new-licence
+            // vehicle licence: test002; 
+            // vehicle colour: test; 
+            // vehicle Make: test; 
+            // vehicle model: test;
+            // owner licence:;
+            // owner fname: fname2;
+            // owner lname: lname2;
+            // owner address: test center;
+            // owner dob: today;
+            // RESULTS1: NEW vehicle added into vehicle table
+            // RESULTS2: NEW person add into people table
+            // RESULTS3: NEW ownership add into people table
+            // RESULTS4: Print the correct id of the ownership.
+
+        // test cases3: Test the form with vehicle:new, owner: exists+licence
+            // vehicle licence: test003; 
+            // vehicle colour: test; 
+            // vehicle Make: test; 
+            // vehicle model: test;
+            // owner licence: testtesttest0001;
+            // owner fname: fname1;
+            // owner lname: lname1;
+            // owner address: test center;
+            // owner dob: today;
+            // RESULTS1: NEW vehicle added into vehicle table
+            // RESULTS2: NEW ownership add into people table
+            // RESULTS3: Print the correct id of the ownership.
+            
+        // test cases4: Test the form with vehicle:new, owner: exists-licence
+            // vehicle licence: test004; 
+            // vehicle colour: test; 
+            // vehicle Make: test; 
+            // vehicle model: test;
+            // owner licence:;
+            // owner fname: fname2;
+            // owner lname: lname2;
+            // owner address: test center;
+            // owner dob: today;
+            // RESULTS1: NEW vehicle added into vehicle table.
+            // RESULTS2: NEW ownership add into people table.
+            // RESULTS3: Print the correct id of the ownership.
+
+        // test cases5: Test the form with vehicle:new, owner: emtpy
+            // vehicle licence: test004; 
+            // vehicle colour: test; 
+            // vehicle Make: test; 
+            // vehicle model: test;
+            // owner licence:;
+            // owner fname:;
+            // owner lname:;
+            // owner address:;
+            // owner dob:;
+            // RESULTS1: NNEW vehicle added into vehicle table.
+            // RESULTS2: NEW ownership add into people table.
+            // RESULTS3: Print the correct id of the ownership.
+
+
+        
+        // test cases6: Test the form with vehicle:exists, owner: new+licence
+            // vehicle licence: test004; 
+            // vehicle colour: test; 
+            // vehicle Make: test; 
+            // vehicle model: test;
+            // owner licence: testtesttest0004;
+            // owner fname: fname4;
+            // owner lname: lname4;
+            // owner address: test center;
+            // owner dob: today;
+            // RESULTS1: NEW person add into people table.
+            // RESULTS2: NEW ownership add into people table.
+            // RESULTS3: Print the correct id of the ownership.
+
+        // test cases7: Test the form with vehicle:exists, owner: new-licence
+            // vehicle licence: test004; 
+            // vehicle colour: test; 
+            // vehicle Make: test; 
+            // vehicle model: test;
+            // owner licence: ;
+            // owner fname: fname5;
+            // owner lname: lname5;
+            // owner address: test center;
+            // owner dob: today;
+            // RESULTS1: NEW person add into people table.
+            // RESULTS2: NEW ownership add into people table.
+            // RESULTS3: Print the correct id of the ownership.
+
+        // test cases8: Test the form with vehicle:exists, owner: exists+licence
+            // vehicle licence: test001; 
+            // vehicle colour: test; 
+            // vehicle Make: test; 
+            // vehicle model: test;
+            // owner licence: testtesttest0004;
+            // owner fname: fname4;
+            // owner lname: lname4;
+            // owner address: test center;
+            // owner dob: today;
+            // RESULTS2: NEW ownership add into people table.
+            // RESULTS3: Print the correct id of the ownership.
+
+        // test cases9: Test the form with vehicle:exists, owner: exists-licence
+            // vehicle licence: test001; 
+            // vehicle colour: test; 
+            // vehicle Make: test; 
+            // vehicle model: test;
+            // owner licence: ;
+            // owner fname: fname5;
+            // owner lname: lname5;
+            // owner address: test center;
+            // owner dob: today;
+            // RESULTS2: NEW ownership add into people table.
+            // RESULTS3: Print the correct id of the ownership.
+
+        // test cases10: Test the form with vehicle:exists, owner: empty
+            // vehicle licence: test001; 
+            // vehicle colour: test; 
+            // vehicle Make: test; 
+            // vehicle model: test;
+            // owner licence: ;
+            // owner fname: ;
+            // owner lname: ;
+            // owner address: ;
+            // owner dob: ;
+            // RESULTS2: NEW ownership add into people table.
+            // RESULTS3: Print the correct id of the ownership.
+        // test case 11 to ?? only 
+
 
 } catch (Exception $error) {
     echo '<div class="feedback-yellow"><div class="feedback-text-line">Error: '.$error->getMessage().'</div></div>';
