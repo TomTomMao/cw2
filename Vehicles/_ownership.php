@@ -482,21 +482,14 @@
             while($row = mysqli_fetch_assoc($result)) {
                 array_push($ownershipIDs, $row["Ownership_ID"]);
             }
-
+            
             if (empty($ownershipIDs)) {
-                echo "return value from ownership->isOwnershipInDB: false<br>";
+                // echo "return value from ownership->isOwnershipInDB: false<br>"; //debugging
                 return false;
-            } elseif (count($ownershipIDs) == 1) {
-                echo "return value from ownership->isOwnershipInDB:".$ownershipIDs[0]." <br>";
+            } elseif (count($ownershipIDs) >= 1) {
+                // echo "return value from ownership->isOwnershipInDB:".$ownershipIDs[0]." <br>"; //debugging
                 return $ownershipIDs[0];
-            } else {
-                $msg = "[";
-                foreach ($ownershipIDs as $ownershipID){
-                    $msg = $msg.$ownershipID;
-                }
-                $msg = $msg."]";
-                throw new Exception("Error: There is redundancy in ownership table! \$ownershipIDs=$msg");
-            }
+            } 
         }
     }
 

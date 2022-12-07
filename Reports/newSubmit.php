@@ -1,8 +1,10 @@
 <?php
 try{
+    $messages = [];
 ?>
 
 <?php // handle not login error
+
         session_start();
         require("../Accounts/_account.php");// there is a User class
         $pageTitle = "submit report";
@@ -78,26 +80,30 @@ try{
             }
             return "invalid form";
         }
-        function isVehicleFormValid($post) {
+        function isVehicleFormValid($post,) {
             // assume there is a vehicle form
             // return an associative array: 
-            // ["allValid"=>true/false, "detail"=>["vehicleField1"=>"valid/invalid hint", "vehicleField2"=>"valid/invalid hint", ...]]
-            // Return True if the format of all the field of vehicle is valid.
-            // throw error if invalid.
-            // Return An associative array whose key is field name of vehicle form, and value is "correct"  -- dismiss this line please.
+            //  ["allValid"=>true/false, "message"=>["feedback message1", "feedback message2"...]]
+            // "allValid" is True and "message" is empty, if the format of all the field of vehicle is valid
+            // "allValid" is False and "message" contains an array of feedback messages
+            $messages = array();
             if (strlen($_POST["vehicleLicence"])!=7) {
-                throw new Exception("Invalid vehicle licence length!<br>length should be 7", 1);
+                array_push($messages,"Invalid vehicle licence length!<br>length should be 7");
             }
             if (strlen($_POST["vehicleColour"])>20 || strlen($_POST["vehicleColour"])<1) {
-                throw new Exception("Invalid vehicle colour length!<br>length should be 1 to 20", 1);
+                array_push($messages,"Invalid vehicle colour length!<br>length should be 1 to 20");
             }
             if (strlen($_POST["vehicleMake"])>20 || strlen($_POST["vehicleMake"])<1) {
-                throw new Exception("Invalid vehicle make length!<br>length should be 1 to 20", 1);
+                array_push($messages,"Invalid vehicle make length!<br>length should be 1 to 20");
             }
             if (strlen($_POST["vehicleModel"])>20 || strlen($_POST["vehicleModel"])<1) {
-                throw new Exception("Invalid vehicle model length!<br>length should be 1 to 20", 1);
+                array_push($messages,"Invalid vehicle model length!<br>length should be 1 to 20");
             }
-            return ["allValid"=>true];
+            if (empty($messages)) {
+                return ["allValid"=>true];
+            } else {
+                return ["allValid"=>false, "messages"=>$messages];
+            }
         }
         function isOwnerFormValid($post) {
             // assume there is a owner form
@@ -109,7 +115,7 @@ try{
             return ["allValid"=>true];
         }
 
-    // TODO: check report type, and set $hasVehicleForm, $hasOwnerForm, $hasOffenderForm to be true/false;
+    // DONE: check report type, and set $hasVehicleForm, $hasOwnerForm, $hasOffenderForm to be true/false;
         require("acceptableForms.php");
         $acceptableForms = [$acceptableForm1,$acceptableForm2,$acceptableForm3,$acceptableForm4,$acceptableForm5];
         $reportType = getReportType($acceptableForms, $_POST);
@@ -143,7 +149,7 @@ try{
         }
 
 
-    // TODO: processing vehicle form. {vehicle form} -> {vehicleID, database change}
+    // DONE: processing vehicle form. {vehicle form} -> {vehicleID, database change}
         // If the all the data in the form that is related to vehicle is valid,
         // These code would set a $vehicleID, either NULL, new one, or old one (from db);
         // These code would also set a $isVehicleNew:
@@ -154,13 +160,12 @@ try{
         if ($hasVehicleForm==false) {
             $vehicleID = "NULL"; // just make it more explicit :)
             // case that the fields of vehicle form is invalid (function is not implemented yet, always valid) : give error feedback
-        } elseif ($hasVehicleForm && isVehicleFormValid($_POST)['allValid']==false) {
-            echo "<hr>";
-            echo "vehicle Information is not valid:";
-            $hint = isVehicleFormValid($_POST)['detail'];
-            print_r($hint);
-            echo "<hr>";
+        } elseif ($hasVehicleForm && isVehicleFormValid($_POST)['allValid']!=true) {
+            // echo "vehicle Information is not valid:";// debug
+            $messages = isVehicleFormValid($_POST)['messages'];
+            // print_r($messages); // debug
             mysqli_close($conn);
+            throw new Exception("check the \$messages");
             die();
 
             // case that the fields of vehicle form is valid: insert and get id if the vehicle is new, get existed id if the vehicle is in db.
@@ -176,7 +181,7 @@ try{
             
             // vehicle is not new
             } else {
-                echo "<hr>vehicle is old<hr>";
+                // echo "<hr>vehicle is old<hr>"; // debugging
                 
                 $oldVehicleArray = $vehicleDB->getVehiclesByLicence($_POST["vehicleLicence"]);
                 
@@ -188,27 +193,32 @@ try{
                 } else {
                     //get the vehicle from database.
                     $oldVehicleFromDB = $oldVehicleArray[0];
-                    echo "old vehicle from the database:<br>".$oldVehicleFromDB->renderHtmlTable()."<hr>";
+                    // echo "old vehicle from the database:<br>".$oldVehicleFromDB->renderHtmlTable()."<hr>"; // debugging
                 }
                 // the vehicle object created use post data.
                 $oldVehicleFromForm = new Vehicle($_POST["vehicleLicence"], $_POST["vehicleColour"], $_POST["vehicleMake"], $_POST["vehicleModel"], null);
-                    echo "old vehicle from the user input:<br>".$oldVehicleFromForm->renderHtmlTable()."<hr>";
+                    
+                    // echo "old vehicle from the user input:<br>".$oldVehicleFromForm->renderHtmlTable()."<hr>"; // debugging
                 // check if vehicle in the db which share the same plate number has the same other information.
                 $oldVehicleSame = true;
                 if ($oldVehicleFromForm->getColour()!=$oldVehicleFromDB->getColour()) {
-                    echo "although vehicle licence is in the database, but the colour is not the same with the vehicle with the licence in the database<hr>";
+                    // echo "Although vehicle licence is in the database, but the colour is not the same with the vehicle with the licence in the database<hr>"; //feedback
+                    array_push($messages, "Although vehicle licence is in the database, but the colour is not the same with the vehicle with the licence in the database");
                     $oldVehicleSame = false;
                 }
                 if ($oldVehicleFromForm->getMake()!=$oldVehicleFromDB->getMake()) {
-                    echo "although vehicle licence is in the database, but the make is not the same with the vehicle with the licence in the database<hr>";
+                    // echo "Although vehicle licence is in the database, but the make is not the same with the vehicle with the licence in the database<hr>";//feedback
+                    array_push($messages, "Although vehicle licence is in the database, but the make is not the same with the vehicle with the licence in the database");
                     $oldVehicleSame = false;
                 }
                 if ($oldVehicleFromForm->getModel()!=$oldVehicleFromDB->getModel()) {
-                    echo "although vehicle licence is in the database, but the model is not the same with the vehicle with the licence in the database<hr>";
+                    // echo "Although vehicle licence is in the database, but the model is not the same with the vehicle with the licence in the database<hr>";//feedback
+                    array_push($messages, "Although vehicle licence is in the database, but the model is not the same with the vehicle with the licence in the database");
                     $oldVehicleSame = false;
                 }
                 if ($oldVehicleSame==false) {
-                    echo "Please Check your vehicle data<hr>";
+                    echo "Please Check your vehicle data<hr>";//feedback
+                    throw new Exception("check \$messages");
                     die();
                 } else {
                     $vehicleID = $oldVehicleFromDB->getID();
@@ -226,7 +236,7 @@ try{
         echo "<hr>---------------------Processing vehicle form done---------------------<hr>";
 
 
-    // TODO: processing the {owner form} -> {$ownerID, database change}
+    // DONE: processing the {owner form} -> {$ownerID, database change}
         $ownerID = "NULL";
         if ($hasOwnerForm==false) {
             $ownerID = "NULL";            
@@ -405,16 +415,17 @@ try{
 
 
     // TODO: processing the {offender form} -> {$offenderID, database change} (not done)
+        $offenderID = $ownerID;
 
-    // TODO: using {vehicleID, ownerID} -> {$ownershipID, database change} 
-        // result: $ownershipID would be null or an id in the database
+    // DONE: processing {vehicleID, ownerID} -> {$ownershipID, database change} 
+        // result: $ownershipID would be "NULL" or, an id in the database. An ownership might be created into the database.
         // sudo:
             // if no vehicle involved:
-                // set $ownershipID null;
+                // set $ownershipID "NULL";
             // if there is a vehicle involved:
-                // create a vehicle and owner object using $vehicleID and $ownershipID
+                // create a vehicle and owner object using $vehicleID and $ownerID
                 // create a $ownership object
-                // if $ownership contain null person id, insert new one, get new ownership id.(this is convenient for update report)
+                // if $ownership contain null person id, use the existed id as $ownershipID or insert new one and use that new id.
                 // elseif $ownership is not new, get existed ownership id.
                 // elseif $ownership is new, use ownershipDB->insertOwnershipBothExisted($ownership), get new ownership id.
         
@@ -425,14 +436,23 @@ try{
         // if there is a vehicle involved:
         else {
 
-            // create a vehicle and owner object using $vehicleID and $ownershipID
+            // create a vehicle and owner object using $vehicleID and $ownerID
             // create a $ownership object
             $ownership = new Ownership(new Vehicle("NULL", "NULL", "NULL", "NULL", $vehicleID), new Person($ownerID, "NULL", "NULL", "NULL","NULL", "NULL"), "NULL");
-            echo "<p></p>".$ownership->render()."<hr>"; // debugging
+            // echo "<p></p>".$ownership->render()."<hr>"; // debugging
             
-            // if $ownership contain null person id, insert new one, get new ownership id.(this is convenient for update report)
+            // if $ownership contain null person id, use the existed id as $ownershipID or insert new one and use that new id.
             if ($ownership->getPersonID() == "NULL" && $ownerID == "NULL") { // double checking for reducing potential bug!
-                $ownershipID = $ownershipDB->insertOwnershipBothExisted($ownership);
+                // echo "flag1";// debugging
+                // $flag1 = $ownershipDB->isOwnershipInDBPersonNull($ownership); //debugging
+                // echo "flag1>".$flag1."<flag1";// debugging
+                if ($ownershipDB->isOwnershipInDBPersonNull($ownership)!=false) {
+                    // echo "flag1.1";// debugging
+                    $ownershipID = $ownershipDB->isOwnershipInDBPersonNull($ownership);
+                } else {
+                    // echo "flag1.2";// debugging
+                    $ownershipID = $ownershipDB->insertOwnershipBothExisted($ownership);
+                }
             } 
             // elseif $ownership is not new, get existed ownership id.
             elseif($ownershipDB->isOwnershipInDB($ownership)!=false) {
@@ -450,9 +470,28 @@ try{
         echo "<h3>ownershipID:$ownershipID</h3>";
 
 
-        // to do:
-        // using {ownership, offenderID, report general data form} -> {reportID, database change}
+    // TODO: processing {ownership, offenderID, report general data form} -> {reportID, database change}
+        $offenceID = $_POST["reportOffence"];
+        $username = $user->getUsername();
+        $incidentDate = $_POST["reportDate"];
+        $reportStatement = $_POST["reportStatement"];
+        if ($ownershipID=="NULL" && $offenderID=="NULL") {
+            $sql = "INSERT INTO Incident (Ownership_ID, People_ID, Offence_ID, Account_username, Incident_date, Incident_report)".
+            "VALUES(NULL,NULL,'$offenceID','$username','$incidentDate','$reportStatement');";
+        } elseif($ownershipID=="NULL") {
+            $sql = "INSERT INTO Incident (Ownership_ID, People_ID, Offence_ID, Account_username, Incident_date, Incident_report)".
+            "VALUES(NULL,'$offenderID','$offenceID','$username','$incidentDate','$reportStatement');";
+        } elseif($offenderID=="NULL") {
+            $sql = "INSERT INTO Incident (Ownership_ID, People_ID, Offence_ID, Account_username, Incident_date, Incident_report)".
+            "VALUES('$ownershipID',NULL,'$offenceID','$username','$incidentDate','$reportStatement');";
+        } else {
+            $sql = "INSERT INTO Incident (Ownership_ID, People_ID, Offence_ID, Account_username, Incident_date, Incident_report)".
+            "VALUES('$ownershipID','$offenderID','$offenceID','$username','$incidentDate','$reportStatement');";
+        }
+        echo "<hr>report insertion query:".$sql."<hr>";
     }
+    
+    
 
     // TODO: test the ownership insert module:
         // note: 'new+licence' means new with a licence, '-' means without
@@ -602,8 +641,9 @@ try{
 
 
 } catch (Exception $error) {
+    // throw $error;
     require("../reuse/errorMessage.php");
-    $messages = ["a<br>","b<br>"];
+    $messages = $messages;
     if (empty($messages)) {
         renderErrorMessages([$error->getMessage()]);
     } else {
