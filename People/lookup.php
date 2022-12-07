@@ -29,7 +29,7 @@
             <a href="../Reports/new.php">New report</a>
             <a href="../Accounts/home.php">My Account</a>
         </div> -->
-        <hr>
+        <!-- <hr> -->
         <h1>Look Up People</h1>
         <hr>
         <form action="lookup.php" method="post">
