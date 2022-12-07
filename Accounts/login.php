@@ -1,5 +1,5 @@
 <?php $pageTitle = "Login";
-    require("../head.php");
+    require("../reuse/head.php");
 ?>
 
 <?php

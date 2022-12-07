@@ -1,17 +1,20 @@
 <?php $pageTitle = "New Report";
-    require("../head.php");
+    require("../reuse/head.php");
     print_r ($_POST);
 ?>
 
 <body>
-    <div class="navbar">
+<?php 
+        require("../reuse/navbar.php");
+    ?>
+<!-- <div class="navbar">
         <a href="../People/lookup.php">Lookup People</a>
         <a href="../Vehicles/lookup.php">Lookup Vehicles</a>
         <a href="../Vehicles/new.php">New Vehicles</a>
         <a href="../Reports/new.php">New report</a>
         <a href="../Accounts/home.php">My Account</a>
     </div>
-    <hr>
+    <hr> -->
     <h1>Create New Report(TESTING)</h1>
     <hr>
 

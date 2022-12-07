@@ -1,5 +1,5 @@
 <?php
-    require("../head.php");
+    require("../reuse/head.php");
     require("_people.php");
     require("../Accounts/_account.php");
     session_start();

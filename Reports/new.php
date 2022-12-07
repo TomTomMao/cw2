@@ -1,5 +1,5 @@
 <?php $pageTitle = "New Report";
-    require("../head.php");
+    require("../reuse/head.php");
     session_start();
         require("../Accounts/_account.php");// there is a User class
         
@@ -7,7 +7,6 @@
         if (!$user->isLoggedIn()) {
             header("location: ../Accounts/notLoginError.html"); // check if logged in
         }
-        require("../head.php");
 
 
 
@@ -25,13 +24,16 @@
                     mysqli_close($conn);
                 ?>
 <body>
-    <div class="navbar">
+<?php 
+        require("../reuse/navbar.php");
+    ?>
+<!-- <div class="navbar">
         <a href="../People/lookup.php">Lookup People</a>
         <a href="../Vehicles/lookup.php">Lookup Vehicles</a>
         <a href="../Vehicles/new.php">New Vehicles</a>
         <a href="../Reports/new.php">New report</a>
         <a href="../Accounts/home.php">My Account</a>
-    </div>
+    </div> -->
     <hr>
     <h1>Create New Report</h1>
     <hr>

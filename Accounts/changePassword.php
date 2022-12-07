@@ -1,5 +1,5 @@
 <?php $pageTitle = "Change Password";
-    require("../head.php");
+    require("../reuse/head.php");
 ?>
 
 <?php
@@ -31,7 +31,10 @@
     }
 ?>
 <body>
-    <div class="navbar">
+<?php 
+        require("../reuse/navbar.php");
+    ?>
+    <!-- <div class="navbar">
         <a href="../People/lookup.php">Lookup People</a>
         <a href="../Vehicles/lookup.php">Lookup Vehicles</a>
         <a href="../Vehicles/new.php">New Vehicles</a>
@@ -39,7 +42,7 @@
         <a href="../Accounts/home.php">My Account</a>
         <a href="../Accounts/logout.php">Log Out</a>
     </div>
-    <hr>
+    <hr> -->
     <h1>Changing Password</h1>
     <form action="changePassword.php" method="post">
     <div>

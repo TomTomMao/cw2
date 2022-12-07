@@ -1,5 +1,5 @@
 <?php $pageTitle = "Login Success";
-    require("../head.php");
+    require("../reuse/head.php");
 ?>
 <?php
     session_start();

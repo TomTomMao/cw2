@@ -1,6 +1,6 @@
 <?php
     $pageTitle = "Lookup Vehicle";
-    require_once("../head.php");
+    require_once("../reuse/head.php");
     
 ?>
 
@@ -138,14 +138,17 @@
             };
         }
     </script>
-    <div class="navbar">
+<?php 
+        require("../reuse/navbar.php");
+    ?>
+<!-- <div class="navbar">
         <a href="../People/lookup.php">Lookup People</a>
         <a href="../Vehicles/lookup.php">Lookup Vehicles</a>
         <a href="../Vehicles/new.php">New Vehicles</a>
         <a href="../Reports/new.php">New report</a>
         <a href="../Accounts/home.php">My Account</a>
     </div>
-    <hr>
+    <hr> -->
     <h1>Create New Vehicle</h1>
     <hr>
     <h2>Vehicle Information</h2>

@@ -2,7 +2,7 @@
 <?php 
     try { ?>
     <?php $pageTitle = "Lookup Vehicle";
-        require_once("../head.php");
+        require_once("../reuse/head.php");
     ?>
 
     <?php // handle not login error
@@ -19,14 +19,17 @@
         require("../reuse/_dbConnect.php");
     ?>
     <body>
-        <div class="navbar">
+    <?php 
+        require("../reuse/navbar.php");
+    ?>
+    <!-- <div class="navbar">
             <a href="../People/lookup.php">Lookup People</a>
             <a href="../Vehicles/lookup.php">Lookup Vehicles</a>
             <a href="../Vehicles/new.php">New Vehicles</a>
             <a href="../Reports/new.php">New report</a>
             <a href="../Accounts/home.php">My Account</a>
         </div>
-        <hr>
+        <hr> -->
         <h1>Look Up Vehicles</h1>
         <hr>
         <form action="lookup.php" method="post">

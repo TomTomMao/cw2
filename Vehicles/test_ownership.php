@@ -1,6 +1,6 @@
 <?php
     $pageTitle = "text_ownership";
-    require("../head.php");
+    require("../reuse/head.php");
     require("_ownership.php");
     require("../Accounts/_account.php");
     require("_vehicles.php");

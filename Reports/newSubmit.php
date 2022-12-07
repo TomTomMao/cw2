@@ -6,7 +6,7 @@ try{
         session_start();
         require("../Accounts/_account.php");// there is a User class
         $pageTitle = "submit report";
-        require("../head.php");
+        require("../reuse/head.php");
         $user = new User();
         if (!$user->isLoggedIn()) {
             header("location: ../Accounts/notLoginError.html"); // check if logged in
