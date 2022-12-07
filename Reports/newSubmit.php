@@ -83,8 +83,20 @@ try{
             // return an associative array: 
             // ["allValid"=>true/false, "detail"=>["vehicleField1"=>"valid/invalid hint", "vehicleField2"=>"valid/invalid hint", ...]]
             // Return True if the format of all the field of vehicle is valid.
-            // Return An associative array whose key is field name of vehicle form, and value is "correct"  
-
+            // throw error if invalid.
+            // Return An associative array whose key is field name of vehicle form, and value is "correct"  -- dismiss this line please.
+            if (strlen($_POST["vehicleLicence"])!=7) {
+                throw new Exception("Invalid vehicle licence length!<br>length should be 7", 1);
+            }
+            if (strlen($_POST["vehicleColour"])>20 || strlen($_POST["vehicleColour"])<1) {
+                throw new Exception("Invalid vehicle colour length!<br>length should be 1 to 20", 1);
+            }
+            if (strlen($_POST["vehicleMake"])>20 || strlen($_POST["vehicleMake"])<1) {
+                throw new Exception("Invalid vehicle make length!<br>length should be 1 to 20", 1);
+            }
+            if (strlen($_POST["vehicleModel"])>20 || strlen($_POST["vehicleModel"])<1) {
+                throw new Exception("Invalid vehicle model length!<br>length should be 1 to 20", 1);
+            }
             return ["allValid"=>true];
         }
         function isOwnerFormValid($post) {
@@ -590,7 +602,14 @@ try{
 
 
 } catch (Exception $error) {
-    echo '<div class="feedback-yellow"><div class="feedback-text-line">Error: '.$error->getMessage().'</div></div>';
+    require("../reuse/errorMessage.php");
+    $messages = ["a<br>","b<br>"];
+    if (empty($messages)) {
+        renderErrorMessages([$error->getMessage()]);
+    } else {
+        renderErrorMessages($messages);
+    }
+    
     // header("location: ../error.php?errorMessage=".$error->getMessage());
 }   
 ?>

@@ -66,6 +66,7 @@
             margin: 0em auto;
             padding: 0.5em;
             width: fit-content;
+            font-size: large;
         }
 
         /* for .uneditable, I referenced this: https://developer.mozilla.org/en-US/docs/Web/CSS/pointer-events */
