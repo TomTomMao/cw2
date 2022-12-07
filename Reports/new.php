@@ -16,7 +16,7 @@
                     $conn = connectDB();
                     $sql = "SELECT Offence_ID, Offence_description, Offence_maxFine, Offence_maxPoints FROM offence;";
                     $offencesResults = mysqli_query($conn, $sql);
-                    echo $sql;
+                    // echo $sql; // debugging
                     $offences = array();
                     while ($row = mysqli_fetch_assoc($offencesResults)) {
                         array_push($offences, $row);
