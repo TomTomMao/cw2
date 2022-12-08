@@ -4,6 +4,7 @@
 
 
 // has vehicle, unknown offender, unknown owner;
+// e.g. illegal parking, and the police doesn't know who is the owner.
 $acceptableForm1 = ["reportType"=>"known vehicle only",
 "format"=>["reportStatement"=>"true",
     "reportDate"=>"true",
@@ -25,6 +26,7 @@ $acceptableForm1 = ["reportType"=>"known vehicle only",
 ]; 
 
 // has vehicle, known offender, unknown owner;
+// e.g. the offender stole someone's car
 $acceptableForm2 = ["reportType"=>"known vehicle and offender",
 "format"=>["reportStatement"=>"true",
     "reportDate"=>"true",
@@ -67,6 +69,8 @@ $acceptableForm3 = ["reportType"=>"known vehicle and owner and offender",
 ]; 
 
 // has vehicle, unknown offender, known owner;
+// e.g., illigal parking, and the police know who is the owner.
+// THIS SHOULD BE REMOVED!
 $acceptableForm4 = ["reportType"=>"known vehicle and owner",
 "format"=>["reportStatement"=>"true",
     "reportDate"=>"true",
@@ -88,6 +92,7 @@ $acceptableForm4 = ["reportType"=>"known vehicle and owner",
 ]; 
 
 // has no vehicle, known offender, unknown owner;
+// e.g., jay walking.
 $acceptableForm5 = ["reportType"=>"known offender only",
 "format"=>["reportStatement"=>"true",
     "reportDate"=>"true",

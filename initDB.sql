@@ -62,6 +62,7 @@ INSERT INTO Vehicles (Vehicle_ID, Vehicle_make, Vehicle_model, Vehicle_colour, V
   (16, 'Toyota', 'Prius', 'Silver', 'FP16KKE'),
   (17, 'Ford', 'Mondeo', 'Black', 'FP66KLM'),
   (18, 'Ford', 'Focus', 'White', 'DJ14SLE'),
+  (19, 'Tesla', 'Model3', 'White', 'TE12SLA'),
   (20, 'Nissan', 'Pulsar', 'Red', 'NY64KWD'),
   (21, 'Renault', 'Scenic', 'Silver', 'BC16OEA'),
   (22, 'Hyundai', 'i30', 'Grey', 'AD223NG');
@@ -98,7 +99,7 @@ INSERT INTO People (People_ID, People_name, People_address, People_licence, Peop
 (7, 'Neil Becker', '6 Fairfax Close, Nottingham', 'BECKE88UPR840F9R', '1988-11-22', NULL),
 (8, 'Angela Smith', '30 Avenue Road, Grantham', 'SMITH222LE9FJ5DS', '1953-09-22', NULL),
 (9, 'Xene Medora', '22 House Drive, West Bridgford', 'MEDORH914ANBB223', '1969-07-22', NULL),
-(10, 'Smith Tony', '22 Avenue Road, Grantham', NULL, NULL, NULL);
+(10, 'Smith Tony', '22 Avenue Road, Grantham', NULL, '2012-01-01', NULL);
 
 ALTER TABLE People
   MODIFY People_ID int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;

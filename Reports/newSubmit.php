@@ -114,6 +114,15 @@ try{
 
             return ["allValid"=>true];
         }
+        function isOffenderFormValid($post) {
+            // assume there is a Offender form
+            // return an associative array:
+            // ["allValid"=>true/false, "detail"=>["OffenderField1"=>"valid/invalid hint", "OffenderField2"=>"valid/invalid hint", ...]]
+            // Return True if the format of all the field of Offender is valid.
+            // Return An associative array whose key is field name of Offender form, and value is "correct" 
+
+            return isOwnerFormValid($post);
+        }
 
     // DONE: check report type, and set $hasVehicleForm, $hasOwnerForm, $hasOffenderForm to be true/false;
         require("acceptableForms.php");
@@ -127,6 +136,7 @@ try{
             throw new Exception("Invalid Form:<br> You should at least enter the <b>licence, colour, make, model</b> of the vehicle<br>"
             ."OR the <b>name, dob, address</b> of the offender!"
             ."<br>The Owner information can be all empty; or at least <b>name, dob, address</b> should be all given!"
+            ."<br>If you don't enter vehicle information, then owner information must be empty as well."
             ."<br>The driving licence number of offender and owner can be empty if they don't have a driving licence");
             die();
         }
@@ -445,8 +455,199 @@ try{
         
 
 
-    // TODO: processing the {offender form} -> {$offenderID, database change} (not done)
-        $offenderID = $ownerID;
+    // DONE: processing the {offender form} -> {$offenderID, database change} 
+        $offenderID = "NULL";
+        if ($hasOffenderForm==false) {
+            $offenderID = "NULL";            
+            // case that the fields of offender form is invalid (function is not implemented yet, always valid) : give error feedback
+        } elseif($hasOffenderForm && isOffenderFormValid($_POST)['allValid']==false) {
+            $messages = isOffenderFormValid($_POST)['messages'];
+            // echo "<hr>";
+            // echo "offender Information is not valid:";
+            mysqli_close($conn);
+            throw new Exception("check the \$messages");
+            die();
+            
+            // valid:
+        } elseif($hasOffenderForm && isOffenderFormValid($_POST)['allValid']==true) {
+            // sudo-code:
+            // case 1: the offender has a licence:
+                // search licence
+                    // if licence in db (not a new offender):
+                        // if form detail not match the db:
+                            // feedback these difference and die();
+                        // if form detial match the db:
+                            // get the offender id
+                            // set the offender id on $offenderID;
+                    // if licence not in db (new):
+                        // if the combination of (name, address, dob) match some data in the database, 
+                            // feedback this problem.
+                            // die();
+                        // insert this offender, get offender id
+                        // set the offender id on $offenderID;
+            // case 2: the offender doesn't have a licence:
+                // if there are given name, dob, address in the form:
+                    // use these 3 data as unique key to search the database
+                    // if match one:
+                        // if the one has licence:
+                            // feed back this problem and die()
+                        // get the id of the data in database
+                        // set the offender id on $offenderID
+                    // else:
+                        // insert new data with name, dob, address
+                        // get id of the newly-inserted offender
+                        // set the offender id on $offenderID
+                // else:
+                    // feedback these missing field and die();
+            
+            // implementation:
+
+            // case1: has licence info
+            if (!empty($_POST['offenderLicence'])) {
+                // licence in db
+                if ($peopleDB->isPersonLicenceInDB($_POST['offenderLicence'])){
+                    // echo "offender is in the database<hr>";// debugging
+                    $isOffenderNew = false;
+
+                    $offenderFromDB = $peopleDB->getPersonByLicence($_POST['offenderLicence']);
+                    // echo "<hr>offender from database:<br>".$offenderFromDB->renderRow(true)."<hr>"; //debugging
+                    // assume offenderFromDB is not empty
+                    if (empty($offenderFromDB)) {
+                        throw new Exception("vehicle licence is not in database, but it should be in the database as it was checked by $peopleDB->isPersonLicenceInDB");
+                    }
+                    $offenderFromForm = new Person("NULL", $_POST['offenderLicence'], $_POST['offenderAddress'], 
+                                                $_POST["offenderDOB"], $_POST["offenderFirstName"]." ".$_POST["offenderLastName"], "NULL");
+                    // echo "<hr>offender from the form:<br>".$offenderFromForm->renderRow(true)."<hr>"; //debugging
+
+                    // get error state, and give feed back.
+                    $oldOffenderSame = true;
+                    if ($offenderFromDB->getLicence()!=$offenderFromForm->getLicence()) {
+                        array_push($messages, "although offender licence is in the database, but the licence is not the same with the offender with the licence in the database");
+                        // echo "although offender licence is in the database, but the licence is not the same with the offender with the licence in the database<hr>"; //debugging
+                        $oldOffenderSame = false;
+                    }
+                    if ($offenderFromDB->getAddress()!=$offenderFromForm->getAddress()) {
+                        array_push($messages, "although offender licence is in the database, but the address is not the same with the offender with the address in the database");
+                        // echo "although offender licence is in the database, but the address is not the same with the offender with the address in the database<hr>"; //debugging
+                        $oldOffenderSame = false;
+                    }
+                    if ($offenderFromDB->getDOB()!=$offenderFromForm->getDOB()) {
+                        array_push($messages, "although offender licence is in the database, but the DOB is not the same with the offender with the DOB in the database");
+                        // echo "although offender licence is in the database, but the DOB is not the same with the offender with the DOB in the database<hr>"; //debugging
+                        $oldOffenderSame = false;
+                    }
+                    if ($offenderFromDB->getFirstName()!=$offenderFromForm->getFirstName()) {
+                        array_push($messages, "although offender licence is in the database, but the first name is not the same with the offender with the first name in the database");
+                        // echo "although offender licence is in the database, but the first name is not the same with the offender with the first name in the database<hr>"; //debugging
+                        $oldOffenderSame = false;
+                    }
+                    if ($offenderFromDB->getLastName()!=$offenderFromForm->getLastName()) {
+                        array_push($messages, "although offender licence is in the database, but the last name is not the same with the offender with the last name in the database");
+                        // echo "although offender licence is in the database, but the last name is not the same with the offender with the last name in the database<hr>"; //debugging
+                        $oldOffenderSame = false;
+                    }
+                    
+                    if ($oldOffenderSame) {
+                        // if the form with licence match the db:
+                            // get the offender id
+                            // set the offender id on $offenderID;
+                        // echo "GOOD GOOD GOOD for the offender form!<br>"; // debugging
+                        $offenderID = $offenderFromDB->getID();
+                        $isOffenderNew = false;
+                        // echo "Offender already in database:offender id=".$offenderID; // debugging
+                    } else {
+                        // if the form with licence not match the db:
+                            // feedback these difference and die():
+                        
+                        throw new Exception("check \$messages");
+                                // echo "The offender information you entered is not the same as the one in the database.<br> Please Check your offender data<hr>"; // debugging
+                        die();
+                    }
+                
+                    // licence not in db
+                } else {
+                    $offenderFromForm = new Person("NULL", $_POST['offenderLicence'], $_POST['offenderAddress'], 
+                                                $_POST["offenderDOB"], $_POST["offenderFirstName"]." ".$_POST["offenderLastName"], "NULL");
+
+                    // if the combination of (name, dob, address) matches data, feedback this error.
+                    if ($peopleDB->isPersonDetailInDB($offenderFromForm)) {
+                        echo "<hr><b>The offender you typed is already in database, please enter correct information: </b><br>";
+                        echo "your data:".$offenderFromForm->renderRow(true)."<br>";
+                        $offenderFromDB = $peopleDB->getPersonByDetail($offenderFromForm);
+                        echo "database data:".$offenderFromDB->renderRow(true)."<br>";
+                        die();
+                    }
+
+                    // offender is new, then insert this offender into the database
+                    $isOffenderNew = true;
+                    
+                    $offenderID = $peopleDB->insertNewPerson($offenderFromForm); // id set
+                    $newOffenderFromDB = $peopleDB->getPersonByLicence($offenderFromForm->getLicence());
+                    // echo "new offender:<br>".$newOffenderFromDB->renderRow(true)."<hr>"; // debugging
+                }
+                
+                
+            } 
+            // case 2: has no licence info
+            else {
+
+                // if has empty data of these, feedback error.
+                if(empty($_POST["offenderAddress"]) || empty($_POST["offenderFirstName"]) || empty($_POST["offenderLastName"]) || empty($_POST["offenderDOB"])) {
+                    throw new Exception("missed some data of offenderAddress or offenderFirstName or offenderLastName or offenderDOB<hr>");
+                    // echo "missed some data of offenderAddress, offenderFirstName, offenderLastName, offenderDOB<hr>";
+                    die();
+                } 
+                // else: name, dob, address is given
+                else {
+                    $offenderWithoutLicenceFromForm = new Person("NULL", "NULL",$_POST["offenderAddress"],$_POST["offenderDOB"],$_POST["offenderFirstName"]." ".$_POST["offenderLastName"], "NULL");
+                    // echo "offender without licence from the form: <br>".$offenderWithoutLicenceFromForm->renderRow(true)."<hr>"; // debug
+
+                    // match one
+                    if ($peopleDB->isPersonDetailInDB($offenderWithoutLicenceFromForm)) {
+                        $offenderWithoutLicenceFromDB = $peopleDB->getPersonByDetail($offenderWithoutLicenceFromForm);
+
+                        // check if the offender from db has no licence, if it has licence, feedback this error and die()
+                        $offenderID = $offenderWithoutLicenceFromDB->getID(); // set id
+                        if (empty($offenderWithoutLicenceFromDB->getLicence())) {
+                            // echo "GOOD, offender licence from db is empty:'".$offenderWithoutLicenceFromDB->getLicence()."'<hr>"; // debugging
+                        } else {
+                            // the one in db have a licence, error.
+                            throw new Exception("<br>The offender you submit:".$offenderWithoutLicenceFromForm->renderRow(true).
+                            "is already in the database, and has a driving licence: ".$offenderWithoutLicenceFromDB->getLicence().
+                            "<br>Please fill the correct offender information and create the report again.</b>");
+                            // echo "<b>Error: offender licence from db is not empty:</b>'".$offenderWithoutLicenceFromDB->getLicence()."'<hr>";
+                            die();
+                        }
+
+                        // echo "<b>Uses exists offender in database:</b> <br>".$offenderWithoutLicenceFromDB->renderRow(true)."<hr>"; // debugging
+                        $isOffenderNew = false;
+                    }
+                    // not match one
+                    else {
+                        // insert new data with name, dob, address
+                        // get id of the newly-inserted offender
+                        // set the offender id on $offenderID
+                        $offenderID = $peopleDB->insertNewPerson($offenderWithoutLicenceFromForm);
+                        $offenderWithoutLicenceFromDB = $peopleDB->getPersonByDetail($offenderWithoutLicenceFromForm);
+                        
+                        // echo "\$offenderID: ".$offenderID."<hr>";
+                        // echo "offenderWithoutLicenceFromForm id: ".$offenderWithoutLicenceFromForm->getID()."<hr>"; // debugging 
+                        // echo "offenderWithoutLicenceFromDB id: ".$offenderWithoutLicenceFromDB->getID()."<hr>"; // debugging
+                        // echo "<b>offender without licence is new, created:</b> <br>".$offenderWithoutLicenceFromDB->renderRow(true)."<hr>"; // debugging
+                        $isOffenderNew = true;
+                    }
+                }
+            }
+        } 
+        
+        echo "<hr>---------------------Processing offender form done, OffenderID:".$offenderID."---------------------<br>";
+        if (!isset($isOffenderNew)) {
+            echo "No offender involved.<hr>";
+        } elseif ($isOffenderNew) {
+            echo "New offender created.<hr>";
+        } else {
+            echo "There is no new offender created.<hr>";
+        }
 
     // DONE: processing {vehicleID, ownerID} -> {$ownershipID, database change} 
         // result: $ownershipID would be "NULL" or, an id in the database. An ownership might be created into the database.
@@ -538,7 +739,7 @@ try{
     
     
 
-    // TODO: test the ownership insert module:
+    // DONE: test the ownership insert module:
         // note: 'new+licence' means new with a licence, '-' means without
         // Restart the database firstly!
         // test case 1 to 10 are inserting new ownership.
@@ -684,7 +885,298 @@ try{
             // RESULTS3: Print the correct id of the ownership.
 
 
-} catch (Exception $error) {
+    // DONE: test the report insert sql sentence:
+        // note: 'new+licence' means new with a licence, '-' means without
+        // note2:if both vehicle and owner are old, assume the ownership is new.
+        // Restart the database between test cases!
+        // test case
+            // normal case
+                // testcase1: vehicle: new, owner: new+licence == offender: new+licence
+                    // vehicle licence: test001
+                    // colour: test
+                    // make: test
+                    // model: test
+                    // ownerLicence: testtesttest0001
+                    // ownerFirstName: owner1
+                    // ownerLastName: owner1
+                    // ownerAddress: test
+                    // ownerDOB: today
+                    // offenderLicence: testtesttest0001
+                    // offenderFirstName: owner1
+                    // offenderLastName: owner1
+                    // offenderAddress: test
+                    // offenderDOB: today
+                    // result: new vehicle, new owner, no new offender, new ownership
+                // testcase2: vehicle: old, owner: old+licence == offender: old+licence
+                    // vehicle licence: TE12SLA
+                    // colour: White
+                    // make: Tesla
+                    // model: Model3
+                    // ownerLicence: ALLEN88K23KLR9B3
+                    // ownerFirstName: Jennifer
+                    // ownerLastName: Allen
+                    // ownerAddress: 46 Bramcote Drive, Nottingham
+                    // ownerDOB: 1994-03-12
+                    // offenderLicence: ALLEN88K23KLR9B3
+                    // offenderFirstName: Jennifer
+                    // offenderLastName: Allen
+                    // offenderAddress: 46 Bramcote Drive, Nottingham
+                    // offenderDOB: 1994-03-12
+                    // results: no new vehicle, no new owner, no new offender, new ownership
+            // driving without licence
+                // testcase1: vehicle: new, owner: new-licence == offender: new-licence
+                    // vehicle licence: test001
+                    // colour: test
+                    // make: test
+                    // model: test
+                    // ownerLicence: 
+                    // ownerFirstName: owner2
+                    // ownerLastName: owner2
+                    // ownerAddress: test
+                    // ownerDOB: today
+                    // offenderLicence: 
+                    // offenderFirstName: owner2
+                    // offenderLastName: owner2
+                    // offenderAddress: test
+                    // offenderDOB: today
+                    // result: new vehicle, new owner, no new offender, new ownership
+                // testcase2: vehicle: old, owner: old-licence == offender: old-licence
+                    // vehicle licence: TE12SLA
+                    // colour: White
+                    // make: Tesla
+                    // model: Model3
+                    // ownerLicence: 
+                    // ownerFirstName: Smith
+                    // ownerLastName: Tony
+                    // ownerAddress: 22 Avenue Road, Grantham
+                    // ownerDOB: 2012-01-01
+                    // offenderLicence: 
+                    // offenderFirstName: Smith
+                    // offenderLastName: Tony
+                    // offenderAddress: 22 Avenue Road, Grantham
+                    // offenderDOB: 2012-01-01
+                    // result: no new vehicle, no new owner, no new offender, new ownership
+
+            // driving without licence(stolen car)
+                // testcase1: vehicle: new, owner: null        ; offender: new-licence
+                    // vehicle licence: test001
+                    // colour: test
+                    // make: test
+                    // model: test
+                    // ownerLicence: 
+                    // ownerFirstName: 
+                    // ownerLastName: 
+                    // ownerAddress: 
+                    // ownerDOB: 
+                    // offenderLicence: 
+                    // offenderFirstName: owner2
+                    // offenderLastName: owner2
+                    // offenderAddress: test
+                    // offenderDOB: today
+                    // result: new vehicle, no new owner, no new offender, new ownership
+            // no vehicle involved
+                // testcase1: vehicle: null, owner: null        ; offender: new+licence
+                    // offenderLicence: testtesttest0001
+                    // offenderFirstName: owner1
+                    // offenderLastName: owner1
+                    // offenderAddress: test
+                    // offenderDOB: today
+                    // no new vehicle, no new owner, new offender, no new ownership
+                // testcase2: vehicle: null, owner: null        ; offender: new-licence
+                    // offenderLicence: 
+                    // offenderFirstName: owner2
+                    // offenderLastName: owner2
+                    // offenderAddress: test
+                    // offenderDOB: today
+                    // no new vehicle, no new owner, new offender, no new ownership
+
+                // testcase3: vehicle: null, owner: null        ; offender: old-licence
+                    // offenderLicence: 
+                    // offenderFirstName: Smith
+                    // offenderLastName: Tony
+                    // offenderAddress: 22 Avenue Road, Grantham
+                    // offenderDOB: 2012-01-01
+                    // no new vehicle, no new owner, no new offender, no new ownership
+                
+                // testcase4: vehicle: null, owner: null        ; offender: old+licence
+                    // offenderLicence: ALLEN88K23KLR9B3
+                    // offenderFirstName: Jennifer
+                    // offenderLastName: Allen
+                    // offenderAddress: 46 Bramcote Drive, Nottingham
+                    // offenderDOB: 1994-03-12
+                    // no new vehicle, no new owner, no new offender, no new ownership
+
+            // illegal parking
+                // testcase1: vehicle:  new, owner: null        ; offender: null; 
+                    // vehicle licence: test001
+                    // colour: test
+                    // make: test
+                    // model: test
+                    // new vehicle, new null ownership
+                // testcase2: vehicle:  new, owner: new+licence == offender: new+licence; 
+                    // vehicle licence: test001
+                    // colour: test
+                    // make: test
+                    // model: test
+                    // ownerLicence: testtesttest0001
+                    // ownerFirstName: owner1
+                    // ownerLastName: owner1
+                    // ownerAddress: test
+                    // ownerDOB: today
+                    // offenderLicence: testtesttest0001
+                    // offenderFirstName: owner1
+                    // offenderLastName: owner1
+                    // offenderAddress: test
+                    // offenderDOB: today
+                    // new vehicle, new owner, no new offender, new ownership
+
+                // testcase3: vehicle:  new, owner: new-licence == offender: new-licence; 
+                    // vehicle licence: test001
+                    // colour: test
+                    // make: test
+                    // model: test
+                    // ownerLicence: 
+                    // ownerFirstName: owner1
+                    // ownerLastName: owner1
+                    // ownerAddress: test
+                    // ownerDOB: today
+                    // offenderLicence: 
+                    // offenderFirstName: owner1
+                    // offenderLastName: owner1
+                    // offenderAddress: test
+                    // offenderDOB: today
+                    // new vehicle, new owner, no new offender, new ownership
+
+                // testcase4: vehicle:  new, owner: old-licence == offender: old-licence; 
+                    // vehicle licence: test001
+                    // colour: test
+                    // make: test
+                    // model: test
+                    // ownerLicence: 
+                    // ownerFirstName: Smith
+                    // ownerLastName: Tony
+                    // ownerAddress: 22 Avenue Road, Grantham
+                    // ownerDOB: 2012-01-01
+                    // offenderLicence: 
+                    // offenderFirstName: Smith
+                    // offenderLastName: Tony
+                    // offenderAddress: 22 Avenue Road, Grantham
+                    // offenderDOB: 2012-01-01
+                    // new vehicle, no new owner, no new offender, new ownership
+
+                // testcase5: vehicle:  new, owner: old+licence == offender: old+licence; 
+                    // vehicle licence: test001
+                    // colour: test
+                    // make: test
+                    // model: test
+                    // ownerLicence: ALLEN88K23KLR9B3
+                    // ownerFirstName: Jennifer
+                    // ownerLastName: Allen
+                    // ownerAddress: 46 Bramcote Drive, Nottingham
+                    // ownerDOB: 1994-03-12
+                    // offenderLicence: ALLEN88K23KLR9B3
+                    // offenderFirstName: Jennifer
+                    // offenderLastName: Allen
+                    // offenderAddress: 46 Bramcote Drive, Nottingham
+                    // offenderDOB: 1994-03-12
+                    // new vehicle, no new owner, no new offender, new ownership
+
+                // testcase6: vehicle:  old, owner: null        ; offender: null; 
+                    // vehicle licence: TE12SLA
+                    // colour: White
+                    // make: Tesla
+                    // model: Model3
+                    // no new vehicle, no new owner, no new offender, new ownership
+                    
+                // testcase7: vehicle:  old, owner: new+licence == offender: new+licence; 
+                    // vehicle licence: TE12SLA
+                    // colour: White
+                    // make: Tesla
+                    // model: Model3
+                    // ownerLicence: testtesttest0001
+                    // ownerFirstName: owner1
+                    // ownerLastName: owner1
+                    // ownerAddress: test
+                    // ownerDOB: today
+                    // offenderLicence: testtesttest0001
+                    // offenderFirstName: owner1
+                    // offenderLastName: owner1
+                    // offenderAddress: test
+                    // offenderDOB: today
+                    // no new vehicle, new owner, no new offender, new ownership
+
+                // testcase8: vehicle:  old, owner: new-licence == offender: new-licence; 
+                    // vehicle licence: TE12SLA
+                    // colour: White
+                    // make: Tesla
+                    // model: Model3
+                    // ownerFirstName: owner1
+                    // ownerLastName: owner1
+                    // ownerAddress: test
+                    // ownerDOB: today
+                    // offenderLicence: 
+                    // offenderFirstName: owner1
+                    // offenderLastName: owner1
+                    // offenderAddress: test
+                    // offenderDOB: today
+                    // no new vehicle, new owner, no new offender, new ownership
+
+                // testcase9(redundancy): vehicle:  old, owner: old+licence == offender: old+licence; 
+                    // vehicle licence: TE12SLA
+                    // colour: White
+                    // make: Tesla
+                    // model: Model3
+                    // ownerLicence: ALLEN88K23KLR9B3
+                    // ownerFirstName: Jennifer
+                    // ownerLastName: Allen
+                    // ownerAddress: 46 Bramcote Drive, Nottingham
+                    // ownerDOB: 1994-03-12
+                    // offenderLicence: ALLEN88K23KLR9B3
+                    // offenderFirstName: Jennifer
+                    // offenderLastName: Allen
+                    // offenderAddress: 46 Bramcote Drive, Nottingham
+                    // offenderDOB: 1994-03-12
+                    // no new vehicle, no new owner, no new offender, new ownership
+
+                // testcase10(redundancy): vehicle:  old, owner: old-licence == offender: old-licence; 
+                    // vehicle licence: TE12SLA
+                    // colour: White
+                    // make: Tesla
+                    // model: Model3
+                    // ownerLicence: 
+                    // ownerFirstName: Smith
+                    // ownerLastName: Tony
+                    // ownerAddress: 22 Avenue Road, Grantham
+                    // ownerDOB: 2012-01-01
+                    // offenderLicence: 
+                    // offenderFirstName: Smith
+                    // offenderLastName: Tony
+                    // offenderAddress: 22 Avenue Road, Grantham
+                    // offenderDOB: 2012-01-01
+
+            // owner and offender are not the same person:
+                // testcase1: vehicle:  new, owner:  new+licence != offender: new+licence; 
+                    // vehicle licence: test001
+                    // colour: test
+                    // make: test
+                    // model: test
+                    // ownerLicence: testtesttest0001
+                    // ownerFirstName: owner1
+                    // ownerLastName: owner1
+                    // ownerAddress: test
+                    // ownerDOB: today
+                    // offenderLicence: testtesttest0002
+                    // offenderFirstName: owner2
+                    // offenderLastName: owner2
+                    // offenderAddress: test
+                    // offenderDOB: today
+                    // new vehicle, new owner, new offender, new ownership
+            // check if ownership with null person id would be inserted twice
+                // test it when testing above cases.
+            // check existed non-null-person ownership
+                // test it when testing above cases.
+
+        } catch (Exception $error) {
     // throw $error;
     require("../reuse/errorMessage.php");
     $messages = $messages;
