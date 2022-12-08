@@ -256,7 +256,7 @@
                     .$person->getAddress()."', '"
                     .$person->getLicence()."', '"
                     .$person->getDOB()."')";
-                    echo $sql."from : peopleDB->insertNewPerson";
+                    // echo $sql."from : peopleDB->insertNewPerson"; //debugging
                     $result = mysqli_query($conn, $sql);
                     $lastID = mysqli_insert_id($conn);
                     return $lastID;

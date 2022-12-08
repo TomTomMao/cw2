@@ -52,7 +52,16 @@
                 // check and render the data
                 echo "<hr>";
                 $ownershipDiv = "";
+                echo "Note: A vehicle might have multiple ownership, the one with largest id is the latested one that was created into the database.";
+
+                $ownershipsIDKEY = array();
+                // sort the ownership
                 foreach ($ownerships as $ownership) {
+                    $ownershipsIDKEY[$ownership->getID()] = $ownership;
+                    krsort($ownershipsIDKEY);
+                }
+                // render the ownership
+                foreach ($ownershipsIDKEY as $k => $ownership) {
                     $ownershipDiv = $ownershipDiv.$ownership->render();
                 }
                 echo $ownershipDiv;

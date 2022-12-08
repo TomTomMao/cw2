@@ -475,7 +475,7 @@
             } 
             $conn = $this->conn;
             $sql = "SELECT Ownership_ID FROM Ownership WHERE People_ID IS NULL AND Vehicle_ID='".$ownership->getVehicleID()."';";
-            echo "<hr>"."ownershipDB->isOwnershipInDB: ".$sql."<hr>";
+            // echo "<hr>"."ownershipDB->isOwnershipInDBPersonNull: ".$sql."<hr>";//debugging
 
             $result = mysqli_query($conn, $sql);
             $ownershipIDs = array();
