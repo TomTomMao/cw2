@@ -1,6 +1,7 @@
 <?php
 try{
     $messages = [];
+    require("../reuse/errorMessage.php");
 ?>
 
 <?php // handle not login error
@@ -735,6 +736,13 @@ try{
             "VALUES('$ownershipID','$offenderID','$offenceID','$username','$incidentDate','$reportStatement');";
         }
         echo "<hr>report insertion query:".$sql."<hr>";
+        try{
+            mysqli_query($conn, $sql);
+            $reportID = mysqli_insert_id($conn);
+            echo "Report created successfully, reportID:$reportID";
+        } catch (Exception $error) {
+            renderErrorMessages(["Failed to create Report",$error->getMessage()]);
+        }
     }
     
     
@@ -1176,9 +1184,9 @@ try{
             // check existed non-null-person ownership
                 // test it when testing above cases.
 
-        } catch (Exception $error) {
+} catch (Exception $error) {
     // throw $error;
-    require("../reuse/errorMessage.php");
+    
     $messages = $messages;
     if (empty($messages)) {
         renderErrorMessages([$error->getMessage()]);
