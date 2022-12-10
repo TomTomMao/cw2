@@ -1,0 +1,134 @@
+body {
+    width: 80vw;
+    margin: 0 auto;
+}
+
+.people-table th,
+.people-table td,
+.report-table th,
+.report-table td,
+.ownership-container th,
+.ownership-container td {
+    background-color: #dddddd;
+}
+
+.people-table,
+.report-table {
+    width: 80 vw;
+}
+
+.ownership-container {
+    width: 600px;
+    margin: 2em auto;
+}
+
+.ownership-container table {
+    width: 500px;
+    border: 1px black solid;
+    margin: auto auto;
+}
+
+.ownership-container td {
+    width: 50%;
+}
+
+.feedback-red {
+    background-color: #ff999c;
+    width: 100%;
+    border-radius: 0.5em;
+    margin: 0.5em auto;
+}
+
+.feedback-yellow {
+    background-color: #efd73c;
+    width: 100%;
+    border-radius: 0.5em;
+    margin: 0.5em auto;
+}
+
+.feedback-green {
+    background-color: #b7ffb4;
+    width: 100%;
+    border-radius: 0.5em;
+    margin: 0.5em auto;
+}
+
+.feedback-text-line {
+    margin: 0em auto;
+    padding: 0.5em;
+    width: fit-content;
+    font-size: large;
+}
+
+/* for .uneditable, I referenced this: https://developer.mozilla.org/en-US/docs/Web/CSS/pointer-events */
+.uneditable {
+    pointer-events: none;
+    background-color: #dedede;
+}
+
+.uneditable:hover {
+    cursor: not-allowed;
+}
+
+.text-green {
+    color: green;
+}
+
+.text-red {
+    color: red;
+}
+
+/*  part of #report-detail-container style(margin, postion, left, right) referenced: https://www.folkstalk.com/tech/how-to-center-with-position-fixed-with-code-examples/ */
+#report-detail-container {
+    position: fixed;
+    background-color: #6a6a6a;
+    width: 600px;
+    height: 400px;
+    margin: 10% auto;
+    left: 0;
+    right: 0;
+    border-radius: 5px;
+    padding: 30px 20px 5px 20px;
+}
+
+.report-detail-information {
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.report-detail-table {
+    width: 97%;
+    border-radius: 5px;
+    background-color: rgb(69, 69, 69);
+    color: rgb(242, 242, 242);
+}
+
+.invisible {
+    display: none;
+}
+
+.report-detail-table-header {
+    width: 30%;
+    text-align: center;
+    background-color: #595959;
+}
+
+.report-detail-table-data {
+    width: 70%;
+    text-align: center;
+    background-color: #6a6a6a;
+}
+
+#report-detail-container-hide-button {
+    color: red;
+    top: 5px;
+    left: 5px;
+    position: absolute;
+    border: 0px black;
+    border-radius: 3px;
+}
+
+#report-detail-container-hide-button:hover {
+    color: black;
+    background-color: rgb(212, 90, 90);
+}

@@ -20,6 +20,132 @@
     ?>
 
 <body>
+    <!-- report container -->
+    <div class="invisible" id="report-detail-container">
+            <button id="report-detail-container-hide-button" onclick="document.getElementById('report-detail-container').classList=['invisible']">X</button>
+            <div class="report-detail-information">
+                <table class="report-detail-table">
+                    <tr>
+                        <td class="report-detail-table-header">accountUsername</td>
+                        <td class="report-detail-table-data" id="report-detail-accountUsername"></td>
+                    </tr>          
+                    <tr>
+                        <td class="report-detail-table-header">incidentDate</td>
+                        <td class="report-detail-table-data" id="report-detail-incidentDate"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">incidentID</td>
+                        <td class="report-detail-table-data" id="report-detail-incidentID"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">incidentReport</td>
+                        <td class="report-detail-table-data" id="report-detail-incidentReport"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">offenceDescription</td>
+                        <td class="report-detail-table-data" id="report-detail-offenceDescription"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">offenceID</td>
+                        <td class="report-detail-table-data" id="report-detail-offenceID"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">offenceMaxFine</td>
+                        <td class="report-detail-table-data" id="report-detail-offenceMaxFine"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">offenceMaxPoints</td>
+                        <td class="report-detail-table-data" id="report-detail-offenceMaxPoints"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">offenderAddress</td>
+                        <td class="report-detail-table-data" id="report-detail-offenderAddress"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">offenderDOB</td>
+                        <td class="report-detail-table-data" id="report-detail-offenderDOB"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">offenderID</td>
+                        <td class="report-detail-table-data" id="report-detail-offenderID"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">offenderLicence</td>
+                        <td class="report-detail-table-data" id="report-detail-offenderLicence"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">offenderName</td>
+                        <td class="report-detail-table-data" id="report-detail-offenderName"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">officerID</td>
+                        <td class="report-detail-table-data" id="report-detail-officerID"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">officerName</td>
+                        <td class="report-detail-table-data" id="report-detail-officerName"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">ownerAddress</td>
+                        <td class="report-detail-table-data" id="report-detail-ownerAddress"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">ownerDOB</td>
+                        <td class="report-detail-table-data" id="report-detail-ownerDOB"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">ownerID</td>
+                        <td class="report-detail-table-data" id="report-detail-ownerID"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">ownerLicence</td>
+                        <td class="report-detail-table-data" id="report-detail-ownerLicence"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">ownerName</td>
+                        <td class="report-detail-table-data" id="report-detail-ownerName"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">ownershipID</td>
+                        <td class="report-detail-table-data" id="report-detail-ownershipID"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">vehicleColour</td>
+                        <td class="report-detail-table-data" id="report-detail-vehicleColour"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">vehicleID</td>
+                        <td class="report-detail-table-data" id="report-detail-vehicleID"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">vehicleLicence</td>
+                        <td class="report-detail-table-data" id="report-detail-vehicleLicence"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">vehicleMake</td>
+                        <td class="report-detail-table-data" id="report-detail-vehicleMake"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">vehicleModel</td>
+                        <td class="report-detail-table-data" id="report-detail-vehicleModel"></td>
+                    </tr>
+
+
+                </table>
+            </div>
+    </div>
+    <script>
+        function showReportDetail(incidentID) {
+            document.getElementById("report-detail-container").classList=[];
+            report = reportJSONs.filter(reportJSON=>reportJSON.incidentID==incidentID)[0];
+            reportTable = document.querySelector(".report-detail-table")
+            keys = Object.keys(report)
+            for(key of keys) {
+                text = report[key] == "" ? "NULL" : report[key];
+                document.getElementById("report-detail-"+key).innerText = text;
+            }
+        }
+    </script>
     <?php 
         require("../reuse/navbar.php");
     ?>

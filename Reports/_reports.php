@@ -73,6 +73,8 @@
                     <th>owner licence</th>
                     <th>offender name</th>
                     <th>offender licence</th>
+                    <th>detail</th>
+                    <th>edit</th>
                 </tr>";
                 $tableTail = "</table>";
             } else {
@@ -103,6 +105,8 @@
                 <td>".$ownerLicence."</td>
                 <td>".$offenderName."</td>
                 <td>".$offenderLicence."</td>
+                <td><button onclick=\"showReportDetail($incidentID)\" class='detial-button' id='detial".$incidentID."''>show</button></td>
+                <td><a href='edit?id=".$incidentID."''>edit</a></td>
             </tr>".$tableTail;
         }
         static function renderGeneralTable($reports) {
@@ -119,6 +123,8 @@
                     <th>owner licence</th>
                     <th>offender name</th>
                     <th>offender licence</th>
+                    <th>detail</th>
+                    <th>edit</th>
                 </tr>";
                 $tableTail = "</table>";
             $tableBody = "";
