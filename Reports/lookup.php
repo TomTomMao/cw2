@@ -278,6 +278,7 @@
         <script>
             let reportJSONs = [];
             let lastPostJSON; // json
+            let userInfo;
         </script>
     </form>
     <!-- get reports using php. the report would be saved into $reports -->
@@ -357,7 +358,10 @@
                         echo "<script>reportJSONs.push(JSON.parse('".$reportJSON."'));</script>";
                     }
                 }
-
+        // TODO: Push username, isAdmin into javascript variable
+                $username = $user->getUsername();
+                $isAdmin = $user->isAdmin() ? "true" : "false";
+                echo "<script>userInfo={username:'$username', isAdmin:$isAdmin}</script>";
     }else {
             // print_r($_POST); // debugging
             // echo "this is not a post"; // debugging
@@ -391,7 +395,22 @@
     }
 
     // auto delete input box if the field name becomes empty
-
+    function setEditLink() {
+        // disable the edit links of the reports which can not be edit by the user.
+        username = userInfo.username
+        isAdmin = userInfo.isAdmin
+        if (isAdmin) {
+            return
+        } else {
+            for (report of reportJSONs) {
+                if (report['accountUsername']!=username) {
+                    console.log(document.getElementById("edit-"+report["incidentID"]))
+                    document.getElementById("edit-"+report["incidentID"]).classList=["forbidden-link"]
+                }
+            }
+        }
+    }
+    setEditLink();
 </script>
 </body>
 

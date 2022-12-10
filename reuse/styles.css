@@ -132,3 +132,9 @@ body {
     color: black;
     background-color: rgb(212, 90, 90);
 }
+
+.forbidden-link {
+    cursor: not-allowed;
+    pointer-events: none;
+    color: gray;
+}

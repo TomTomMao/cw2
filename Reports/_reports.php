@@ -106,7 +106,7 @@
                 <td>".$offenderName."</td>
                 <td>".$offenderLicence."</td>
                 <td><button onclick=\"showReportDetail($incidentID)\" class='detial-button' id='detial".$incidentID."''>show</button></td>
-                <td><a target='_blank' $isMyReportText href='edit.php?id=".$incidentID."''>edit</a></td>
+                <td><a id='edit-$incidentID' target='_blank' href='edit.php?id=".$incidentID."''>edit</a></td>
             </tr>".$tableTail;
         }
         static function renderGeneralTable($reports) {
