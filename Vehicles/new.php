@@ -39,6 +39,18 @@
         }
         function displayPerson(person) {
             // auto fill the input box using person object.
+            if (document.getElementById("personFirstName").value != person.firstName) {
+                changeFeedback(document.getElementById("personFirstNameFeedback"), "red", "not match the person with the driving licence, auto corrected")
+            }
+            if (document.getElementById("personLastName").value != person.lastName) {
+                changeFeedback(document.getElementById("personLastNameFeedback"), "red", "not match the person with the driving licence, auto corrected")
+            }
+            if (document.getElementById("personAddress").value != person.address) {
+                changeFeedback(document.getElementById("personAddressFeedback"), "red", "not match the person with the driving licence, auto corrected")
+            }
+            if (document.getElementById("personDOB").value != person.dateOfBirth) {
+                changeFeedback(document.getElementById("personDOBFeedback"), "red", "not match the person with the driving licence, auto corrected")
+            }
             document.getElementById("personFirstName").value = person.firstName;
             document.getElementById("personLastName").value = person.lastName;
             document.getElementById("personAddress").value = person.address;
@@ -378,7 +390,7 @@
                 checker.isCheckingAllChecked = false
                 checker.correct = false
             }
-
+            personLicenceChecker.getPersonByLicence(displayPerson);
             for (checker of checkers) {
                 checker.checkAndFeedback(isCheckingAll = true);
             }

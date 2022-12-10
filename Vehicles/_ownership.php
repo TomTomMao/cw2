@@ -366,8 +366,7 @@
                         ('".$person->getFullName()."', '"
                         .$person->getAddress()."', '"
                         .$person->getLicence()."', '"
-                        .$person->getDOB()."', '"
-                        .$person->getPhotoID()."');";
+                        .$person->getDOB()."', NULL);";
                         $results = mysqli_query($conn, $sql); // insert the person
                         $newPersonID = mysqli_insert_id($conn); // get the person_id
                         // echo "flag4";
