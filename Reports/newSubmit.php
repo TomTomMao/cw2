@@ -777,7 +777,7 @@ try{
             "VALUES('$ownershipID',NULL,'$offenceID','$username','$incidentDate','$reportStatement');";
         } else {
             $sql = "INSERT INTO Incident (Ownership_ID, People_ID, Offence_ID, Account_username, Incident_date, Incident_report)".
-            "VALUES('$ownershipID','$offenderID','$offenceID','$username','$incidentDate','$reportStatement');";
+            "VALUES('$ownershipID','$offenderID','$offenceID','$username','$incidentDate',\"$reportStatement\");";
         }
         echo "<hr>report insertion query:".$sql."<hr>";
         try{

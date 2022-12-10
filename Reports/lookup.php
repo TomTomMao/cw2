@@ -367,7 +367,7 @@
                     foreach($reports as $report){
                         $reportJSON = $report->toJSON();
                         // echo "<br>pusing<br>";
-                        echo "<script>reportJSONs.push(JSON.parse('".$reportJSON."'));</script>";
+                        echo "<script>reportJSONs.push($reportJSON);</script>";
                     }
                 }
         // DONE: Push username, isAdmin into javascript variable
