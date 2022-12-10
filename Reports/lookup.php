@@ -170,6 +170,12 @@
             if (document.querySelector("#columnName3 #empty").selected) {
                 document.querySelector("#searchValue3").value="";
             }
+            if (document.querySelector("#searchValue2").value=="") {
+                document.querySelector("#columnName2 #empty").selected=true;
+            }
+            if (document.querySelector("#searchValue3").value=="") {
+                document.querySelector("#columnName3 #empty").selected=true;
+            }
         }
     </script>
     <h1>Retrieve Reports</h1>
@@ -198,6 +204,8 @@
                         <option value="incidentID" id="incidentID">Incident ID</option>
                         <option value="officerName" id="officerName">Officer Name</option>
                         <option value="officerID" id="officerID">Officer ID</option>
+                        <option value="offenceID" id="offenceID">Offence ID</option>
+                        <option value="offenceDescription" id="offenceDescription">Offence Description</option>
                     </select>
                 </td>
                 <td>=</td>
@@ -230,6 +238,8 @@
                         <option value="incidentID" id="incidentID">Incident ID</option>
                         <option value="officerName" id="officerName">Officer Name</option>
                         <option value="officerID" id="officerID">Officer ID</option>
+                        <option value="offenceID" id="offenceID">Offence ID</option>
+                        <option value="offenceDescription" id="offenceDescription">Offence Description</option>
                     </select>
                 </td>
                 <td>=</td>
@@ -262,6 +272,8 @@
                         <option value="incidentID" id="incidentID">Incident ID</option>
                         <option value="officerName" id="officerName">Officer Name</option>
                         <option value="officerID" id="officerID">Officer ID</option>
+                        <option value="offenceID" id="offenceID">Offence ID</option>
+                        <option value="offenceDescription" id="offenceDescription">Offence Description</option>
                     </select>
                 </td>
                 <td>=</td>
@@ -358,7 +370,7 @@
                         echo "<script>reportJSONs.push(JSON.parse('".$reportJSON."'));</script>";
                     }
                 }
-        // TODO: Push username, isAdmin into javascript variable
+        // DONE: Push username, isAdmin into javascript variable
                 $username = $user->getUsername();
                 $isAdmin = $user->isAdmin() ? "true" : "false";
                 echo "<script>userInfo={username:'$username', isAdmin:$isAdmin}</script>";

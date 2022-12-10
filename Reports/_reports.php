@@ -185,7 +185,9 @@
                 "incidentDate"=>"incident.Incident_date",
                 "incidentID"=>"incident.Incident_ID",
                 "officerName"=>"accounts.Officer_name",
-                "officerID"=>"accounts.Officer_ID"
+                "officerID"=>"accounts.Officer_ID",
+                "offenceID"=>"offence.Offence_ID",
+                "offenceDescription"=>"offence.Offence_description"
             ][$fieldName];
         }
 
