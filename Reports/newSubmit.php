@@ -25,11 +25,12 @@ try{
         require("../Vehicles/_vehicles.php");
         require("../reuse/_dbConnect.php");
         require("../People/_people.php");
+        require("_reports.php");
         $conn = connectDB();
         $ownershipDB = new OwnershipDB($user->getUsername(), $conn);
         $vehicleDB = new VehiclesDB($user->getUsername(), $conn);
         $peopleDB = new PeopleDB($user->getUsername(), $conn);
-        
+        $reportDB = new ReportsDB($user->getUsername(), $conn);
 
         function getReportType($acceptableForms, $post) {
             // given an array of $acceptableForms, and $post information,
@@ -125,6 +126,25 @@ try{
             return isOwnerFormValid($post);
         }
 
+    // DONE1(for edit): IF it is an editing submit, Check if the report id exists in $_GET and in databas, and check if the user can edit it.
+        if (isset($_GET["edit"])&&$_GET["edit"]=="true") {
+            if (empty($_GET["id"])) {
+                throw new Exception("in valid argument, report id is not given for editing");
+                die();
+            } else {
+                $reportTmp = $reportDB->getReportByReportID($_GET["id"], false);
+                if ($reportTmp==false) {
+                    throw new Exception("in valid argument, report id doesn't exist");
+                    die();
+                } elseif ($reportTmp->accountUsername != $user->getUsername() && !$user->isAdmin()) {
+                    throw new Exception("Illegal submit, you don't have permission to edit this report");
+                    die();
+                } else {
+                    echo "no assertion about editing submit valiated"; //debugging
+                    // die(); //debugging, because I haven't avoid insert new report.
+                }
+            } 
+        }
     // DONE: check report type, and set $hasVehicleForm, $hasOwnerForm, $hasOffenderForm to be true/false;
         require("acceptableForms.php");
         $acceptableForms = [$acceptableForm1,$acceptableForm2,$acceptableForm3,$acceptableForm4,$acceptableForm5];
@@ -717,7 +737,31 @@ try{
             echo "There is no new ownership created.<hr>";
         }
 
-    // TODO: processing {ownership, offenderID, report general data form} -> {reportID, database change}
+    
+    // DONE2(for edit): If it is an editing submit, update the report using{ownership, offenderID, report general dataform, reportID} and die();
+        // because at done1, it is already validated, so it can be assumed that the report is valid.
+        if (isset($_GET["edit"])&&$_GET["edit"]=="true") {
+            $reportID = $_GET["id"];
+            $offenceID = $_POST["reportOffence"];
+
+            $incidentDate = $_POST["reportDate"];
+            $reportStatement = $_POST["reportStatement"];
+            $ownershipIDtext = $ownershipID=="NULL" ? "NULL" : "'".$ownershipID."'";
+            $offenderIDtext = $offenderID=="NULL" ? "NULL" : "'".$offenderID."'";
+            
+            $sql = "UPDATE Incident SET Ownership_ID=$ownershipIDtext, People_ID=$offenderIDtext, Offence_ID='$offenceID'"
+            .", Incident_date='$incidentDate', Incident_report='$reportStatement' WHERE Incident_ID=$reportID";
+            
+            echo "<hr>report update query:".$sql."<hr>"; //debugging
+            try{
+                mysqli_query($conn, $sql);
+                echo "Report update successfully, reportID:$reportID";
+            } catch (Exception $error) {
+                renderErrorMessages(["Failed to create Report",$error->getMessage()]);
+            }
+            die();// do this so won't insert an identical one.
+        }
+    // DONE: processing {ownership, offenderID, report general data form} -> {reportID, database change}
         $offenceID = $_POST["reportOffence"];
         $username = $user->getUsername();
         $incidentDate = $_POST["reportDate"];

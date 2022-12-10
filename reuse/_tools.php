@@ -21,5 +21,11 @@
                 return $json;
             }
     }
+    function assignJSONToJs($jsonString, $jsVarName) {
+        // $jsonString: a json string
+        // $jsVarName: the variable name in javascript for saving the json string.
+
+        echo "<script>let $jsVarName=$jsonString</script>";
+    }
 ?>
 

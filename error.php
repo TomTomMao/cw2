@@ -1,6 +1,6 @@
 <?php 
 $pageTitle = "Error";
-    require("/reuse/head.php");
+    require("reuse/head.php");
     if (isset($_GET["errorMessage"])) {
         $errorMessage = $_GET["errorMessage"];
     } else {

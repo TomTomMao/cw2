@@ -1,4 +1,4 @@
-<?php $pageTitle = "New Report";
+<?php $pageTitle = "Edit Report";
     require("../reuse/head.php");
     session_start();
         require("../Accounts/_account.php");// there is a User class
@@ -7,13 +7,12 @@
         if (!$user->isLoggedIn()) {
             header("location: ../Accounts/notLoginError.html"); // check if logged in
         }
-
-
-
 ?>
 <?php 
                     require("../reuse/_dbConnect.php");
                     $conn = connectDB();
+
+                    // get offence data
                     $sql = "SELECT Offence_ID, Offence_description, Offence_maxFine, Offence_maxPoints FROM offence;";
                     $offencesResults = mysqli_query($conn, $sql);
                     // echo $sql; // debugging
@@ -21,16 +20,40 @@
                     while ($row = mysqli_fetch_assoc($offencesResults)) {
                         array_push($offences, $row);
                     }
+
+                    require("_reports.php");
+                    $reportsDB = new ReportsDB($user, $conn);
+                    
+                    // DONE: ACCORDING TO THE $_GET["id"], retrieve a report.
+                        $reportID = $_GET["id"];
+                        $report = $reportsDB->getReportByReportID($reportID);
+                        // echo $report->renderGeneralRow(true); // debugging
+                    // DONE: Assert the report is in the database
+                        if ($report==false) {
+                            header("Location: ../error.php?errorMessage=Report doesn't exist");
+                            die();
+                        }
+                    // DONE: Assert the report belongs to the current user or the current user is admin
+                    echo "report accountUsername:".$report->accountUsername; //debugging
+                    echo "Your username:".$user->getUsername(); // debugging
+                        if ($report->accountUsername != $user->getUsername() && !$user->isAdmin()) {
+                            header("Location: ../error.php?errorMessage=You can't edit this report! Because this report was not created by you.");
+                        }
+                    // DONE: SAVE REPORT INTO A JAVASCRIPT VARIABLE as an javascript object: reportJSON
+                        $reportJSON = $report->toJSON();
+                        require_once("../reuse/_tools.php");
+                        assignJSONToJs($reportJSON, "reportJSON");
+                    // DONE: USING JS OBJECT TO AUTO FILL THE REPORT. (do it at flag-todo-3)
+                    
                     mysqli_close($conn);
                 ?>
+
 <body>
-<?php 
+    <?php 
         require("../reuse/navbar.php");
-        // TODO: ACCORDING TO THE $_GET["id"], retrieve a report.
-        // TODO: ACCORDING TO REPORT, create a javascript object
-        // TODO: USING JS OBJECT TO AUTO FILL THE REPORT.
+        
     ?>
-<!-- <div class="navbar">
+    <!-- <div class="navbar">
         <a href="../People/lookup.php">Lookup People</a>
         <a href="../Vehicles/lookup.php">Lookup Vehicles</a>
         <a href="../Vehicles/new.php">New Vehicles</a>
@@ -40,7 +63,7 @@
     <hr>
     <h1>Edit Report</h1>
     <hr>
-    <form action="newSubmit.php?edit=true&id=<?php echo $_GET["id"]?>" method="post">
+    <form action="newSubmit.php?edit=true&id=<?php echo $_GET['id']?>" method="post">
         <div>
             <h3>*Report General Information</h3>
             <div>
@@ -52,7 +75,7 @@
             </div>
             <div>
                 *Offence:
-                
+
                 <select name="reportOffence" id="reportOffence">
                     <?php 
                         foreach ($offences as $offence) {
@@ -60,7 +83,7 @@
                             $offenceDescription = $offence["Offence_description"];
                             $offenceMaxFine = $offence["Offence_maxFine"];
                             $offenceMaxPoints = $offence["Offence_maxPoints"];
-                            echo '<option value="'.$offenceID.'">'.'(Max Fine:'.$offenceMaxFine.'; Max Panelty Points:'.$offenceMaxPoints.') '.$offenceDescription.'</option>';
+                            echo '<option value="'.$offenceID.'" id=offence-'.$offenceID.'>'.'(Max Fine:'.$offenceMaxFine.'; Max Panelty Points:'.$offenceMaxPoints.') '.$offenceDescription.'</option>';
                         }
                     ?>
                 </select>
@@ -118,7 +141,27 @@
         <input type="submit" value="submit">
         <!--  -->
     </form>
-
+    <!-- flag-doto-3 -->
+    <script>
+        console.log(reportJSON);
+        document.getElementById("reportStatement").value = reportJSON["incidentReport"] ? reportJSON["incidentReport"] : "";
+        document.getElementById("reportDate").value = reportJSON["incidentDate"] ? reportJSON["incidentDate"] : "";
+        document.getElementById("offence-" + reportJSON["offenceID"]).selected = true;
+        document.getElementById("vehicleLicence").value = reportJSON["vehicleLicence"] ? reportJSON["vehicleLicence"] : "";
+        document.getElementById("vehicleColour").value = reportJSON["vehicleColour"] ? reportJSON["vehicleColour"] : "";
+        document.getElementById("vehicleMake").value = reportJSON["vehicleMake"] ? reportJSON["vehicleMake"] : "";
+        document.getElementById("vehicleModel").value = reportJSON["vehicleModel"] ? reportJSON["vehicleModel"] : "";
+        document.getElementById("ownerLicence").value = reportJSON["ownerLicence"] ? reportJSON["ownerLicence"] : "";
+        document.getElementById("ownerFirstName").value = reportJSON["ownerName"].split(" ")[0] ? reportJSON["ownerName"].split(" ")[0] : "";
+        document.getElementById("ownerLastName").value = reportJSON["ownerName"].split(" ")[1] ? reportJSON["ownerName"].split(" ")[1] : "";
+        document.getElementById("ownerAddress").value = reportJSON["ownerAddress"] ? reportJSON["ownerAddress"] : "";
+        document.getElementById("ownerDOB").value = reportJSON["ownerDOB"] ? reportJSON["ownerDOB"] : "";
+        document.getElementById("offenderLicence").value = reportJSON["offenderLicence"] ? reportJSON["offenderLicence"] : "";
+        document.getElementById("offenderFirstName").value = reportJSON["offenderName"].split(" ")[0] ? reportJSON["offenderName"].split(" ")[0] : "";
+        document.getElementById("offenderLastName").value = reportJSON["offenderName"].split(" ")[1] ? reportJSON["offenderName"].split(" ")[1] : "";
+        document.getElementById("offenderAddress").value = reportJSON["offenderAddress"] ? reportJSON["offenderAddress"] : "";
+        document.getElementById("offenderDOB").value = reportJSON["offenderDOB"] ? reportJSON["offenderDOB"] : "";
+    </script>
 </body>
 
 </html>

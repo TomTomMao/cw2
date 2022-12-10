@@ -191,7 +191,7 @@
 
 
 
-        function getReportsMultipleConditions(array $conditions) {
+        function getReportsMultipleConditions(array $conditions, $audit=true) {
             // Assume $conditions is not empty
             // $conditions: an array of search condition
             // e,g,: $conditions = Array ( [0] => Array ( ["columnName"] => offender.People_ID ["searchValue"] => "1" ) 
@@ -244,6 +244,24 @@
                 $row["Officer_ID"]));
             }
             return $reports;
+        }
+
+        function getReportByReportID(string $reportID, $audit=true) {
+            // given reportID 
+            // return the first report object that in the db searching result.
+            // return false if no report has this report id.
+            $conditions = array();
+            $condition = array();
+            $condition["columnName"] = "incident.Incident_ID";
+            $condition["searchValue"] = $reportID;
+            array_push($conditions, $condition);
+            $reports = $this->getReportsMultipleConditions($conditions,$audit);
+            if (empty($reports)) {
+                return false;
+            } else {
+                return $reports[0];
+            }
+            // return $this->getReportsMultipleConditions($conditions)[0];
         }
         
     }
