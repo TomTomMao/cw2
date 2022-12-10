@@ -16,12 +16,14 @@
 
         .people-table th,
         .people-table td,
+        .report-table th,
+        .report-table td,
         .ownership-container th,
         .ownership-container td {
             background-color: #dddddd;
         }
 
-        .people-table,
+        .people-table,.report-table
         {
         width: 80 vw;
         }
