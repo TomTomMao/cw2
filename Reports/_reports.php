@@ -63,7 +63,7 @@
             if ($showTable) {
                 $tableHead = "<table class='report-table'>
                 <tr>
-                    <th>incident Creator</th>
+                    <th>report creater</th>
                     <th>incident ID</th>
                     <th>incident date</th>
                     <th>incident description</th>
@@ -106,14 +106,14 @@
                 <td>".$offenderName."</td>
                 <td>".$offenderLicence."</td>
                 <td><button onclick=\"showReportDetail($incidentID)\" class='detial-button' id='detial".$incidentID."''>show</button></td>
-                <td><a href='edit.php?id=".$incidentID."''>edit</a></td>
+                <td><a target='_blank' $isMyReportText href='edit.php?id=".$incidentID."''>edit</a></td>
             </tr>".$tableTail;
         }
         static function renderGeneralTable($reports) {
             // render a reports table
             $tableHead = "<table class='report-table'>
                 <tr>
-                    <th>incident Creator</th>
+                    <th>report creater</th>
                     <th>incident ID</th>
                     <th>incident date</th>
                     <th>incident description</th>
