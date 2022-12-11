@@ -9,18 +9,33 @@
         } elseif (!$user->isAdmin()) {
             header("location: ../error.php?errorMessage=You are not an admin, so you are not allowed to access this page."); // check if logged in
         }
+
         require("../reuse/navbar.php");
+        require_once("../reuse/_dbConnect.php");
+        $conn = connectDB();
 
         if (isset($_GET["id"])) {
             $reportID = $_GET["id"];
         } else {
             $reportID = "";
         }
-?>
 
+        function isReportHasFine($conn, $reportID) {
+            $sql = "SELECT * FROM Fines WHERE Incident_ID = $reportID";
+            $result = mysqli_query($conn, $sql);
+            if (mysqli_num_rows($result)>0) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        if (isReportHasFine($conn, $reportID)) {
+            throw new Exception("You shouldn't be here, as the report already has a fine.");
+        }
+?>
 <body>
-    <form action="addFine.php" method="post">
-        <h1>Add Fine</h1>
+    <form action="addFine.php?id=<?php echo $reportID;?>" method="post">
+        <h1>Admin: Add Fine</h1>
         <table>
             <tr>
                 <td>Report ID:</td>
@@ -32,10 +47,46 @@
             </tr>
             <tr>
                 <td>Fine Point:</td>
-                <td><input type="number" name="finePoint" id="finePoint"></td>
+                <td><input type="number" name="finePoints" id="finePoints"></td>
             </tr>
-            <td><input type="submit" value="add"></td>
+            <td><input type="submit" value="add" name="submit"></td>
         </table>
     </form>
 </body>
 </html>
+<?php 
+    if (isset($_POST["submit"])) {
+        // echo "this is a post"; // debugging
+        if (empty($_POST["reportID"])) {
+            throw new Exception("Empty Report ID!", 1);
+        } elseif (empty($_POST["fineAmount"])) {
+            throw new Exception("You didn't enter fine amount!", 1);
+        } elseif (empty($_POST["finePoints"])) {
+            throw new Exception("You didn't enter fine amount!", 1);
+        }
+
+        
+        
+        $reportID = $_POST["reportID"];
+        $fineAmount = $_POST["fineAmount"];
+        $finePoints = $_POST["finePoints"];
+
+        // CHECK IF THE REPORT HAS FINE.
+        if (isReportHasFine($conn, $reportID)) {
+            throw new Exception("Failed to add fine, because the report already has a fine.");
+        }
+        
+        try {
+            $sql = "INSERT INTO Fines (Fine_amount, Fine_points, Incident_ID) VALUES ($fineAmount, $finePoints, $reportID)";
+            mysqli_query($conn, $sql);
+            mysqli_close($conn);
+            header("location: addFineSuccess.php");
+        } catch (Exception $error) {
+            throw $error;
+        }
+
+
+    } else {
+        // echo "not a post"; // debugging
+    }
+?>

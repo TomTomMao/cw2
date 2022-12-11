@@ -8,7 +8,8 @@ body {
 .report-table th,
 .report-table td,
 .ownership-container th,
-.ownership-container td {
+.ownership-container td,
+.account-td {
     background-color: #dddddd;
 }
 
