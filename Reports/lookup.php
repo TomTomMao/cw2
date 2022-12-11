@@ -129,6 +129,18 @@
                         <td class="report-detail-table-header">vehicleModel</td>
                         <td class="report-detail-table-data" id="report-detail-vehicleModel"></td>
                     </tr>
+                    <tr>
+                        <td class="report-detail-table-header">fineID</td>
+                        <td class="report-detail-table-data" id="report-detail-fineID"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">fineAmount</td>
+                        <td class="report-detail-table-data" id="report-detail-fineAmount"></td>
+                    </tr>
+                    <tr>
+                        <td class="report-detail-table-header">finePoints</td>
+                        <td class="report-detail-table-data" id="report-detail-finePoints"></td>
+                    </tr>
 
 
                 </table>
@@ -214,6 +226,7 @@
                     <input type="checkbox" id="searchValue1Null" onclick="toggleNullValue('searchValue1')">
                     <label for="searchValue1Null" id="searchValue1Null">NULL</label>
                 </td>
+                <td><button type="button" onclick="document.querySelector('#columnName1 #officerName').selected=true;document.getElementById('searchValue1').value=userInfo.officerName">Use my officer name</button></td>
             </tr>
             <tr>
                 <td style="text-align: right">AND</td>
@@ -284,6 +297,11 @@
                 </td>
             </tr>
             <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
                 <td><input type="submit" name="submit" value="Search" onclick="onSubmit()"></td>
             </tr>
         </table>
@@ -295,6 +313,11 @@
     </form>
     <!-- get reports using php. the report would be saved into $reports -->
 <?php
+        // DONE: Push username, isAdmin into javascript variable
+        $username = $user->getUsername();
+        $isAdmin = $user->isAdmin() ? "true" : "false";
+        $officerName = $user->getOfficerName();
+        echo "<script>userInfo={username:'$username', isAdmin:$isAdmin, officerName:'$officerName'}</script>";
     if (isset($_POST['submit'])) {
             // echo "this is a post"; // debugging
         
@@ -370,10 +393,7 @@
                         echo "<script>reportJSONs.push($reportJSON);</script>";
                     }
                 }
-        // DONE: Push username, isAdmin into javascript variable
-                $username = $user->getUsername();
-                $isAdmin = $user->isAdmin() ? "true" : "false";
-                echo "<script>userInfo={username:'$username', isAdmin:$isAdmin}</script>";
+        
     }else {
             // print_r($_POST); // debugging
             // echo "this is not a post"; // debugging
@@ -408,17 +428,22 @@
 
     // auto delete input box if the field name becomes empty
     function setEditLink() {
-        // disable the edit links of the reports which can not be edit by the user.
+        // disable the edit and add fine links of the reports which can not be edit by the user.
         username = userInfo.username
         isAdmin = userInfo.isAdmin
         if (isAdmin) {
             return
         } else {
+            // forbid edit report links
             for (report of reportJSONs) {
                 if (report['accountUsername']!=username) {
                     console.log(document.getElementById("edit-"+report["incidentID"]))
                     document.getElementById("edit-"+report["incidentID"]).classList=["forbidden-link"]
                 }
+            }
+            // forbid all add fine links
+            for (addFineTag of Array.from(document.getElementsByClassName("add-fine"))){
+                addFineTag.classList = ['add-fine forbidden-link']
             }
         }
     }

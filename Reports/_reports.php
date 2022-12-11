@@ -1,5 +1,22 @@
 <?php 
     class Report {
+        static $TABLEHEAD = "<table class='report-table'>
+        <tr>
+            <th>report creater</th>
+            <th>incident ID</th>
+            <th>incident date</th>
+            <th>incident description</th>
+            <th>offence</th>
+            <th>vehicle licence</th>
+            <th>owner name</th>
+            <th>owner licence</th>
+            <th>offender name</th>
+            <th>offender licence</th>
+            <th>detail</th>
+            <th>edit</th>
+            <th>fine</th>
+        </tr>";
+        static $TABLETAIL = "</table>";
         function __construct(   $Incident_ID,
                                 $Account_username,
                                 $Incident_date,
@@ -25,7 +42,10 @@
                                 $Offender_DOB,
                                 $Offender_licence,
                                 $Officer_name,
-                                $Officer_ID) {
+                                $Officer_ID,
+                                $Fine_ID,
+                                $Fine_amount,
+                                $Fine_points) {
                 $this->incidentID=$Incident_ID;
                 $this->accountUsername=$Account_username;
                 $this->incidentDate=$Incident_date;
@@ -52,31 +72,21 @@
                 $this->offenderLicence=$Offender_licence;
                 $this->officerName=$Officer_name;
                 $this->officerID=$Officer_ID;
-
+                $this->fineID=$Fine_ID;
+                $this->fineAmount=$Fine_amount;
+                $this->finePoints=$Fine_points;
+                
+                
 
 
         }
         function toJSON() {
-            return '{"incidentID":"'.$this->incidentID.'","accountUsername":"'.$this->accountUsername.'","incidentDate":"'.$this->incidentDate.'","incidentReport":"'.$this->incidentReport.'","offenceID":"'.$this->offenceID.'","offenceDescription":"'.$this->offenceDescription.'","offenceMaxFine":"'.$this->offenceMaxFine.'","offenceMaxPoints":"'.$this->offenceMaxPoints.'","vehicleID":"'.$this->vehicleID.'","vehicleLicence":"'.$this->vehicleLicence.'","vehicleMake":"'.$this->vehicleMake.'","vehicleModel":"'.$this->vehicleModel.'","vehicleColour":"'.$this->vehicleColour.'","ownerID":"'.$this->ownerID.'","ownerName":"'.$this->ownerName.'","ownerAddress":"'.$this->ownerAddress.'","ownerDOB":"'.$this->ownerDOB.'","ownerLicence":"'.$this->ownerLicence.'","ownershipID":"'.$this->ownershipID.'","offenderID":"'.$this->offenderID.'","offenderName":"'.$this->offenderName.'","offenderAddress":"'.$this->offenderAddress.'","offenderDOB":"'.$this->offenderDOB.'","offenderLicence":"'.$this->offenderLicence.'","officerName":"'.$this->officerName.'","officerID":"'.$this->officerID.'"}';
+            return '{"incidentID":"'.$this->incidentID.'","accountUsername":"'.$this->accountUsername.'","incidentDate":"'.$this->incidentDate.'","incidentReport":"'.$this->incidentReport.'","offenceID":"'.$this->offenceID.'","offenceDescription":"'.$this->offenceDescription.'","offenceMaxFine":"'.$this->offenceMaxFine.'","offenceMaxPoints":"'.$this->offenceMaxPoints.'","vehicleID":"'.$this->vehicleID.'","vehicleLicence":"'.$this->vehicleLicence.'","vehicleMake":"'.$this->vehicleMake.'","vehicleModel":"'.$this->vehicleModel.'","vehicleColour":"'.$this->vehicleColour.'","ownerID":"'.$this->ownerID.'","ownerName":"'.$this->ownerName.'","ownerAddress":"'.$this->ownerAddress.'","ownerDOB":"'.$this->ownerDOB.'","ownerLicence":"'.$this->ownerLicence.'","ownershipID":"'.$this->ownershipID.'","offenderID":"'.$this->offenderID.'","offenderName":"'.$this->offenderName.'","offenderAddress":"'.$this->offenderAddress.'","offenderDOB":"'.$this->offenderDOB.'","offenderLicence":"'.$this->offenderLicence.'","officerName":"'.$this->officerName.'","officerID":"'.$this->officerID.'","fineID":"'.$this->fineID.'","fineAmount":"'.$this->fineAmount.'","finePoints":"'.$this->finePoints.'"}';
         }
         function renderGeneralRow($showTable = false) {
             if ($showTable) {
-                $tableHead = "<table class='report-table'>
-                <tr>
-                    <th>report creater</th>
-                    <th>incident ID</th>
-                    <th>incident date</th>
-                    <th>incident description</th>
-                    <th>offence</th>
-                    <th>vehicle licence</th>
-                    <th>owner name</th>
-                    <th>owner licence</th>
-                    <th>offender name</th>
-                    <th>offender licence</th>
-                    <th>detail</th>
-                    <th>edit</th>
-                </tr>";
-                $tableTail = "</table>";
+                $tableHead = Report::$TABLEHEAD;
+                $tableTail = Report::$TABLETAIL;
             } else {
                 $tableHead = "";
                 $tableTail = "";
@@ -92,7 +102,15 @@
             $ownerLicence = $this->ownerLicence != NULL ? $this->ownerLicence : "NULL";
             $offenderName = $this->offenderName != NULL ? $this->offenderName : "NULL";
             $offenderLicence = $this->offenderLicence != NULL ? $this->offenderLicence : "NULL";
-            
+            $fineID = $this->fineID != NULL ? $this->fineID : "NULL";
+            $fineAmount = $this->fineAmount != NULL ? $this->fineAmount : "NULL";
+            $finePoints = $this->finePoints != NULL ? $this->finePoints : "NULL";
+            if ($fineID == "NULL") {
+                $fineCell = "<td><a class='add-fine' id='fine-$incidentID' target='_blank' href='../Admin/addFine.php?id=".$incidentID."'>add</a></td>";
+            } else {
+                $fineCell = "<td>".$fineAmount."</td>";
+            }
+
             return $tableHead."
             <tr id='$incidentID'>
                 <td>".$accountUsername."</td>
@@ -105,28 +123,15 @@
                 <td>".$ownerLicence."</td>
                 <td>".$offenderName."</td>
                 <td>".$offenderLicence."</td>
-                <td><button onclick=\"showReportDetail($incidentID)\" class='detial-button' id='detial".$incidentID."''>show</button></td>
-                <td><a id='edit-$incidentID' target='_blank' href='edit.php?id=".$incidentID."''>edit</a></td>
+                <td><button onclick=\"showReportDetail($incidentID)\" class='detial-button' id='detial".$incidentID."'>show</button></td>
+                <td><a id='edit-$incidentID' target='_blank' href='edit.php?id=".$incidentID."'>edit</a></td>
+                ".$fineCell."
             </tr>".$tableTail;
         }
         static function renderGeneralTable($reports) {
             // render a reports table
-            $tableHead = "<table class='report-table'>
-                <tr>
-                    <th>report creater</th>
-                    <th>incident ID</th>
-                    <th>incident date</th>
-                    <th>incident description</th>
-                    <th>offence</th>
-                    <th>vehicle licence</th>
-                    <th>owner name</th>
-                    <th>owner licence</th>
-                    <th>offender name</th>
-                    <th>offender licence</th>
-                    <th>detail</th>
-                    <th>edit</th>
-                </tr>";
-                $tableTail = "</table>";
+            $tableHead = Report::$TABLEHEAD;
+            $tableTail = Report::$TABLETAIL;
             $tableBody = "";
             if (!empty($reports)){
                 foreach($reports as $report) {
@@ -156,15 +161,18 @@
                 
                 Incident.People_ID AS 'Offender_ID', offender.People_name AS 'Offender_name', offender.People_address AS 'Offender_address', offender.People_DOB AS 'Offender_DOB',  offender.People_licence AS 'Offender_licence',
 
-                accounts.Officer_name, accounts.Officer_ID
+                accounts.Officer_name, accounts.Officer_ID,
                 
+                fines.Fine_ID, fines.Fine_amount, fines.Fine_points
+
                 FROM incident
                 LEFT JOIN people AS offender ON incident.People_ID = offender.People_ID
                 LEFT JOIN ownership USING (Ownership_ID)
                 LEFT JOIN people AS owner ON ownership.People_ID = owner.People_ID
                 LEFT JOIN vehicles ON ownership.Vehicle_ID = vehicles.Vehicle_ID
                 LEFT JOIN offence USING(Offence_ID)
-                LEFT JOIN accounts USING(Account_username) ";
+                LEFT JOIN accounts USING(Account_username)
+                LEFT JOIN fines USING(Incident_ID) ";
         }
         static function getWhereName(string $fieldName) {
             // given a string $fieldName, return it's column name that would be used in sql where clause.
@@ -243,7 +251,11 @@
                 $row["Offender_DOB"],
                 $row["Offender_licence"],
                 $row["Officer_name"],
-                $row["Officer_ID"]));
+                $row["Officer_ID"],
+                $row["Fine_ID"],
+                $row["Fine_amount"],
+                $row["Fine_points"]
+            ));
             }
             return $reports;
         }
