@@ -82,7 +82,7 @@ try{
             }
             return "invalid form";
         }
-        function isVehicleFormValid($post,) {
+        function isVehicleFormValid($post) {
             // assume there is a vehicle form
             // return an associative array: 
             //  ["allValid"=>true/false, "message"=>["feedback message1", "feedback message2"...]]
