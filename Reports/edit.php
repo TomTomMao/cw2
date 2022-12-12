@@ -13,7 +13,7 @@
                     $conn = connectDB();
 
                     // get offence data
-                    $sql = "SELECT Offence_ID, Offence_description, Offence_maxFine, Offence_maxPoints FROM offence;";
+                    $sql = "SELECT Offence_ID, Offence_description, Offence_maxFine, Offence_maxPoints FROM Offence;";
                     $offencesResults = mysqli_query($conn, $sql);
                     // echo $sql; // debugging
                     $offences = array();

@@ -203,7 +203,7 @@
 
 
 
-        function getReportsMultipleConditions(array $conditions, $audit=true) {
+        function getReportsMultipleConditions($conditions, $audit=true) {
             // Assume $conditions is not empty
             // $conditions: an array of search condition
             // e,g,: $conditions = Array ( [0] => Array ( ["columnName"] => offender.People_ID ["searchValue"] => "1" ) 
