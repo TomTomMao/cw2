@@ -151,32 +151,32 @@
 
                 Incident_ID, Incident.Account_username, Incident_date, Incident_report, 
                 
-                Incident.Offence_ID, offence.Offence_description, offence.Offence_maxFine, offence.Offence_maxPoints,
+                Incident.Offence_ID, Offence.Offence_description, Offence.Offence_maxFine, Offence.Offence_maxPoints,
                 
-                ownership.Vehicle_ID , vehicles.Vehicle_licence,vehicles.Vehicle_make, vehicles.Vehicle_model, vehicles.Vehicle_colour,
+                Ownership.Vehicle_ID , Vehicles.Vehicle_licence,Vehicles.Vehicle_make, Vehicles.Vehicle_model, Vehicles.Vehicle_colour,
                 
-                ownership.People_ID AS 'Owner_ID', owner.People_name AS 'Owner_name', owner.People_address AS 'Owner_Address', owner.People_DOB AS 'Owner_DOB', owner.People_licence AS 'Owner_licence',
+                Ownership.People_ID AS 'Owner_ID', owner.People_name AS 'Owner_name', owner.People_address AS 'Owner_Address', owner.People_DOB AS 'Owner_DOB', owner.People_licence AS 'Owner_licence',
                 
                 Incident.Ownership_ID, 
                 
                 Incident.People_ID AS 'Offender_ID', offender.People_name AS 'Offender_name', offender.People_address AS 'Offender_address', offender.People_DOB AS 'Offender_DOB',  offender.People_licence AS 'Offender_licence',
 
-                accounts.Officer_name, accounts.Officer_ID,
+                Accounts.Officer_name, Accounts.Officer_ID,
                 
-                fines.Fine_ID, fines.Fine_amount, fines.Fine_points
+                Fines.Fine_ID, Fines.Fine_amount, Fines.Fine_points
 
-                FROM incident
-                LEFT JOIN people AS offender ON incident.People_ID = offender.People_ID
-                LEFT JOIN ownership USING (Ownership_ID)
-                LEFT JOIN people AS owner ON ownership.People_ID = owner.People_ID
-                LEFT JOIN vehicles ON ownership.Vehicle_ID = vehicles.Vehicle_ID
-                LEFT JOIN offence USING(Offence_ID)
-                LEFT JOIN accounts USING(Account_username)
-                LEFT JOIN fines USING(Incident_ID) ";
+                FROM Incident
+                LEFT JOIN People AS offender ON Incident.People_ID = offender.People_ID
+                LEFT JOIN Ownership USING (Ownership_ID)
+                LEFT JOIN People AS owner ON Ownership.People_ID = owner.People_ID
+                LEFT JOIN Vehicles ON Ownership.Vehicle_ID = Vehicles.Vehicle_ID
+                LEFT JOIN Offence USING(Offence_ID)
+                LEFT JOIN Accounts USING(Account_username)
+                LEFT JOIN Fines USING(Incident_ID) ";
         }
-        static function getWhereName(string $fieldName) {
+        static function getWhereName($fieldName) {
             // given a string $fieldName, return it's column name that would be used in sql where clause.
-            return [
+            $dictionary =[
                 "offenderID"=>"offender.People_ID",
                 "offenderName"=>"offender.People_name",
                 "offenderDOB"=>"offender.People_DOB",
@@ -185,18 +185,20 @@
                 "ownerName"=>"owner.People_name",
                 "ownerDOB"=>"owner.People_DOB",
                 "ownerLicence"=>"owner.People_Licence",
-                "vehicleID"=>"vehicles.Vehicle_ID",
-                "vehicleLicence"=>"vehicles.Vehicle_licence",
-                "vehicleColour"=>"vehicles.Vehicle_Colour",
-                "vehicleMake"=>"vehicles.Vehicle_Make",
-                "vehicleModel"=>"vehicles.Vehicle_Model",
-                "incidentDate"=>"incident.Incident_date",
-                "incidentID"=>"incident.Incident_ID",
-                "officerName"=>"accounts.Officer_name",
-                "officerID"=>"accounts.Officer_ID",
-                "offenceID"=>"offence.Offence_ID",
-                "offenceDescription"=>"offence.Offence_description"
-            ][$fieldName];
+                "vehicleID"=>"Vehicles.Vehicle_ID",
+                "vehicleLicence"=>"Vehicles.Vehicle_licence",
+                "vehicleColour"=>"Vehicles.Vehicle_Colour",
+                "vehicleMake"=>"Vehicles.Vehicle_Make",
+                "vehicleModel"=>"Vehicles.Vehicle_Model",
+                "incidentDate"=>"Incident.Incident_date",
+                "incidentID"=>"Incident.Incident_ID",
+                "officerName"=>"Accounts.Officer_name",
+                "officerID"=>"Accounts.Officer_ID",
+                "offenceID"=>"Offence.Offence_ID",
+                "offenceDescription"=>"Offence.Offence_description"
+            ]; 
+            // echo $dictionary[$fieldName]."<br>"; // debugging
+            return $dictionary[$fieldName];
         }
 
 
@@ -225,6 +227,7 @@
             // echo $sql;// debugging
             $results = mysqli_query($conn, $sql);
             $reports = array();
+            // echo $sql; //debugging
             while ($row=mysqli_fetch_assoc($results)) {
                 array_push($reports, new Report($row["Incident_ID"],
                 $row["Account_username"],
@@ -260,13 +263,13 @@
             return $reports;
         }
 
-        function getReportByReportID(string $reportID, $audit=true) {
+        function getReportByReportID($reportID, $audit=true) {
             // given reportID 
             // return the first report object that in the db searching result.
             // return false if no report has this report id.
             $conditions = array();
             $condition = array();
-            $condition["columnName"] = "incident.Incident_ID";
+            $condition["columnName"] = "Incident.Incident_ID";
             $condition["searchValue"] = $reportID;
             array_push($conditions, $condition);
             $reports = $this->getReportsMultipleConditions($conditions,$audit);

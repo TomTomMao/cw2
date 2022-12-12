@@ -36,7 +36,7 @@
     // DONE: FORBID THE CASE THAT THE USERNAME EXISTS IN THE DATABASE.
         // use username to query the account table
         // if result is more than one, throw exception and die()
-        $sql = "SELECT Account_username FROM accounts WHERE Account_username='$accountUsername';";
+        $sql = "SELECT Account_username FROM Accounts WHERE Account_username='$accountUsername';";
         $result = mysqli_query($conn, $sql);
         if (mysqli_num_rows($result)!=0) {
             mysqli_close($conn);
@@ -61,7 +61,7 @@
 
 
     // TODO: SHOW THE ACCOUNT INFORMATION.
-        $sql = "SELECT Account_username, Account_password, Officer_name, Officer_id, Account_userType FROM accounts WHERE Account_username = '$accountUsername';";
+        $sql = "SELECT Account_username, Account_password, Officer_name, Officer_id, Account_userType FROM Accounts WHERE Account_username = '$accountUsername';";
         $result = mysqli_query($conn, $sql);
         $account = mysqli_fetch_assoc($result);
         $usernameFromDB = $account["Account_username"];
