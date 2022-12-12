@@ -30,7 +30,7 @@
             $accountUsername = $_POST["accountUsername"];
             $officerFirstName = $_POST["officerFirstName"];
             $officerLastName = $_POST["officerLastName"];
-            $officerName = $officerFirstName.$officerLastName;
+            $officerName = $officerFirstName." ".$officerLastName;
             $officerID = $_POST["officerID"]; 
         }
     // DONE: FORBID THE CASE THAT THE USERNAME EXISTS IN THE DATABASE.
