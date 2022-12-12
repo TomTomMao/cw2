@@ -57,12 +57,13 @@
 <?php 
     if (isset($_POST["submit"])) {
         // echo "this is a post"; // debugging
+        // check if the table is empty or not. Note: if the value is 0, it is not empty.
         if (empty($_POST["reportID"])) {
             throw new Exception("Empty Report ID!", 1);
-        } elseif (empty($_POST["fineAmount"])) {
+        } elseif (!isset($_POST["fineAmount"]) || ($_POST['fineAmount']!= 0 && empty($_POST["fineAmount"]))) {
             throw new Exception("You didn't enter fine amount!", 1);
-        } elseif (empty($_POST["finePoints"])) {
-            throw new Exception("You didn't enter fine amount!", 1);
+        } elseif (!isset($_POST["finePoints"]) || ($_POST['finePoints']!= 0 && empty($_POST["finePoints"]))) {
+            throw new Exception("You didn't enter fine points!", 1);
         }
 
         

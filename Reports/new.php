@@ -14,7 +14,7 @@
 <?php 
                     require("../reuse/_dbConnect.php");
                     $conn = connectDB();
-                    $sql = "SELECT Offence_ID, Offence_description, Offence_maxFine, Offence_maxPoints FROM offence;";
+                    $sql = "SELECT Offence_ID, Offence_description, Offence_maxFine, Offence_maxPoints FROM Offence;";
                     $offencesResults = mysqli_query($conn, $sql);
                     // echo $sql; // debugging
                     $offences = array();

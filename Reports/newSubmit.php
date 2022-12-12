@@ -432,9 +432,12 @@ try{
 
                         // check if the owner from db has no licence, if it has licence, feedback this error and die()
                         $ownerID = $ownerWithoutLicenceFromDB->getID(); // set id
-                        if (empty($ownerWithoutLicenceFromDB->getLicence())) {
+                        $ownerLicenceTmp = $ownerWithoutLicenceFromDB->getLicence(); 
+                        if (empty($ownerLicenceTmp)) {
+                            unset($ownerLicenceTmp);
                             // echo "GOOD, owner licence from db is empty:'".$ownerWithoutLicenceFromDB->getLicence()."'<hr>"; // debugging
                         } else {
+                            unset($ownerLicenceTmp);
                             // the one in db have a licence, error.
                             throw new Exception("<br>The owner you submit:".$ownerWithoutLicenceFromForm->renderRow(true).
                             "is already in the database, and has a driving licence: ".$ownerWithoutLicenceFromDB->getLicence().
@@ -629,9 +632,12 @@ try{
 
                         // check if the offender from db has no licence, if it has licence, feedback this error and die()
                         $offenderID = $offenderWithoutLicenceFromDB->getID(); // set id
-                        if (empty($offenderWithoutLicenceFromDB->getLicence())) {
+                        $offenderTmp = $offenderWithoutLicenceFromDB->getLicence(); 
+                        if (empty($offenderTmp)) {
+                            unset($offenderTmp);
                             // echo "GOOD, offender licence from db is empty:'".$offenderWithoutLicenceFromDB->getLicence()."'<hr>"; // debugging
                         } else {
+                            unset($offenderTmp);
                             // the one in db have a licence, error.
                             throw new Exception("<br>The offender you submit:".$offenderWithoutLicenceFromForm->renderRow(true).
                             "is already in the database, and has a driving licence: ".$offenderWithoutLicenceFromDB->getLicence().
