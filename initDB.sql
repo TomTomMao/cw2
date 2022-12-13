@@ -256,16 +256,17 @@ CREATE TABLE Audit (
   Table_ID varchar(20) NOT NULL,
   Old_data varchar(3000) DEFAULT NULL,
   New_data varchar(3000) DEFAULT NULL,
-  Behaviour_type varchar(20) NOT NULL
+  Behaviour_type varchar(20) NOT NULL,
+  Audit_time datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 ALTER TABLE Audit
   ADD PRIMARY KEY (Audit_ID);
 
-INSERT INTO Audit (Audit_ID,Account_username,Table_name,Table_ID,Old_data,New_data,Behaviour_type) VALUES
+INSERT INTO Audit (Audit_ID,Account_username,Table_name,Table_ID,Old_data,New_data,Behaviour_type, Audit_time) VALUES
 (1, "daniels", "People", "1", NULL, 
 '{"ID":"1","licence":"SMITH92LDOFJJ829","address":"23 Barnsdale Road, Leicester","dateOfBirth":"1991-02-12","firstName":"James","lastName":"Smith","photoID":"NULL"}',
-"INSERT");
+"INSERT", "2020-10-11 14:15:35");
 
 ALTER TABLE Audit
   MODIFY Audit_ID int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
