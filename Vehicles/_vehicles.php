@@ -9,6 +9,13 @@
             $this->make = $make;
             $this->model = $model;
         }
+        function toJSON() {
+            return '{"ID":"'.$this->ID.
+                '","licence":"'.$this->getLicence().
+                '","colour":"'.$this->getColour().
+                '","make":"'.$this->getMake().
+                '","model":"'.$this->getModel().'"}';
+        }
         function setID($ID) {
             $this->ID = $ID;
         }

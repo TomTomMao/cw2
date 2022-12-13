@@ -41,8 +41,8 @@
                 </tr>
             </table>
         </form>
-        
-        
+        <script>let ownerships = [];</script> 
+        <!-- The line above is for testing the php object method Ownership->toJSON and Vehicle->toJSON and Person->toJSON -->
         <?php
             if(!empty($_POST["vehicleLicence"])) {
                 $conn = connectDB();
@@ -64,6 +64,10 @@
                 foreach ($ownershipsIDKEY as $k => $ownership) {
                     $ownershipDiv = $ownershipDiv.$ownership->render();
                 }
+
+                foreach ($ownershipsIDKEY as $k => $ownership) { // testing the php object method Ownership->toJSON and Vehicle->toJSON and Person->toJSON
+                    echo "<script>ownerships.push(".$ownership->toJSON().");</script>";// testing the php object method Ownership->toJSON and Vehicle->toJSON and Person->toJSON
+                }// testing the php object method Ownership->toJSON and Vehicle->toJSON and Person->toJSON
                 echo $ownershipDiv;
                 mysqli_close($conn);
             } elseif(isset($_POST["vehicleLicence"])) {

@@ -53,7 +53,7 @@
                 </tr>
             </table>
         </form>
-        
+
         <?php
             require("../reuse/_dbConnect.php");
             $conn = connectDB();
@@ -61,7 +61,7 @@
 
             if(!empty($_POST["peopleName"])) {
                 $people = $peopleDB->getPeopleByName($_POST["peopleName"]);
-
+                
                 // check and render the data
                 echo "<hr>";
                 if (count($people)<=0) {
@@ -69,6 +69,9 @@
                     "Person with name: '".$_POST["peopleName"]."'"." Not found"."</div></div>";
                 } else {
                     echo Person::renderPeopleTable($people);
+                    foreach ($people as $person) {
+                        echo $person->toJSON()."<br>"; // testing person->toJSON()
+                    }    
                 }
 
             } elseif(!empty($_POST["peopleLicence"])) {
@@ -80,6 +83,9 @@
                     echo "Person with driving licence: '".$_POST["peopleLicence"]."'"."Not found";
                 } else {
                     echo Person::renderPeopleTable($people);
+                    foreach ($people as $person) {
+                        echo $person->toJSON()."<br>"; // testing person->toJSON()
+                    }    
                 }
 
             } elseif(isset($_POST["peopleName"]) || isset($_POST["peopleLicence"])) {

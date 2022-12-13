@@ -80,7 +80,13 @@
 
 
         }
-        function toJSON() {
+        function toJSONNew() {
+            throw new Exception("Not Implemented Error", 1);
+        }
+        function toJSON($new = false) {
+            if ($new) {
+                return $this->toJSONNew();
+            }
             return '{"incidentID":"'.$this->incidentID
                 .'","accountUsername":"'.$this->accountUsername
                 .'","incidentDate":"'.$this->incidentDate

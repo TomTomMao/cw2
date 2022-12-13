@@ -21,7 +21,7 @@
         $peopleDB = new PeopleDB($user, $conn);
         $person = $peopleDB->getPersonByLicence($personLicence);
         if ($person != NULL) {
-            echo $person->getJSONText();
+            echo $person->toJSON();
         } else {
             echo "NULL";
         }

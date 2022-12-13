@@ -41,7 +41,7 @@
         function getPhotoID() {
             return "NULL";
         }
-        function getJSONText() {
+        function toJSON() {
             return '{"ID":"'.$this->ID.
                 '","licence":"'.$this->getLicence().
                 '","address":"'.$this->getAddress().
