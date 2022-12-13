@@ -248,6 +248,30 @@ ALTER TABLE Fines
 
 
 
+DROP TABLE IF EXISTS Audit;
+CREATE TABLE Audit (
+  Audit_ID int(30) NOT NULL,
+  Account_username varchar(40) NOT NULL,
+  Table_name varchar(20) NOT NULL,
+  Table_ID varchar(20) NOT NULL,
+  Old_data varchar(3000) DEFAULT NULL,
+  New_data varchar(3000) DEFAULT NULL,
+  Behaviour_type varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE Audit
+  ADD PRIMARY KEY (Audit_ID);
+
+INSERT INTO Audit (Audit_ID,Account_username,Table_name,Table_ID,Old_data,New_data,Behaviour_type) VALUES
+(1, "daniels", "People", "1", NULL, 
+'{"ID":"1","licence":"SMITH92LDOFJJ829","address":"23 Barnsdale Road, Leicester","dateOfBirth":"1991-02-12","firstName":"James","lastName":"Smith","photoID":"NULL"}',
+"INSERT");
+
+ALTER TABLE Audit
+  MODIFY Audit_ID int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+
+
 
 
 -- DROP TABLE IF EXISTS Fines;

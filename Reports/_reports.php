@@ -81,7 +81,35 @@
 
         }
         function toJSON() {
-            return '{"incidentID":"'.$this->incidentID.'","accountUsername":"'.$this->accountUsername.'","incidentDate":"'.$this->incidentDate.'","incidentReport":"'.$this->incidentReport.'","offenceID":"'.$this->offenceID.'","offenceDescription":"'.$this->offenceDescription.'","offenceMaxFine":"'.$this->offenceMaxFine.'","offenceMaxPoints":"'.$this->offenceMaxPoints.'","vehicleID":"'.$this->vehicleID.'","vehicleLicence":"'.$this->vehicleLicence.'","vehicleMake":"'.$this->vehicleMake.'","vehicleModel":"'.$this->vehicleModel.'","vehicleColour":"'.$this->vehicleColour.'","ownerID":"'.$this->ownerID.'","ownerName":"'.$this->ownerName.'","ownerAddress":"'.$this->ownerAddress.'","ownerDOB":"'.$this->ownerDOB.'","ownerLicence":"'.$this->ownerLicence.'","ownershipID":"'.$this->ownershipID.'","offenderID":"'.$this->offenderID.'","offenderName":"'.$this->offenderName.'","offenderAddress":"'.$this->offenderAddress.'","offenderDOB":"'.$this->offenderDOB.'","offenderLicence":"'.$this->offenderLicence.'","officerName":"'.$this->officerName.'","officerID":"'.$this->officerID.'","fineID":"'.$this->fineID.'","fineAmount":"'.$this->fineAmount.'","finePoints":"'.$this->finePoints.'"}';
+            return '{"incidentID":"'.$this->incidentID
+                .'","accountUsername":"'.$this->accountUsername
+                .'","incidentDate":"'.$this->incidentDate
+                .'","incidentReport":"'.$this->incidentReport
+                .'","offenceID":"'.$this->offenceID
+                .'","offenceDescription":"'.$this->offenceDescription
+                .'","offenceMaxFine":"'.$this->offenceMaxFine
+                .'","offenceMaxPoints":"'.$this->offenceMaxPoints
+                .'","vehicleID":"'.$this->vehicleID
+                .'","vehicleLicence":"'.$this->vehicleLicence
+                .'","vehicleMake":"'.$this->vehicleMake
+                .'","vehicleModel":"'.$this->vehicleModel
+                .'","vehicleColour":"'.$this->vehicleColour
+                .'","ownerID":"'.$this->ownerID
+                .'","ownerName":"'.$this->ownerName
+                .'","ownerAddress":"'.$this->ownerAddress
+                .'","ownerDOB":"'.$this->ownerDOB
+                .'","ownerLicence":"'.$this->ownerLicence
+                .'","ownershipID":"'.$this->ownershipID
+                .'","offenderID":"'.$this->offenderID
+                .'","offenderName":"'.$this->offenderName
+                .'","offenderAddress":"'.$this->offenderAddress
+                .'","offenderDOB":"'.$this->offenderDOB
+                .'","offenderLicence":"'.$this->offenderLicence
+                .'","officerName":"'.$this->officerName
+                .'","officerID":"'.$this->officerID
+                .'","fineID":"'.$this->fineID
+                .'","fineAmount":"'.$this->fineAmount
+                .'","finePoints":"'.$this->finePoints.'"}';
         }
         function renderGeneralRow($showTable = false) {
             if ($showTable) {
