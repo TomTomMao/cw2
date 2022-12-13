@@ -7,7 +7,7 @@
     require("../People/_people.php");
     session_start();
     $user = new User();
-    $ownershipDB = new OwnershipDB($user->getUsername());
+    $ownershipDB = new OwnershipDB($user);
     // $ownerships = $ownershipDB->getOwnershipsByLicence("AD223NG");
     // print_r(count($ownerships));
     // foreach ($ownerships as $ownership) {

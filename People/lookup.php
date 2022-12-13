@@ -57,7 +57,7 @@
         <?php
             require("../reuse/_dbConnect.php");
             $conn = connectDB();
-            $peopleDB = new PeopleDB($user->getUsername(), $conn);
+            $peopleDB = new PeopleDB($user, $conn);
 
             if(!empty($_POST["peopleName"])) {
                 $people = $peopleDB->getPeopleByName($_POST["peopleName"]);

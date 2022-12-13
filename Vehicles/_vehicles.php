@@ -57,8 +57,8 @@
         }
     }
     class VehiclesDB {
-    function __construct($username, $conn) {
-        $this->username = $username;
+    function __construct($user, $conn) {
+        $this->user = $user;
         $this->conn = $conn;
     }
     function isVehicleExists($vehicleLicence) {

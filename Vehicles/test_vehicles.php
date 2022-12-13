@@ -15,7 +15,7 @@
 
     <?php    
         require_once("_vehicles.php");
-        $vehiclesDB = new vehiclesDB($user->getUsername());
+        $vehiclesDB = new vehiclesDB($user);
     ?>
     <body>
     <?php 

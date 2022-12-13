@@ -27,10 +27,10 @@ try{
         require("../People/_people.php");
         require("_reports.php");
         $conn = connectDB();
-        $ownershipDB = new OwnershipDB($user->getUsername(), $conn);
-        $vehicleDB = new VehiclesDB($user->getUsername(), $conn);
-        $peopleDB = new PeopleDB($user->getUsername(), $conn);
-        $reportDB = new ReportsDB($user->getUsername(), $conn);
+        $ownershipDB = new OwnershipDB($user, $conn);
+        $vehicleDB = new VehiclesDB($user, $conn);
+        $peopleDB = new PeopleDB($user, $conn);
+        $reportDB = new ReportsDB($user, $conn);
 
         function getReportType($acceptableForms, $post) {
             // given an array of $acceptableForms, and $post information,

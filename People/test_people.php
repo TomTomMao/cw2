@@ -6,7 +6,7 @@
     function testGetPersonIDByLicence() {
         $allPass = true;
         $user = new User();
-        $peopleDB = new PeopleDB($user->getUsername());
+        $peopleDB = new PeopleDB($user);
         $personID = $peopleDB->getPersonIDByLicence("SMITH92LDOFJJ829");
         $testCases = array();
         $testCases["SMITH92LDOFJJ829"] = 1;

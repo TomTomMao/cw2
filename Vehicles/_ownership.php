@@ -194,8 +194,8 @@
     }
     class OwnershipDB {
         // this is a class for handling data about Vehicles
-        function __construct($username, $conn){ // for audit trial function
-            $this->username = $username;
+        function __construct($user, $conn){ // for audit trial function
+            $this->user = $user;
             $this->conn = $conn;
         }
         function recordGetVehicleByLicence(){

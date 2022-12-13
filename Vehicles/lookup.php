@@ -46,7 +46,7 @@
         <?php
             if(!empty($_POST["vehicleLicence"])) {
                 $conn = connectDB();
-                $ownershipDB = new OwnershipDB($user->getUsername(),$conn);
+                $ownershipDB = new OwnershipDB($user,$conn);
                 $ownerships = $ownershipDB->getOwnershipsByLicence($_POST["vehicleLicence"]);
 
                 // check and render the data

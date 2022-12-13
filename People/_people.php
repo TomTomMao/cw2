@@ -113,8 +113,8 @@
     }
     class PeopleDB {
         // this is a class for handling data about people
-        function __construct($username, $conn){
-            $this->username = $username;
+        function __construct($user, $conn){
+            $this->user = $user;
             $this->conn = $conn;
         }
         function recordGetPeopleByName(){
