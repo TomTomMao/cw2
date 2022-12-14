@@ -56,9 +56,10 @@
 
         <?php
             require("../reuse/_dbConnect.php");
+            require("../reuse/_audit.php");
             $conn = connectDB();
             $peopleDB = new PeopleDB($user, $conn);
-
+            $auditDB =  new AuditDB($user, $conn);
             if(!empty($_POST["peopleName"])) {
                 $people = $peopleDB->getPeopleByName($_POST["peopleName"]);
                 
@@ -67,9 +68,21 @@
                 if (count($people)<=0) {
                     echo "<div class='feedback-yellow'><div class='feedback-text-line'>".
                     "Person with name: '".$_POST["peopleName"]."'"." Not found"."</div></div>";
+                    
+                    // insert audit trial for this.
+                    $audit = new Audit("NULL", $user->getUsername()
+                    , "People", "NULL", "NULL"
+                    , '{"partialName":"'.$_POST["peopleName"].'"}'
+                    , "SELECT-EMPTY", "now");
+                    $auditDB->insertAudit($audit);
                 } else {
-                    echo Person::renderPeopleTable($people);
+                    echo Person::renderPeopleTable($people); // render table at server
                     foreach ($people as $person) {
+                        // insert audit trial for each person found.
+                        $audit = new Audit("NULL", $user->getUsername(), "People"
+                        ,$person->ID, $person->toJSON(), "NULL", "SELECT-FOUND", "now");
+                        $auditDB->insertAudit($audit);
+                        
                         echo $person->toJSON()."<br>"; // testing person->toJSON()
                     }    
                 }
@@ -81,9 +94,21 @@
                 echo "<hr>";
                 if (!$people) {
                     echo "Person with driving licence: '".$_POST["peopleLicence"]."'"."Not found";
+                    
+                    // insert audit trial for this.
+                    $audit = new Audit("NULL", $user->getUsername()
+                    , "People", "NULL", "NULL"
+                    , '{"personLicence":"'.$_POST["peopleLicence"].'"}'
+                    , "SELECT-EMPTY", "now");
+                    $auditDB->insertAudit($audit);
                 } else {
-                    echo Person::renderPeopleTable($people);
+                    echo Person::renderPeopleTable($people); // render table at server
                     foreach ($people as $person) {
+                        // insert audit trial for each person found.
+                        $audit = new Audit("NULL", $user->getUsername(), "People"
+                        ,$person->ID, $person->toJSON(), "NULL", "SELECT-FOUND", "now");
+                        $auditDB->insertAudit($audit);
+                        
                         echo $person->toJSON()."<br>"; // testing person->toJSON()
                     }    
                 }
@@ -97,7 +122,8 @@
     
 <?php 
     } catch (Exception $error) {
-        header("location: ../error.php?errorMessage=".$error->getMessage());
+        throw $error;
+        // header("location: ../error.php?errorMessage=".$error->getMessage());
     }
 ?>
 </body>

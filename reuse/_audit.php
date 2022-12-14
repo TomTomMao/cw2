@@ -1,7 +1,7 @@
 <?php
     
     class Audit {
-        function __construct($auditID, $accountUsername, $tableName, $tableID, $oldData, $newData, $behaviourType, $auditTime) {
+        function __construct($auditID, $accountUsername, $tableName, $tableID, $oldData, $newData, $behaviourType, $auditTime = "now") {
             // if attribute is null, please use a string "NULL" rather than NULL value. If the attribute is null type, it would be convert to a String "NULL"
             $this->auditID = $auditID == NULL ? "NULL" : $auditID;
             $this->accountUsername = $accountUsername == NULL ? "NULL" : $accountUsername;
@@ -10,7 +10,7 @@
             $this->oldData = $oldData == NULL ? "NULL" : $oldData;
             $this->newData = $newData == NULL ? "NULL" : $newData;
             $this->behaviourType = $behaviourType == NULL ? "NULL" : $behaviourType;
-            $this->auditTime = $auditTime == NULL ? "NULL" : $auditTime;
+            $this->auditTime = $auditTime == "now" ? date("y-m-d H-i-s") : $auditTime;//I reference the link for calling the date function: https://www.w3schools.com/php/php_date.asp
             if (gettype($this->auditID)!="string") {
                 $type = gettype($this->auditID);
                 throw new Exception("Wrong parameter type of \$auditID, should use a string, given $type", 1);
@@ -206,18 +206,19 @@
         }
     }
     // DO THIS: refresh the database manually.
-    require("../Accounts/_account.php");
-    require("../reuse/_dbConnect.php");
-    $user = new User();
-    $conn = connectDB();
-    if (testcase1($user, $conn)) {
-        echo "<h1>test case 1 passed</h1>";
-    };
-    if (testcase2($user, $conn)) {
-        echo "<h1>test case 2 passed</h1>";
-    };
-    if (testcase3($user, $conn)) {
-        echo "<h1>test case 3 passed</h1>";
-    };
-    mysqli_close($conn);
+    // test:
+    // require("../Accounts/_account.php");
+    // require("../reuse/_dbConnect.php");
+    // $user = new User();
+    // $conn = connectDB();
+    // if (testcase1($user, $conn)) {
+    //     echo "<h1>test case 1 passed</h1>";
+    // };
+    // if (testcase2($user, $conn)) {
+    //     echo "<h1>test case 2 passed</h1>";
+    // };
+    // if (testcase3($user, $conn)) {
+    //     echo "<h1>test case 3 passed</h1>";
+    // };
+    // mysqli_close($conn);
 ?>
