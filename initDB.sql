@@ -256,7 +256,7 @@ CREATE TABLE Audit (
   Table_ID varchar(20) DEFAULT NULL,
   Old_data varchar(3000) DEFAULT NULL,
   New_data varchar(3000) DEFAULT NULL,
-  Behaviour_type varchar(20) NOT NULL,
+  Behaviour_type varchar(100) NOT NULL,
   Audit_time datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 

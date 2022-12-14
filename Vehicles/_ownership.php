@@ -123,7 +123,7 @@
 
         function isVehicleIDNull() {
             // return if the vehicle id is null
-            if ($this->vehicle->getID()) {
+            if ($this->vehicle->getID()==NULL) {
                 return true;
             } else {
                 return false;
