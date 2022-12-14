@@ -11,16 +11,16 @@
         }
         function toJSON() {
             if ($this->hasPerson() && $this->hasVehicle()) {
-                return '{"owner":'.$this->getPerson()->toJSON()
+                return '{"ownershipID": "'.$this->ID.'","owner":'.$this->getPerson()->toJSON()
                     .',"vehicle":'.$this->getVehicle()->toJSON().'}';
             } elseif ($this->hasPerson()) {
-                return '{"owner":'.$this->getPerson()->toJSON()
+                return '{"ownershipID": "'.$this->ID.'","owner":'.$this->getPerson()->toJSON()
                     .',"vehicle":{"ID":"","licence":"","colour":"","make":"","model":""}}';
             } elseif ($this->hasVehicle()) {
-                return '{"owner":{"ID":"","licence":"","address":"","dateOfBirth":"","firstName":"","lastName":"","photoID":""}'
+                return '{"ownershipID": "'.$this->ID.'","owner":{"ID":"","licence":"","address":"","dateOfBirth":"","firstName":"","lastName":"","photoID":""}'
                     .',"vehicle":'.$this->getVehicle()->toJSON().'}';
             } else {
-                return '{"owner":{"ID":"","licence":"","address":"","dateOfBirth":"","firstName":"","lastName":"","photoID":""}'
+                return '{"ownershipID": "'.$this->ID.'","owner":{"ID":"","licence":"","address":"","dateOfBirth":"","firstName":"","lastName":"","photoID":""}'
                 .',"vehicle":{"ID":"","licence":"","colour":"","make":"","model":""}}';
             }
             
