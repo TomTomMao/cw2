@@ -20,7 +20,9 @@
 
     require("../reuse/navbar.php");
     require("../reuse/_dbConnect.php");
+    require("../reuse/_audit.php");
     $conn = connectDB();
+    $auditDB = new AuditDB($user, $conn);
 
     // DONE: FORBID THE FORM THAT HAS EMPTY VALUE
         if (empty($_POST["accountUsername"]) || empty($_POST["officerFirstName"]) || empty($_POST["officerLastName"]) || empty($_POST["officerID"]) ) {
@@ -45,7 +47,7 @@
 
     // TODO: FORBID THE CASE THAT ANY FIELD HAS INVALID DATA FORMAT
         
-    // TODO: GENERATE AN RANDOM PASSWORD, AND INSERT DATA INTO THE DATABASE.
+    // DONE: GENERATE AN RANDOM PASSWORD, AND INSERT DATA INTO THE DATABASE.
         // note: This is not secure.
         $CHARS=["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","1","2","3","4","5","6","7","8","9","0"];
         $randPasswordKeys = array_rand($CHARS, 8);
@@ -60,7 +62,7 @@
         mysqli_query($conn, $sql);
 
 
-    // TODO: SHOW THE ACCOUNT INFORMATION.
+    // DONE: SHOW THE ACCOUNT INFORMATION.
         $sql = "SELECT Account_username, Account_password, Officer_name, Officer_id, Account_userType FROM Accounts WHERE Account_username = '$accountUsername';";
         $result = mysqli_query($conn, $sql);
         $account = mysqli_fetch_assoc($result);
@@ -74,5 +76,10 @@
             <tr><td class='account-td'>password</td class='account-td'><td class='account-td'>$passwordFromDB</td class='account-td'></tr>
             <tr><td class='account-td'>officer name</td class='account-td'><td class='account-td'>$officerNameFromDB</td class='account-td'></tr>
             <tr><td class='account-td'>officer id</td class='account-td'><td class='account-td'>$officerIDFromDB</td></tr>
-        </table>"
+        </table>";
+
+        $accountJSON = json_encode(array("accountUsername"=>$usernameFromDB, "officerName"=>$officerNameFromDB, "officerID"=>$officerIDFromDB));
+    // add audit trail
+        $audit = new Audit("NULL", $user->getUsername(), "Accounts", $usernameFromDB, "NULL", $accountJSON, "INSERT-SUCCESS", "now");
+        $auditDB->insertAudit($audit);
 ?>
