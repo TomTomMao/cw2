@@ -12,7 +12,11 @@
 
         require("../reuse/navbar.php");
         require_once("../reuse/_dbConnect.php");
+        require_once("../reuse/_audit.php");
+        require_once("../Reports/_reports.php");
         $conn = connectDB();
+        $auditDB = new AuditDB($user, $conn);
+        $reportsDB = new ReportsDB($user, $conn);
 
         if (isset($_GET["id"])) {
             $reportID = $_GET["id"];
@@ -78,9 +82,18 @@
         }
         
         try {
+            $oldReport = $reportsDB->getReportByReportID($reportID);
             $sql = "INSERT INTO Fines (Fine_amount, Fine_points, Incident_ID) VALUES ($fineAmount, $finePoints, $reportID)";
-            mysqli_query($conn, $sql);
+            $result = mysqli_query($conn, $sql);
+            $newFineID = mysqli_insert_id($conn);
+            $newReport = $reportsDB->getReportByReportID($reportID);
+            
+            // add audit trail (INSERT-SUCCESS)
+            $audit = new Audit("NULL", $user->getUsername(), "Fines", strval($newFineID), $oldReport->toJSON(), $newReport->toJSON(), "INSERT-SUCCESS", "now");
+            $auditDB->insertAudit($audit);
+
             mysqli_close($conn);
+
             header("location: addFineSuccess.php");
         } catch (Exception $error) {
             throw $error;
