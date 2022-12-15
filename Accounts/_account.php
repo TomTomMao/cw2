@@ -61,13 +61,33 @@ class User {
                     $_SESSION["userStatus"]="logged";
                     $_SESSION["officerName"] = $row["Officer_name"];
                     $_SESSION["officerID"] = $row["Officer_ID"];
+                
+                    // insert audit trail
+                    require_once("../reuse/_audit.php");
+                    $auditDB = new AuditDB($this, $conn);
+                    $loginAudit = new Audit("NULL", $username, "Accounts", $username, "NULL", '{"accountUsername":"'.$username.'"}',"LOGIN-SUCCESS", "now");
+                    $auditDB->insertAudit($loginAudit);
+
                     return "success";
                 } else {
                     debugEcho("wrong password"); // for debugging
+                    // insert audit trail
+                    require_once("../reuse/_audit.php");
+                    $auditDB = new AuditDB($this, $conn);
+                    $loginAudit = new Audit("NULL", "unknown", "Accounts", $username, "NULL", '{"accountUsername":"'.$username.'"}',"LOGIN-FAILED", "now");
+                    $auditDB->insertAudit($loginAudit);
+                    
                     return "wrongPassword";
                 }
             } else {
                 debugEcho("username not exist");
+
+                // insert audit trail
+                require_once("../reuse/_audit.php");
+                $auditDB = new AuditDB($this, $conn);
+                $loginAudit = new Audit("NULL", "unknown", "Accounts", $username, "NULL", '{"accountUsername":"'.$username.'"}',"LOGIN-FAILED", "now");
+                $auditDB->insertAudit($loginAudit);
+
                 return "usernameNotExist";
             }
             mysqli_close($conn); // disconnect
@@ -92,12 +112,21 @@ class User {
         // Unset $_SESSION['userStatus']
         $this->hasSessionStarted();
         debugPrint_r($_SESSION);
+        $username = $_SESSION['username'];
         unset($_SESSION['username']);
         unset($_SESSION['userType']);
         unset($_SESSION['userStatus']);
         unset($_SESSION['officerName']);
         unset($_SESSION['officerID']);
         if (!$this->isLoggedIn()) {
+            // insert audit trail
+            require("../config/db.inc.php");
+            $conn = mysqli_connect($servername, $dbUsername, $dbPassword, $dbname);
+            require_once("../reuse/_audit.php");
+            $auditDB = new AuditDB($this, $conn);
+            $loginAudit = new Audit("NULL", $username, "Accounts", $username, "NULL", '{"accountUsername":"'.$username.'"}',"LOGOUT-SUCCESS", "now");
+            $auditDB->insertAudit($loginAudit);
+
             debugEcho("logout successfully");
         } else {
             debugEcho("Something went wrong!"); 

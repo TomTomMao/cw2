@@ -6,9 +6,12 @@
 
     session_start();
     require("_account.php");// there is a User class
+    require_once("../reuse/_audit.php");
+    require_once("../reuse/_dbConnect.php");
     $user = new User();
     $msg = "";
     $changeSuccess=false;
+    $conn = connectDB();
     if (!$user->isLoggedIn()) {
         header("location: notLoginError.html"); // check if logged in
     }
@@ -22,9 +25,20 @@
         } elseif (isset($_POST['newPassword'])) {
             if ($user->isValidPassword($_POST['newPassword'])) {
                 $user->changePassword($_POST['newPassword']);
+                
+                // Add audit trail for password changing
+                $auditDB = new AuditDB($user, $conn);
+                $audit = new Audit("NULL", $user->getUsername(), "Accounts", $user->getUsername(), "NULL",  '{"accountUsername":"'.$user->getUsername().'"}', "CHANGEPASSWORD-SUCCESS", "now");
+                $auditDB->insertAudit($audit);
+
                 $msg = "password changed!";
                 $changeSuccess=true;
             } else {
+                // Add audit trail for password changing
+                $auditDB = new AuditDB($user, $conn);
+                $audit = new Audit("NULL", $user->getUsername(), "Accounts", $user->getUsername(), "NULL",  '{"accountUsername":"'.$user->getUsername().'"}', "CHANGEPASSWORD-FAILED", "now");
+                $auditDB->insertAudit($audit);
+
                 $msg = "invalid password";
             }
         }
