@@ -266,11 +266,11 @@ ALTER TABLE Audit
 INSERT INTO Audit (Audit_ID,Account_username,Table_name,Table_ID,Old_data,New_data,Behaviour_type, Audit_time) VALUES
 (1, "daniels", "People", "1", NULL, 
 '{"ID":"1","licence":"SMITH92LDOFJJ829","address":"23 Barnsdale Road, Leicester","dateOfBirth":"1991-02-12","firstName":"James","lastName":"Smith","photoID":"NULL"}',
-"INSERT", "2020-10-11 14:15:35"),
+"INSERT-SUCCESS", "2020-10-11 14:15:35"),
 (2, "daniels", "Incidents", "1", NULL, '{"incidentID":"1","accountUsername":"daniels","incidentDate":"2017-12-01","incidentReport":"40mph in a 30 limit","offenceID":"1","offenceDescription":"Speeding","offenceMaxFine":"1000","offenceMaxPoints":"3","vehicleID":"15","vehicleLicence":"FJ17AUG","vehicleMake":"Honda","vehicleModel":"Civic","vehicleColour":"Green","ownerID":"4","ownerName":"James Smith","ownerAddress":"26 Devonshire Avenue, Nottingham","ownerDOB":"1978-11-24","ownerLicence":"SMITHR004JFS20TR","ownershipID":"3","offenderID":"4","offenderName":"James Smith","offenderAddress":"26 Devonshire Avenue, Nottingham","offenderDOB":"1978-11-24","offenderLicence":"SMITHR004JFS20TR","officerName":"Daniel Sull","officerID":"ds001","fineID":"","fineAmount":"","finePoints":""}',
-"INSERT", "2017-12-01 11:08:17"),
+"INSERT-SUCCESS", "2017-12-01 11:08:17"),
 (3, "daniels", "Ownership", "1", NULL, '{"ownershipID":"1","owner":{"ID":"3","licence":"MYERS99JDW8REWL3","address":"323 Derby Road, Nottingham","dateOfBirth":"1981-04-25","firstName":"John","lastName":"Myers","photoID":"NULL"},"vehicle":{"ID":"12","licence":"LB15AJL","colour":"Blue","make":"Ford","model":"Fiesta"}}',
-"INSERT", "2019-06-07 21:55:35");
+"INSERT-SUCCESS", "2019-06-07 21:55:35");
 
 ALTER TABLE Audit
   MODIFY Audit_ID int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;

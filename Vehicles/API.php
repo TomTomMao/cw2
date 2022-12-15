@@ -19,12 +19,18 @@
 
     function getPersonByLicence($personLicence, $user, $conn){
         $peopleDB = new PeopleDB($user, $conn);
+        $auditDB = new AuditDB($user, $conn);
         $person = $peopleDB->getPersonByLicence($personLicence);
         if ($person != NULL) {
             echo $person->toJSON();
+            // create audit
+            $audit = new Audit("NULL",$user->getUsername(), "People", $person->getID(), $person->toJSON(), "NULL", "SELECT-FOUND", "now");
         } else {
             echo "NULL";
+            // create audit
+            $audit = new Audit("NULL",$user->getUsername(), "People", "NULL", "NULL", '{"personLicence":"'.$personLicence.'"}', "SELECT-EMPTY", "now");
         }
+        $auditDB->insertAudit($audit);
     }
     function checkVehicleLicenceFormat($correct) {
         if ($correct) {
@@ -111,13 +117,59 @@
         $newVehicle = new Vehicle($vehicleLicence,$vehicleColour,$vehicleMake,$vehicleModel,"NULL");
         $person = new Person("NULL",$personLicence,$personAddress,$personDOB,$personFirstName." ".$personLastName,"NULL");
         $ownershipDB = new OwnershipDB($user,$conn);
+        $peopleDB = new PeopleDB($user, $conn);
+        $auditDB = new AuditDB($user, $conn);
+        // check if an owner in the database has the same name,address,dob as the $person but has different licence
+        if ($peopleDB->isPersonDetailInDB($person)) {
+            $personInDB = $peopleDB->getPersonByDetail($person);
+            if ($personInDB->licence==NULL || $personInDB->licence=="NULL") {
+                echo '{"state":"failed", "reason":"person already in the database but does not have a licence in database"}';
+                return;
+            } elseif ($personInDB->licence != $person->licence) {
+                echo '{"state":"failed", "reason":"person already in the database but the licence number is different with the driving licence number that you entered"}';
+                return;
+            }
+        }
+
+        // check if the person is new before insert the person. (Do this because I don't want to modify the return value of owenrshipDB->getOwnershipByLicence method.)
+        $isPersonNew = $peopleDB->isPersonDetailInDB($person)==true ? false : true;
+
+        // insert the ownership as well as the vehicle, maybe the person.
         $result = $ownershipDB->insertOwnershipWithNewVehicle($newVehicle,$person,$conn);
+        
+        
+        
+        
         if (!isset($result["state"])) {
             echo '{"state":"error", "reason":"missing information in insertOwnershipWithNewVehicle()"}';
-            print_r($result);
+            print_r($result); // debugging
         } elseif ($result["state"]=="failed") {
                 echo '{"state":"'.$result["state"].'","reason":"'.$result["reason"].'"}';
         } elseif ($result["state"]=="success") {
+            // set id to objects, and get ownership object.
+            $person->ID = strval($result["personID"]);
+            $newVehicle->ID = strval($result["vehicleID"]);
+            $ownership = new Ownership($newVehicle, $person, strval($result["newOwnershipID"]));
+            
+            // add audit trail(INSERT) for person if the person is new
+            // echo "<hr>\$isPersonNew = ".strval($isPersonNew)."<hr>"; // debugging
+            if ($isPersonNew==true) {
+                $personAudit = new Audit("NULL", $user->getUsername(), "People", $person->ID, "NULL", $person->toJSON(), "INSERT-SUCCESS", "now");
+            } elseif($isPersonNew==false) {
+                $personAudit = new Audit("NULL", $user->getUsername(), "People", $person->ID, $person->toJSON(), "NULL",  "REFERENCE-INSERT", "now");
+            }
+            $auditDB->insertAudit($personAudit);
+            $auditTime = $personAudit->auditTime;
+
+            // add audit trail for the new vehicle
+            $vehicleAudit = new Audit("NULL", $user->getUsername(), "Vehicles", $newVehicle->ID, "NULL", $newVehicle->toJSON(), "INSERT-SUCCESS", $auditTime);
+            $auditDB->insertAudit($vehicleAudit);
+            
+            // add audit trail for the new ownership
+            $ownershipAudit = new Audit("NULL", $user->getUsername(), "Ownership", $ownership->ID, "NULL", $ownership->toJSON(), "INSERT-SUCCESS", $auditTime);
+            $auditDB->insertAudit($ownershipAudit);
+
+
                 echo '{"state":"'.$result["state"]
                     .'","newOwnershipID":"'.$result["newOwnershipID"]
                     .'","vehicleID":"'.$result["vehicleID"]
@@ -125,7 +177,7 @@
                     .'"}'; 
         } else {
             echo '{"state":"error", "reason":"unexpected data in the state field"}';
-            print_r($result);
+            print_r($result); // debugging
         }
         
         
@@ -138,6 +190,7 @@
     require("../Vehicles/_ownership.php");
     require("../People/_people.php");
     require("../reuse/_dbConnect.php");
+    require("../reuse/_audit.php");
     $user = new User();
     if (!$user->isLoggedIn()) {
         header("location: ../Accounts/notLoginError.html"); // check if logged in

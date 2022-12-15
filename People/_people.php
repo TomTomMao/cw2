@@ -207,7 +207,7 @@
             $conn = $this->conn;
             $sql = "SELECT * FROM People WHERE People_name='".$person->getFullName().
                 "'AND People_DOB='".$person->getDOB()."'AND People_address='".$person->getAddress()."';";
-            // echo $sql."<hr>";
+            // echo $sql."<hr>"; // debugging
             $results = mysqli_query($conn, $sql);
             $people = array();
             while($row = mysqli_fetch_assoc($results)) {
@@ -225,6 +225,7 @@
             // return true if person is in db.
             // otherwise return false;
             $people = $this->getPeopleByDetail($person);
+            // echo "<hr>isPersonDetailInDB.people.count=".strval(count($people))."<hr>"; // debugging
             if (empty($people)) {
                 return false;
             } else {

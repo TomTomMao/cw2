@@ -229,8 +229,8 @@
             // return a list of ownership object, include ownership without any owner. 
             // note the ownership objects returned include those not in the database for the purpose of future flexibility
             $ownerships = array();
-            require("../People/_people.php");
-            require("_vehicles.php");
+            require_once("../People/_people.php");
+            require_once("_vehicles.php");
 
             $conn = $this->conn;
 

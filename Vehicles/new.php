@@ -445,6 +445,8 @@
                     "person id:" + data.personID);
             } else if (data.state == "failed") {
                 renderFeedbackText("feedbackBox1", "feedback-red", "Failed. Reason: " + data.reason);
+            } else if (data.state == "error") {
+                renderFeedbackText("feedbackBox1", "feedback-red", "Error. Reason: " + data.reason)
             }
         }
 
