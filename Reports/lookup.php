@@ -402,7 +402,7 @@
                     // add audit for these ownerships (SELECT-FOUND-SECONDARY)
                     // add audit for these people (SELECT-FOUND-SECONDARY)
                     // add audit for these vehicles (SELECT-FOUND-SECONDARY)
-            
+            date_default_timezone_set("Europe/London");
             $auditTime = date("y-m-d H:i:s");
 
             // add audit for each report (SELECT-FOUND)

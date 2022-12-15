@@ -209,6 +209,7 @@ try{
         if ($hasVehicleForm==false) {
             $vehicleID = "NULL"; // just make it more explicit :)
             // set the audit time.
+            date_default_timezone_set("Europe/London");
             $auditTime = date("y-m-d H-i-s"); //I reference the link for calling the date function: https://www.w3schools.com/php/php_date.asp
 
             // case that the fields of vehicle form is invalid (function is not implemented yet, always valid) : give error feedback

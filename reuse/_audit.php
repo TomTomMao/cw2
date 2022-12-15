@@ -10,6 +10,7 @@
             $this->oldData = $oldData == NULL ? "NULL" : $oldData;
             $this->newData = $newData == NULL ? "NULL" : $newData;
             $this->behaviourType = $behaviourType == NULL ? "NULL" : $behaviourType;
+            date_default_timezone_set("Europe/London");
             $this->auditTime = $auditTime == "now" ? date("y-m-d H-i-s") : $auditTime;//I reference the link for calling the date function: https://www.w3schools.com/php/php_date.asp
             if (gettype($this->auditID)!="string") {
                 $type = gettype($this->auditID);
@@ -156,6 +157,7 @@
         // test insertAudit and getAuditByUsername
         // return true if testcase1 passed, else raise an error.
         // echo "<hr>creating audit1<hr>"; // debugging
+        date_default_timezone_set("Europe/London");
         $audit1 = new Audit("NULL", "daniels", "People", "2"
         , '{"ID":"2","licence":"ALLEN88K23KLR9B3","address":"46 Bramcote Drive, Nottingham","dateOfBirth":"1994-03-12","firstName":"Jennifer","lastName":"Allen","photoID":"NULL"}'
         , '{"ID":"2","licence":"ALLEN88K23KLR9B3","address":"46 Bramcote Drive, Nottingham","dateOfBirth":"1994-03-12","firstName":"Jennifer","lastName":"Allen","photoID":"NULL"}'
@@ -164,6 +166,7 @@
         $auditDB = new AuditDB($user, $conn);
         $auditDB->insertAudit($audit1);
         
+        date_default_timezone_set("Europe/London");
         $auditFromDB = $auditDB->getAuditByUsername("daniels", false, $timeStart=date('2022-12-13 23:44:00'), $timeEnd=date('2022-12-13 23:44:00'))[0];
         if ($audit1->isSame($auditFromDB)) {
             // echo "<hr>\$audit1=".$audit1->toJSON()."<hr>"; //debugging
