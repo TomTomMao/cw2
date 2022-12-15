@@ -323,8 +323,17 @@
         
             require("../reuse/_dbConnect.php");
             require("_reports.php");
+            require_once("../reuse/_audit.php");
+            require_once("../People/_people.php");
+            require_once("../Vehicles/_vehicles.php");
+            require_once("../Vehicles/_ownership.php");
             $conn = connectDB();
+            $auditDB = new AuditDB($user, $conn);
             $reportsDB = new ReportsDB($user, $conn);
+            $peopleDB = new PeopleDB($user, $conn);
+            $vehiclesDB = new VehiclesDB($user, $conn);
+            $ownershipDB = new OwnershipDB($user, $conn);
+
             // echo "\$_POST:<br>";// debugging
             // print_r($_POST); // debugging
             // echo "flag-1<hr>";// debugging
@@ -360,9 +369,9 @@
                 array_push($searchCondition, ["columnName"=>$columnName3, "searchValue"=>$searchValue3]);
             }
 
-            echo "\$searchCondition:<br>";// debugging
-            print_r($searchCondition);// debugging
-            echo "flag0<hr>";// debugging
+            // echo "\$searchCondition:<br>";// debugging
+            // print_r($searchCondition);// debugging
+            // echo "flag0<hr>";// debugging
 
         // DONE: Get reports according to the $searchCondition and then render reports
 
@@ -370,7 +379,6 @@
             // print_r ($searchCondition); // debugging
             // echo "flag1"; // debugging
             $reports = $reportsDB->getReportsMultipleConditions($searchCondition);
-            mysqli_close($conn); // disconnect
             // render reports
             if(isset($reports)) {
                 $table = Report::renderGeneralTable($reports);
@@ -380,19 +388,113 @@
                     echo "No report found";
                 }
             }
-            
         
+        // TODO: INSERT AUDIT TRAILS FOR THE REPORT SEARCHED
+            // sudo: 
+                // if $reports is not empty:
+                    // add audit for each report (SELECT-FOUND)
+                    // create a set of ownership id involved
+                    // create a set of people id involved in these reports and ownerships.
+                    // create a set of vehicle licence involved in these ownerships.
+                    // get these ownerships by id
+                    // get these people by id
+                    // get these vehicles by licence (because i didn't implement getVehicleByID in VehiclesDB class)
+                    // add audit for these ownerships (SELECT-FOUND-SECONDARY)
+                    // add audit for these people (SELECT-FOUND-SECONDARY)
+                    // add audit for these vehicles (SELECT-FOUND-SECONDARY)
+            
+            $auditTime = date("y-m-d H:i:s");
 
+            // add audit for each report (SELECT-FOUND)
+            if (!empty($reports)) {
+                
+                // add audit for the incident (SELECT-FOUND)
+                foreach($reports as $report) {
+                    $audit = new Audit("NULL", $user->getUsername(), "Incidents", strval($report->incidentID), $report->toJSON(), "NULL", "SELECT-FOUND", $auditTime);
+                    $auditDB->insertAudit($audit);
+                }
 
+                // create a set of ownership id
+                // create a set of person id involved in these reports and ownerships.
+                // create a set of vehicle licence involved in these ownerships.
+                $ownershipIDs = [];
+                $personIDs = [];
+                $vehicleLicences = [];
+                foreach($reports as $report) {
+                    if (in_array($report->ownershipID, $ownershipIDs, true)==false) {
+                        array_push($ownershipIDs, $report->ownershipID);  
+                    } 
+                    if (in_array($report->ownerID, $personIDs, true)==false) {
+                        array_push($personIDs, $report->ownerID);  
+                    } 
+                    if (in_array($report->offenderID, $personIDs, true)==false) {
+                        array_push($personIDs, $report->offenderID);  
+                    } 
+                    if (in_array($report->vehicleLicence, $vehicleLicences, true)==false) {
+                        array_push($vehicleLicences, $report->vehicleLicence);  
+                    } 
+                }
+                // print_r($ownershipIDs); // debugging
+                // print_r($personIDs); // debugging
+                // print_r($vehicleLicences); // debugging
+                // get these ownerships by id
+                $ownerships = [];
+                foreach($ownershipIDs as $ownershipID) {
+                    array_push($ownerships, $ownershipDB->getOwnershipByID($ownershipID));
+                }
+                // echo "<hr>#ownerships:".count($ownerships)."<hr>"; // debugging
+
+                // get these people by id
+                $people = [];
+                foreach($personIDs as $personID) {
+                    array_push($people, $peopleDB->getPersonByID($personID));
+                }
+                // echo "<hr>#people:".count($people)."<hr>"; // debugging
+
+                // get these vehicles by vehicleLicences
+                $vehicles = [];
+                foreach($vehicleLicences as $vehicleLicence) {
+                    array_push($vehicles, $vehiclesDB->getVehiclesByLicence($vehicleLicence)[0]);
+                }
+                // echo "<hr>#vehicles:".count($vehicles)."<hr>"; // debugging
+
+                // add audit for these ownerships (SELECT-FOUND-SECONDARY)
+                foreach($ownerships as $ownership) {
+                    $ownershipAudit = new Audit("NULL", $user->getUsername(), "Ownership", strval($ownership->ID), $ownership->toJSON(), "NULL", "SELECT-FOUND-SECONDARY", $auditTime);
+                    $auditDB->insertAudit($ownershipAudit);
+                }
+                // add audit for these people (SELECT-FOUND-SECONDARY)
+                foreach($people as $person) {
+                    $personAudit = new Audit("NULL", $user->getUsername(), "People", strval($person->ID), $person->toJSON(), "NULL", "SELECT-FOUND-SECONDARY", $auditTime);
+                    $auditDB->insertAudit($personAudit);
+                }
+                // add audit for these vehicles (SELECT-FOUND-SECONDARY)
+                foreach($vehicles as $vehicle) {
+                    // echo $vehicle->toJSON()."<br>"; // debugging
+                    $vehicleAudit = new Audit("NULL", $user->getUsername(), "Vehicles", strval($vehicle->ID), $vehicle->toJSON(), "NULL", "SELECT-FOUND-SECONDARY", $auditTime);
+                    $auditDB->insertAudit($vehicleAudit);
+                }
+                
+            } else {
+                // add audit for incident (SELECT-EMPTY)
+                $audit = new Audit("NULL", $user->getUsername(), "Incidents", "NULL", "NULL", json_encode($searchCondition), "SELECT-EMPTY", $auditTime);
+                // echo json_encode($searchCondition); //debugging
+                $auditDB->insertAudit($audit);
+            }
+
+            
+            
+            mysqli_close($conn); // disconnect
             
         // DONE: push reports into javascript code
-                if(!empty($reports)) {
-                    foreach($reports as $report){
-                        $reportJSON = $report->toJSON();
-                        // echo "<br>pusing<br>";
-                        echo "<script>reportJSONs.push($reportJSON);</script>";
-                    }
+            if(!empty($reports)) {
+                foreach($reports as $report){
+                    $reportJSON = $report->toJSON();
+                    // echo "<br>pusing<br>";
+                    echo "<script>reportJSONs.push($reportJSON);</script>";
                 }
+            } else {
+            }
         
     }else {
             // print_r($_POST); // debugging
