@@ -25,13 +25,14 @@ try{
         require("../Vehicles/_vehicles.php");
         require("../reuse/_dbConnect.php");
         require("../People/_people.php");
+        require("../reuse/_audit.php");
         require("_reports.php");
         $conn = connectDB();
         $ownershipDB = new OwnershipDB($user, $conn);
         $vehicleDB = new VehiclesDB($user, $conn);
         $peopleDB = new PeopleDB($user, $conn);
         $reportDB = new ReportsDB($user, $conn);
-
+        $auditDB = new AuditDB($user, $conn);
         function getReportType($acceptableForms, $post) {
             // given an array of $acceptableForms, and $post information,
             // return the type of post if it matches one of the formats.
@@ -125,7 +126,8 @@ try{
 
             return isOwnerFormValid($post);
         }
-
+    // NOTE: $auditTime is defined once the vehicle is inserted or referenced.
+    // NOTE(CTND): However, if there is no vehicle involved. the Time should be set manually.
     // DONE1(for edit): IF it is an editing submit, Check if the report id exists in $_GET and in databas, and check if the user can edit it.
         if (isset($_GET["edit"])&&$_GET["edit"]=="true") {
             if (empty($_GET["id"])) {
@@ -134,12 +136,24 @@ try{
             } else {
                 $reportTmp = $reportDB->getReportByReportID($_GET["id"], false);
                 if ($reportTmp==false) {
+                    // // add audit trail
+                    // $audit = new Audit("NULL", $user->getUsername(), "Incidents", "NULL","NULL", $reportTmp->toJSON(), "SELECT-EMPTY-SECONDARY", "now");
+                    // $auditDB->insertAudit($audit);
+
                     throw new Exception("in valid argument, report id doesn't exist");
                     die();
                 } elseif ($reportTmp->accountUsername != $user->getUsername() && !$user->isAdmin()) {
+                    // // add audit trail
+                    // $audit = new Audit("NULL", $user->getUsername(), "Incidents", strval($reportTmp->Incident_ID), $reportTmp->toJSON(), "NULL", "SELECT-FOUND-SECONDARY", "now");
+                    // $auditDB->insertAudit($audit);
+
                     throw new Exception("Illegal submit, you don't have permission to edit this report");
                     die();
                 } else {
+                    // // add audit trail
+                    // $audit = new Audit("NULL", $user->getUsername(), "Incidents", strval($reportTmp->Incident_ID), $reportTmp->toJSON(), "NULL", "SELECT-FOUND-SECONDARY", "now");
+                    // $auditDB->insertAudit($audit);
+
                     echo "no assertion about editing submit valiated"; //debugging
                     // die(); //debugging, because I haven't avoid insert new report.
                 }
@@ -194,6 +208,9 @@ try{
         $vehicleID = "NULL";
         if ($hasVehicleForm==false) {
             $vehicleID = "NULL"; // just make it more explicit :)
+            // set the audit time.
+            $auditTime = date("y-m-d H-i-s"); //I reference the link for calling the date function: https://www.w3schools.com/php/php_date.asp
+
             // case that the fields of vehicle form is invalid (function is not implemented yet, always valid) : give error feedback
         } elseif ($hasVehicleForm && isVehicleFormValid($_POST)['allValid']!=true) {
             // echo "vehicle Information is not valid:";// debug
@@ -215,8 +232,13 @@ try{
                 $vehicleID = $vehicleDB->insertNewVehicle($newVehicle);
                 $newVehicleFromDB = $vehicleDB->getVehiclesByLicence($newVehicle->getLicence())[0];
                 echo "<hr>new vehicle inserted(data from database): <br>".$newVehicleFromDB->renderHtmlTable();
+                
+                // add audit trial (INSERT-SUCCESS)
+                $vehicleAudit = new Audit("NULL", $user->getUsername(), "Vehicles", strval($newVehicleFromDB->ID), "NULL", $newVehicleFromDB->toJSON(), "INSERT-SUCCESS", "now");
+                $auditTime = $vehicleAudit->auditTime;
+                $auditDB->insertAudit($vehicleAudit);
             
-            // vehicle is not new
+                // vehicle is not new
             } else {
                 // echo "<hr>vehicle is old<hr>"; // debugging
                 
@@ -259,6 +281,10 @@ try{
                     die();
                 } else {
                     $vehicleID = $oldVehicleFromDB->getID();
+                    // create audit object, don't INSERT here. INSERT WHEN THE OWNERSHIP IS CREATED. 
+                    $oldVehicleAudit = new Audit("NULL", $user->getUsername(), "Vehicles", strval($vehicleID), $oldVehicleFromDB->toJSON(), "NULL", "REFERENCE-INSERT", "now");
+                    $auditTime = $oldVehicleAudit->auditTime;
+
                     // echo "GOOD GOOD GOOD for the vehicle form!<br>vehicle id=$vehicleID<hr>"; // debugging
                     // return something if in future refactor these code into a function.
                 }
@@ -309,6 +335,7 @@ try{
                             // die();
                         // insert this owner, get owner id
                         // set the owner id on $ownerID;
+                        // audit (INSERT-SUCCESS)
             // case 2: the owner doesn't have a licence:
                 // if there are given name, dob, address in the form:
                     // use these 3 data as unique key to search the database
@@ -321,6 +348,7 @@ try{
                         // insert new data with name, dob, address
                         // get id of the newly-inserted owner
                         // set the owner id on $ownerID
+                        // audit (INSERT-SUCCESS)
                 // else:
                     // feedback these missing field and die();
             
@@ -408,6 +436,10 @@ try{
                     $ownerID = $peopleDB->insertNewPerson($ownerFromForm); // id set
                     $newOwnerFromDB = $peopleDB->getPersonByLicence($ownerFromForm->getLicence());
                     // echo "new owner:<br>".$newOwnerFromDB->renderRow(true)."<hr>"; // debugging
+
+                    // audit (INSERT-SUCCESS)
+                    $ownerAudit = new Audit("NULL", $user->getUsername(), "People", strval($ownerID), "NULL", $newOwnerFromDB->toJSON(), "INSERT-SUCCESS", $auditTime);
+                    $auditDB->insertAudit($ownerAudit);
                 }
                 
                 
@@ -462,6 +494,10 @@ try{
                         // echo "ownerWithoutLicenceFromDB id: ".$ownerWithoutLicenceFromDB->getID()."<hr>"; // debugging
                         // echo "<b>owner without licence is new, created:</b> <br>".$ownerWithoutLicenceFromDB->renderRow(true)."<hr>"; // debugging
                         $isOwnerNew = true;
+
+                        // audit (INSERT-SUCCESS)
+                        $ownerAudit = new Audit("NULL", $user->getUsername(), "People", strval($ownerID), "NULL", $ownerWithoutLicenceFromDB->toJSON(), "INSERT-SUCCESS", $auditTime);
+                        $auditDB->insertAudit($ownerAudit);
                     }
                 }
             }
@@ -509,6 +545,7 @@ try{
                             // die();
                         // insert this offender, get offender id
                         // set the offender id on $offenderID;
+                        // audit (INSERT-SUCCESS)
             // case 2: the offender doesn't have a licence:
                 // if there are given name, dob, address in the form:
                     // use these 3 data as unique key to search the database
@@ -521,6 +558,7 @@ try{
                         // insert new data with name, dob, address
                         // get id of the newly-inserted offender
                         // set the offender id on $offenderID
+                        // audit (INSERT-SUCCESS)
                 // else:
                     // feedback these missing field and die();
             
@@ -608,6 +646,10 @@ try{
                     $offenderID = $peopleDB->insertNewPerson($offenderFromForm); // id set
                     $newOffenderFromDB = $peopleDB->getPersonByLicence($offenderFromForm->getLicence());
                     // echo "new offender:<br>".$newOffenderFromDB->renderRow(true)."<hr>"; // debugging
+                
+                    // audit (INSERT-SUCCESS)
+                    $offenderAudit = new Audit("NULL", $user->getUsername(), "People", strval($offenderID), "NULL", $newOffenderFromDB->toJSON(), "INSERT-SUCCESS", $auditTime);
+                    $auditDB->insertAudit($offenderAudit);
                 }
                 
                 
@@ -662,6 +704,10 @@ try{
                         // echo "offenderWithoutLicenceFromDB id: ".$offenderWithoutLicenceFromDB->getID()."<hr>"; // debugging
                         // echo "<b>offender without licence is new, created:</b> <br>".$offenderWithoutLicenceFromDB->renderRow(true)."<hr>"; // debugging
                         $isOffenderNew = true;
+
+                        // audit (INSERT-SUCCESS)
+                        $offenderAudit = new Audit("NULL", $user->getUsername(), "People", strval($offenderID), "NULL", $offenderWithoutLicenceFromDB->toJSON(), "INSERT-SUCCESS", $auditTime);
+                        $auditDB->insertAudit($offenderAudit);
                     }
                 }
             }
@@ -684,9 +730,18 @@ try{
             // if there is a vehicle involved:
                 // create a vehicle and owner object using $vehicleID and $ownerID
                 // create a $ownership object
-                // if $ownership contain null person id, use the existed id as $ownershipID or insert new one and use that new id.
-                // elseif $ownership is not new, get existed ownership id.
+                // if $ownership contain null person id
+                    // If $ownership is in db
+                        // use the existed id as $ownershipID (insert audit later when the report is created)
+                    // elseif $ownership not in db
+                        // insert the new ownership.
+                        // audit INSERT-SUCCESS FOR the ownership
+                        // audit REFERENCE-INSERT for the vehicle
+                // elseif $ownership is not new, get existed ownership id. (insert audit later when the report is created.)
                 // elseif $ownership is new, use ownershipDB->insertOwnershipBothExisted($ownership), get new ownership id.
+                    // audit INSERT-SUCCESS for the ownership
+                    // audit REFERENCE-INSERT for the vehicle
+                    // audit REFERENCE-INSERT for the owner
         
         // if no vehicle involved:
         if ($vehicleID == "NULL") {
@@ -716,6 +771,15 @@ try{
                     // echo "flag1.2";// debugging
                     $ownershipID = $ownershipDB->insertOwnershipBothExisted($ownership);
                     $isOwnershipNew = true;
+                    $newOwnershipFromDB = $ownershipDB->getOwnershipByID(strval($ownershipID));
+
+                    // audit INSERT-SUCCESS FOR the ownership
+                    $ownershipAudit = new Audit("NULL", $user->getUsername(), "Ownership", strval($ownershipID), "NULL", $newOwnershipFromDB->toJSON(), "INSERT-SUCCESS", $auditTime);
+                    $auditDB->insertAudit($ownershipAudit);
+
+                    // audit REFERENCE-INSERT for the vehicle
+                    $vehicleAudit = new Audit("NULL", $user->getUsername(), "Vehicles", strval($newOwnershipFromDB->getVehicleID()), $newOwnershipFromDB->getVehicle()->toJSON(), "NULL", "REFERENCE-INSERT", $auditTime);
+                    $auditDB->insertAudit($vehicleAudit);
                 }
             } 
             // elseif $ownership is not new, get existed ownership id.
@@ -727,6 +791,21 @@ try{
             elseif($ownershipDB->isOwnershipInDB($ownership)==false) {
                 $isOwnershipNew = true;
                 $ownershipID = $ownershipDB->insertOwnershipBothExisted($ownership);
+                
+                $newOwnershipFromDB = $ownershipDB->getOwnershipByID(strval($ownershipID));
+
+                // audit INSERT-SUCCESS FOR the ownership
+                $ownershipAudit = new Audit("NULL", $user->getUsername(), "Ownership", strval($ownershipID), "NULL", $newOwnershipFromDB->toJSON(), "INSERT-SUCCESS", $auditTime);
+                $auditDB->insertAudit($ownershipAudit);
+
+                // audit REFERENCE-INSERT for the vehicle
+                $vehicleAudit = new Audit("NULL", $user->getUsername(), "Vehicles", strval($newOwnershipFromDB->getVehicleID()), $newOwnershipFromDB->getVehicle()->toJSON(), "NULL", "REFERENCE-INSERT", $auditTime);
+                $auditDB->insertAudit($vehicleAudit);
+
+                // audit REFERENCE-INSERT for the owner
+                $ownerAudit = new Audit("NULL", $user->getUsername(), "People", strval($newOwnershipFromDB->getPersonID()), $newOwnershipFromDB->getPerson()->toJSON(), "NULL", "REFERENCE-INSERT", $auditTime);
+                $auditDB->insertAudit($ownerAudit);
+
             }
             // undifined error
             else {
@@ -760,8 +839,30 @@ try{
             
             echo "<hr>report update query:".$sql."<hr>"; //debugging
             try{
+                $initialIncidentsFromDB = $reportDB->getReportByReportID($reportID);
                 mysqli_query($conn, $sql);
                 echo "Report update successfully, reportID:$reportID";
+                
+                // audit incident (UPDATE-SUCCESS)
+                $updatedIncidentsFromDB = $reportDB->getReportByReportID($reportID);
+                $incidentAudit = new Audit("NULL", $user->getUsername(), "Incidents", strval($updatedIncidentsFromDB->incidentID), $initialIncidentsFromDB->toJSON(), $updatedIncidentsFromDB->toJSON(), "UPDATE-SUCCESS", $auditTime);
+                $auditDB->insertAudit($incidentAudit);
+                
+                // if ownership is not null: audit ownership (REFERENCE-UPDATE) (not sure if audits trail for vehicle and owner should be added or not, probabaly should not because they were already recorded when creating ownership. However, .... I DONT KNOW...)
+                if ($ownershipID != "NULL" && $ownershipID != NULL) {
+                    $ownershipFromDB = $ownershipDB->getOwnershipByID($ownershipID);
+                    $ownershipAudit = new Audit("NULL", $user->getUsername(), "Ownership", strval($ownershipFromDB->ID), $ownershipFromDB->toJSON(), "NULL", "REFERENCE-UPDATE", $auditTime);
+                    $auditDB->insertAudit($ownershipAudit);
+                }
+                
+                // if offender is not null: audit offender (REFERENCE-UPDATE)
+                if ($offenderID != "NULL" && $offenderID != NULL) {
+                    $offenderFromDB = $peopleDB->getPersonByID($offenderID);
+                    $offenderAudit = new Audit("NULL", $user->getUsername(), "People", strval($offenderFromDB->ID), $offenderFromDB->toJSON(), "NULL", "REFERENCE-UPDATE", $auditTime);
+                    $auditDB->insertAudit($offenderAudit);
+                }
+
+
             } catch (Exception $error) {
                 renderErrorMessages(["Failed to create Report",$error->getMessage()]);
             }
@@ -790,6 +891,25 @@ try{
             mysqli_query($conn, $sql);
             $reportID = mysqli_insert_id($conn);
             echo "Report created successfully, reportID:$reportID";
+
+            // audit incident (INSERT-SUCCESS)
+            $newIncidentsFromDB = $reportDB->getReportByReportID($reportID);
+            $incidentAudit = new Audit("NULL", $user->getUsername(), "Incidents", strval($newIncidentsFromDB->incidentID), "NULL", $newIncidentsFromDB->toJSON(), "INSERT-SUCCESS", $auditTime);
+            $auditDB->insertAudit($incidentAudit);
+            
+            // if ownership is not null: audit ownership (REFERENCE-INSERT) (not sure if audits trail for vehicle and owner should be added or not, probabaly should not because they were already recorded when creating ownership. However, .... I DONT KNOW...)
+            if ($ownershipID != "NULL" && $ownershipID != NULL) {
+                $ownershipFromDB = $ownershipDB->getOwnershipByID($ownershipID);
+                $ownershipAudit = new Audit("NULL", $user->getUsername(), "Ownership", strval($ownershipFromDB->ID), $ownershipFromDB->toJSON(), "NULL", "REFERENCE-INSERT", $auditTime);
+                $auditDB->insertAudit($ownershipAudit);
+            }
+            
+            // if offender is not null: audit offender (REFERENCE-INSERT)
+            if ($offenderID != "NULL" && $offenderID != NULL) {
+                $offenderFromDB = $peopleDB->getPersonByID($offenderID);
+                $offenderAudit = new Audit("NULL", $user->getUsername(), "People", strval($offenderFromDB->ID), $offenderFromDB->toJSON(), "NULL", "REFERENCE-INSERT", $auditTime);
+                $auditDB->insertAudit($offenderAudit);
+            }
         } catch (Exception $error) {
             renderErrorMessages(["Failed to create Report",$error->getMessage()]);
         }

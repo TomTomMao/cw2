@@ -217,7 +217,26 @@
             }
             return $people;
         }
-
+        function getPersonByID($ID) {
+            // return false if not found,
+            // return the person object whose ID = $ID
+            $conn = $this->conn;
+            $sql = "SELECT * FROM People WHERE People_ID='$ID';";
+            $result = mysqli_query($conn, $sql);
+            if (mysqli_num_rows($result) == 0) {
+                return false;
+            } elseif(mysqli_num_rows($result) == 1) {
+                while ($row = mysqli_fetch_assoc($result)) {
+                    $person = new Person($row["People_ID"], $row["People_licence"], 
+                    $row["People_address"], $row["People_DOB"], $row["People_name"], $row["People_photoID"]);
+                    return $person;
+                }
+            } elseif(mysqli_num_rows($result) < 0 || mysqli_num_rows($result) > 1) {
+                throw new Exception("Number of person in db with People_ID = $ID is incorrect, sql: $sql");
+            } else {
+                throw new Exception("Something else wrong, sql: $sql");
+            }
+        }
 
         function isPersonDetailInDB($person) {
             // $person: person object with mandatory data: name, dob, address

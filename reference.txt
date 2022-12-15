@@ -5,4 +5,4 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/pointer-events ----for---- reus
 https://www.w3schools.com/xml/ajax_database.asp ----for---- /Vehicles/create.php
 https://www.folkstalk.com/tech/how-to-center-with-position-fixed-with-code-examples/ ----for---- reuse/sytles.css
 https://www.freecodecamp.org/news/how-to-link-css-to-html ----for---- reuse/head.php
-https://www.w3schools.com/php/php_date.asp ----for---- reuse/_audit.php
+https://www.w3schools.com/php/php_date.asp ----for---- reuse/_audit.php and Reports/newSubmit.php
