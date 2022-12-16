@@ -10,6 +10,7 @@
         <a href="../Reports/new.php">New report</a>
         <a href="../Reports/lookup.php">Retrieve report</a>
         <a href="../Accounts/home.php">My Account</a>
+        <a href="../Accounts/myAuditTrails.php">My Audit Trails</a>
         <a href="../Accounts/logout.php">Log Out</a>
     </div>
     <hr>

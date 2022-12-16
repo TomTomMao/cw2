@@ -9,8 +9,15 @@ body {
 .report-table td,
 .ownership-container th,
 .ownership-container td,
+#general-audit-table td,
+#general-audit-table th,
+.ownership-table td,
+.ownership-table th,
+.vehicle-table td,
+.vehicle-table th,
 .account-td {
     background-color: #dddddd;
+    color: black;
 }
 
 .people-table,
@@ -23,13 +30,17 @@ body {
     margin: 2em auto;
 }
 
-.ownership-container table {
+.ownership-container table,
+.ownership-table,
+.vehicle-table {
     width: 500px;
     border: 1px black solid;
     margin: auto auto;
 }
 
-.ownership-container td {
+.ownership-container td,
+.ownership-table td,
+.vehicle-table td {
     width: 50%;
 }
 
@@ -64,7 +75,7 @@ body {
 /* for .uneditable, I referenced this: https://developer.mozilla.org/en-US/docs/Web/CSS/pointer-events */
 .uneditable {
     pointer-events: none;
-    background-color: #dedede;
+    background-color: #3e3e3e;
 }
 
 .uneditable:hover {
@@ -92,12 +103,14 @@ body {
     padding: 30px 20px 5px 20px;
 }
 
-.report-detail-information {
+.report-detail-information,
+.audit-detail-information {
     height: 100%;
     overflow-y: scroll;
 }
 
-.report-detail-table {
+.report-detail-table,
+.audit-detail-table {
     width: 97%;
     border-radius: 5px;
     background-color: rgb(69, 69, 69);
@@ -120,7 +133,8 @@ body {
     background-color: #6a6a6a;
 }
 
-#report-detail-container-hide-button {
+#report-detail-container-hide-button,
+#detail-audit-info button {
     color: red;
     top: 5px;
     left: 5px;
@@ -129,7 +143,8 @@ body {
     border-radius: 3px;
 }
 
-#report-detail-container-hide-button:hover {
+#report-detail-container-hide-button:hover,
+#detail-audit-info button:hover {
     color: black;
     background-color: rgb(212, 90, 90);
 }
@@ -138,4 +153,44 @@ body {
     cursor: not-allowed;
     pointer-events: none;
     color: gray;
+}
+
+#general-audit-info {
+    width: 760px;
+    height: 760px;
+    margin-bottom: 0.5em;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#general-audit-table td,
+#general-audit-table th {
+    height: 24px;
+}
+
+#detail-audit-info {
+    position: fixed;
+    background-color: #6a6a6a;
+    width: 800px;
+    height: 720px;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    border-radius: 5px;
+    padding: 30px 20px 5px 20px;
+}
+
+.audit-detail-information-subcontainer {
+    width: 97%;
+    border-radius: 5px;
+    height: 215px;
+    background-color: rgb(69, 69, 69);
+    margin-top: 10px;
+    padding: 5px;
+    overflow-y: scroll;
+    color: rgb(242, 242, 242);
+}
+
+.audit-detail-information-subcontainer h1 {
+    color: rgb(242, 242, 242);
 }
