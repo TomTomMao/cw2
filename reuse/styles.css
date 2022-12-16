@@ -171,8 +171,8 @@ body {
 #detail-audit-info {
     position: fixed;
     background-color: #6a6a6a;
-    width: 800px;
-    height: 720px;
+    width: min(800px, 80vw);
+    height: min(720px, 86vh);
     margin: 0 auto;
     left: 0;
     right: 0;
