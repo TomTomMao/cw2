@@ -1,4 +1,4 @@
-<?php $pageTitle = "My audit trails";
+<?php $pageTitle = "Audit trails";
     require("../reuse/head.php");
 ?>
 <?php // handle not login error
@@ -14,7 +14,23 @@
     require_once("../reuse/_dbConnect.php");
     $conn = connectDB();
     $auditDB = new AuditDB($user, $conn);
-    $audits = $auditDB->getAuditByUsername($user->getUsername());
+    // print_r($_GET); // debugging
+    if (isset($_POST["submit"])) {
+        if ($user->isAdmin()==false) {
+            header("location: ../error.php?errorMessage=You are not an admin, so you are not allowed to access this page."); 
+        }
+        if (isset($_POST["accountUsername"])) {
+            $audits = $auditDB->getAuditByUsername($_POST["accountUsername"]);
+        } elseif (isset($_POST["tableName"]) && isset($_POST["tableID"])) {
+            $audits = $auditDB->getAuditByTableID($_POST["tableName"], $_POST["tableID"]);
+        }
+    } elseif (isset($_GET["q"])) {
+        if ($_GET["q"]=="accounts") {
+            $audits = $auditDB->getAccountsAudit();
+        }
+    } else {
+        $audits = $auditDB->getAuditByUsername($user->getUsername());
+    }
 ?>
 
 <body>

@@ -16,13 +16,51 @@
 
         
 ?>
+
 <body>
-        <h1>Admin Home</h1>
-        <p>You can:</p>
-            <ul>
-                <li><a href="../Admin/newAccount.php" target="blank">create an account</a></li>
-                <li><a href="../Reports/lookup.php" target="blank"> add fine for a report</a></li>
-            </ul>
-        
+    <h1>Admin Home</h1>
+    <hr>
+    <h2><a href="../Admin/newAccount.php" target="blank">create an account</a></h2>
+    <hr>
+    <h2><a href="../Reports/lookup.php" target="blank"> add fine for a report</a></h2>
+    <hr>
+    <h2><a href="../Accounts/lookup.php" target="blank"> Lookup accounts information</a></h2>
+
+
+    <hr>
+    <h2>Check the audit trails of a user</h2>
+    <form action="../Accounts/myAuditTrails.php" method="POST">
+        <table>
+            <tr>
+                <td>Username:</td>
+                <td><input type="text" name="accountUsername"></td>
+                <td><input type="submit" value="search" name="submit"></td>
+            </tr>
+        </table>
+    </form>
+    <hr>
+
+    <h2>Check the audit trails per audit</h2>
+    <form action="../Accounts/myAuditTrails.php" method="POST">
+        <table>
+            <tr>
+                <td>Table name:</td>
+                <td><select name="tableName" id="table-name-select">
+                        <option value="People">People</option>
+                        <option value="Vehicles">Vehicles</option>
+                        <option value="Fines">Fines</option>
+                        <option value="Incidents">Incidents</option>
+                        <option value="Ownership">Ownership</option>
+                        <option value="Accounts">Accounts</option>
+                    </select></td>
+                <td>Table id:</td>
+                <td><input type="text" name="tableID"></td>
+                <td><input type="submit" value="search" name="submit"></td>
+            </tr>
+        </table>
+    </form>
+    <hr>
+    <h2><a href="../Accounts/myAuditTrails.php?q=accounts">Check account records</a></h2>
 </body>
+
 </html>

@@ -145,6 +145,19 @@
             // return a list of Audit objects, which could be an empty list.
             $conn = $this->conn;
             $sql = "SELECT * FROM Audit WHERE Table_name = '$tableName' AND Table_ID = '$tableID';";
+            if ($tableID == "NULL") {
+                $sql = "SELECT * FROM Audit WHERE Table_name = '$tableName' AND Table_ID IS NULL;";
+            }
+            $result = mysqli_query($conn, $sql);$auditObjects = [];
+            while($row = mysqli_fetch_assoc($result)) {
+                array_push($auditObjects, new Audit($row['Audit_ID'], $row["Account_username"], $row["Table_name"], $row["Table_ID"]
+                ,$row["Old_data"], $row["New_data"], $row["Behaviour_type"], $row["Audit_time"]));
+            }
+            return $auditObjects;
+        }
+        function getAccountsAudit() {
+            $conn = $this->conn;
+            $sql = "SELECT * FROM Audit WHERE Table_name = 'Accounts';";
             $result = mysqli_query($conn, $sql);$auditObjects = [];
             while($row = mysqli_fetch_assoc($result)) {
                 array_push($auditObjects, new Audit($row['Audit_ID'], $row["Account_username"], $row["Table_name"], $row["Table_ID"]
