@@ -165,6 +165,10 @@
             $vehicleAudit = new Audit("NULL", $user->getUsername(), "Vehicles", $newVehicle->ID, "NULL", $newVehicle->toJSON(), "INSERT-SUCCESS", $auditTime);
             $auditDB->insertAudit($vehicleAudit);
             
+            // add audit trail for the vehicle's being referenced.
+            $vehicleAudit = new Audit("NULL", $user->getUsername(), "Vehicles", $newVehicle->ID,  $newVehicle->toJSON(), "NULL", "REFERENCE-INSERT", $auditTime);
+            $auditDB->insertAudit($vehicleAudit);
+
             // add audit trail for the new ownership
             $ownershipAudit = new Audit("NULL", $user->getUsername(), "Ownership", $ownership->ID, "NULL", $ownership->toJSON(), "INSERT-SUCCESS", $auditTime);
             $auditDB->insertAudit($ownershipAudit);

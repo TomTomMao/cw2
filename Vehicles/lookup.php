@@ -91,7 +91,7 @@
                         $auditDB->insertAudit($audit);
                     } elseif ($vehicleAuditAdded==false) {
                         // vehicle exists
-                        echo "flag2";
+                        // echo "flag2";
                         $audit = new Audit("NULL", $user->getUsername(), "Vehicles", $ownership->getVehicleID()
                         , $ownership->getVehicle()->toJSON(), "NULL", "SELECT-FOUND-SECONDARY", $auditTime);
                         $auditDB->insertAudit($audit);

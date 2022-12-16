@@ -483,6 +483,16 @@
                 document.querySelector("#vehicle-table #accountUsername").innerText = audit.newData.accountUsername;
                 table.deleteRow(1);
                 table.deleteRow(1);
+            } else if (audit.behaviourType == "CHANGEPASSWORD-SUCCESS") {
+                oldContainer.innerHTML = "<h1>No old data</h1>"
+
+                table = document.getElementById("account-table-template").cloneNode(true);
+                table.id = "vehicle-table";
+                newContainer.innerHTML = "<h1>User Changed Password:</h1>"
+                newContainer.appendChild(table);
+                document.querySelector("#vehicle-table #accountUsername").innerText = audit.newData.accountUsername;
+                table.deleteRow(1);
+                table.deleteRow(1);
             }
         }
         function showRangeButtons(filteredAudit) {

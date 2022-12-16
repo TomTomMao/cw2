@@ -447,7 +447,9 @@
                 // get these people by id
                 $people = [];
                 foreach($personIDs as $personID) {
-                    array_push($people, $peopleDB->getPersonByID($personID));
+                    if ($personID != NULL && $personID != "NULL") {
+                        array_push($people, $peopleDB->getPersonByID($personID));
+                    }
                 }
                 // echo "<hr>#people:".count($people)."<hr>"; // debugging
 
