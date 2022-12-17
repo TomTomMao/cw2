@@ -253,7 +253,7 @@ CREATE TABLE Audit (
   Audit_ID int(30) NOT NULL,
   Account_username varchar(40) NOT NULL,
   Table_name varchar(20) NOT NULL,
-  Table_ID varchar(20) DEFAULT NULL,
+  Table_ID varchar(40) DEFAULT NULL,
   Old_data varchar(3000) DEFAULT NULL,
   New_data varchar(3000) DEFAULT NULL,
   Behaviour_type varchar(100) NOT NULL,

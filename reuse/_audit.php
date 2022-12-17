@@ -111,6 +111,7 @@
             $sql = "INSERT INTO Audit (Account_username, Table_name, Table_ID, Old_data, New_data, Behaviour_type, Audit_time) VALUES"
             ."($accountUsername, $tableName, $tableID, $oldData, $newData, $behaviourType, $auditTime)";
             // echo $sql."<hr>"; //debugging
+            // echo $sql;//debugging
             mysqli_query($conn, $sql);
         }
         function getAuditByUsername($accountUsername, $tableName=false, $timeStart=false, $timeEnd=false) {

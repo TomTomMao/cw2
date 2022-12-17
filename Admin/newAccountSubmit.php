@@ -49,7 +49,20 @@
             throw new Exception("Can not create account $accountUsername. Because the account exist");
         }
 
-    // TODO: FORBID THE CASE THAT ANY FIELD HAS INVALID DATA FORMAT
+    // DONE: FORBID THE CASE THAT ANY FIELD HAS INVALID DATA FORMAT
+    if (strlen($_POST["accountUsername"]) > 40) {
+        throw new Exception("Invalid account username length, should be greater than 40, given ".strlen($_POST["accountUsername"]));
+    } 
+    if (strlen($_POST["officerFirstName"]) > 20) {
+        throw new Exception("Invalid account officer first name length, should not be greater than 20, given ".strlen($_POST["officerFirstName"]));
+    } 
+    if (strlen($_POST["officerLastName"]) > 20) {
+        throw new Exception("Invalid account officer last name length, should not be greater than 20, given ".strlen($_POST["officerLastName"]));
+    } 
+    if (strlen($_POST["officerID"]) > 20) {
+        throw new Exception("Invalid account officer id length, should not be greater than 20, given ".strlen($_POST["officerID"]));
+    } 
+
         
     // DONE: GENERATE AN RANDOM PASSWORD, AND INSERT DATA INTO THE DATABASE.
         // note: This is not secure.
@@ -88,5 +101,6 @@
         $auditDB->insertAudit($audit);
     } catch (Exception $error) {
         renderErrorMessage($error->getMessage());
+        throw $error;// debugging
     }
 ?>
