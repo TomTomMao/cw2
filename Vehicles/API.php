@@ -6,7 +6,8 @@
             return;
         } elseif(strlen($personLicence) != 16) {
             echo "false,driving licence must be 16 length";
-        }
+            return;
+        } 
         $peopleDB = new PeopleDB($user, $conn);
         $people = $peopleDB->getPeopleByLicence($personLicence);
         if (is_null($people)){
@@ -57,28 +58,28 @@
         if (strlen($model)<=20 && strlen($model)>0) {
             echo "true,model is valid";
         } else {
-            echo "false,model format is incorrect";
+            echo "false,length should be >0 and <=20";
         }
     }
     function isFnameValid($fname) {
         if (strlen($fname)<=25 && strlen($fname)>0) {
             echo "true,firstname is valid";
         } else {
-            echo "false,firstname format is incorrect";
+            echo "false,length should be >0 and <=25";
         }
     }
     function isLnameValid($lname) {
         if (strlen($lname)<=25 && strlen($lname)>0) {
             echo "true,lastname is valid";
         } else {
-            echo "false,lastname format is incorrect";
+            echo "false,length should be >0 and <=25";
         }
     }
     function isaddressValid($address) {
         if (strlen($address)<=50 && strlen($address)>0) {
             echo "true,address is valid";
         } else {
-            echo "false,address format is incorrect";
+            echo "false,length should be >0 and <=50";
         }
     }
     function isDOBValid($DOB) {
@@ -127,6 +128,14 @@
                 return;
             } elseif ($personInDB->licence != $person->licence) {
                 echo '{"state":"failed", "reason":"person already in the database but the licence number is different with the driving licence number that you entered"}';
+                return;
+            }
+        }
+        // check if the owner licence is in database, and check if the data in database of this person is the same as the new person data.
+        if ($peopleDB->isPersonLicenceInDB($personLicence)) {
+            $personInDB=$peopleDB->getPersonByLicence($personLicence);
+            if ($personInDB->name != $person->name) {
+                '{"state":"failed", "reason":"person with the licence already in the database but the name you typed in different with the name of the person in the database."}';
                 return;
             }
         }
