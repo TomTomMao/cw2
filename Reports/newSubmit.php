@@ -114,8 +114,27 @@ try{
             // ["allValid"=>true/false, "detail"=>["ownerField1"=>"valid/invalid hint", "ownerField2"=>"valid/invalid hint", ...]]
             // Return True if the format of all the field of owner is valid.
             // Return An associative array whose key is field name of owner form, and value is "correct" 
-
-            return ["allValid"=>true];
+            $messages = array();
+            if (!empty($_POST["ownerLicence"]) && strlen($_POST["ownerLicence"])!=16) {
+                array_push($messages,"Invalid owner driving licence length!<br>length should be 16 or empty");
+            }
+            if (strlen($_POST["ownerFirstName"])>25 || strlen($_POST["ownerFirstName"])<1) {
+                array_push($messages,"Invalid owner first name length!<br>length should be 1 to 25");
+            }
+            if (strlen($_POST["ownerLastName"])>25 || strlen($_POST["ownerLastName"])<1) {
+                array_push($messages,"Invalid owner last name length!<br>length should be 1 to 25");
+            }
+            if (strlen($_POST["ownerAddress"])>50 || strlen($_POST["vehicleModel"])<1) {
+                array_push($messages,"Invalid owner address length!<br>length should be 1 to 50");
+            }
+            if (empty($_POST["ownerDOB"])) {
+                array_push($messages,"Invalid ownerDOB length!<br>should not be empty value");
+            }
+            if (empty($messages)) {
+                return ["allValid"=>true];
+            } else {
+                return ["allValid"=>false, "messages"=>$messages];
+            }
         }
         function isOffenderFormValid($post) {
             // assume there is a Offender form
@@ -124,7 +143,27 @@ try{
             // Return True if the format of all the field of Offender is valid.
             // Return An associative array whose key is field name of Offender form, and value is "correct" 
 
-            return isOwnerFormValid($post);
+            $messages = array();
+            if (!empty($_POST["offenderLicence"]) && strlen($_POST["offenderLicence"])!=16) {
+                array_push($messages,"Invalid offender driving licence length!<br>length should be 16 or empty");
+            }
+            if (strlen($_POST["offenderFirstName"])>25 || strlen($_POST["offenderFirstName"])<1) {
+                array_push($messages,"Invalid offender first name length!<br>length should be 1 to 25");
+            }
+            if (strlen($_POST["offenderLastName"])>25 || strlen($_POST["offenderLastName"])<1) {
+                array_push($messages,"Invalid offender last name length!<br>length should be 1 to 25");
+            }
+            if (strlen($_POST["offenderAddress"])>50 || strlen($_POST["vehicleModel"])<1) {
+                array_push($messages,"Invalid offender address length!<br>length should be 1 to 50");
+            }
+            if (empty($_POST["offenderDOB"])) {
+                array_push($messages,"Invalid offenderDOB length!<br>should not be empty value");
+            }
+            if (empty($messages)) {
+                return ["allValid"=>true];
+            } else {
+                return ["allValid"=>false, "messages"=>$messages];
+            }
         }
     // NOTE: $auditTime is defined once the vehicle is inserted or referenced.
     // NOTE(CTND): However, if there is no vehicle involved. the Time should be set manually.
@@ -196,7 +235,26 @@ try{
             $hasOwnerForm = false;
             $hasOffenderForm = true;
         }
-
+        
+    // DONE(NOTE TESTED): Validate each form if exists
+        if ($hasVehicleForm && isVehicleFormValid($_POST)['allValid']!=true) {
+            $messages = isVehicleFormValid($_POST)['messages'];
+            mysqli_close($conn);
+            throw new Exception("check the \$messages");
+            die();
+        }
+        if ($hasOwnerForm && isOwnerFormValid($_POST)['allValid']!=true) {
+            $messages = isOwnerFormValid($_POST)['messages'];
+            mysqli_close($conn);
+            throw new Exception("check the \$messages");
+            die();
+        }
+        if ($hasOffenderForm && isOffenderFormValid($_POST)['allValid']!=true) {
+            $messages = isOffenderFormValid($_POST)['messages'];
+            mysqli_close($conn);
+            throw new Exception("check the \$messages");
+            die();
+        }
 
     // DONE: processing vehicle form. {vehicle form} -> {vehicleID, database change}
         // If the all the data in the form that is related to vehicle is valid,
@@ -214,12 +272,13 @@ try{
 
             // case that the fields of vehicle form is invalid (function is not implemented yet, always valid) : give error feedback
         } elseif ($hasVehicleForm && isVehicleFormValid($_POST)['allValid']!=true) {
-            // echo "vehicle Information is not valid:";// debug
-            $messages = isVehicleFormValid($_POST)['messages'];
-            // print_r($messages); // debug
-            mysqli_close($conn);
-            throw new Exception("check the \$messages");
-            die();
+            // moved to "Validate each form if exists"
+            // // echo "vehicle Information is not valid:";// debug
+            // $messages = isVehicleFormValid($_POST)['messages'];
+            // // print_r($messages); // debug
+            // mysqli_close($conn);
+            // throw new Exception("check the \$messages");
+            // die();
             
             // case that the fields of vehicle form is valid: insert and get id if the vehicle is new, get existed id if the vehicle is in db.
         } elseif ($hasVehicleForm && isVehicleFormValid($_POST)['allValid']==true) { // boolean expression could be simplified, but current one is more explicit
@@ -887,11 +946,11 @@ try{
             $sql = "INSERT INTO Incident (Ownership_ID, People_ID, Offence_ID, Account_username, Incident_date, Incident_report)".
             "VALUES('$ownershipID','$offenderID','$offenceID','$username','$incidentDate',\"$reportStatement\");";
         }
-        echo "<hr>report insertion query:".$sql."<hr>";
+        // echo "<hr>report insertion query:".$sql."<hr>"; // debugging
         try{
             mysqli_query($conn, $sql);
             $reportID = mysqli_insert_id($conn);
-            echo "Report created successfully, reportID:$reportID";
+            echo "<div class='feedback-green'><div class='feedback-text-line'>Report created successfully, reportID:$reportID</div></div>";
 
             // audit incident (INSERT-SUCCESS)
             $newIncidentsFromDB = $reportDB->getReportByReportID($reportID);
