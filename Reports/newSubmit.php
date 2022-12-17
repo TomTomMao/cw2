@@ -901,8 +901,7 @@ try{
             try{
                 $initialIncidentsFromDB = $reportDB->getReportByReportID($reportID);
                 mysqli_query($conn, $sql);
-                echo "Report update successfully, reportID:$reportID";
-                
+                echo "<div class='feedback-green'><div class='feedback-text-line'>Report update successfully, reportID:$reportID</div></div>";
                 // audit incident (UPDATE-SUCCESS)
                 $updatedIncidentsFromDB = $reportDB->getReportByReportID($reportID);
                 $incidentAudit = new Audit("NULL", $user->getUsername(), "Incidents", strval($updatedIncidentsFromDB->incidentID), $initialIncidentsFromDB->toJSON(), $updatedIncidentsFromDB->toJSON(), "UPDATE-SUCCESS", $auditTime);

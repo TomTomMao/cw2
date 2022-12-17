@@ -27,6 +27,7 @@
             }
             $audits = $auditDB->getAuditByUsername($_POST["accountUsername"]);
             if (empty($audits)) {
+                $accountUsername = $_POST["accountUsername"];
                 throw new Exception ("Audit trails for the user '$accountUsername' not found", 0);
             }
         } elseif (isset($_POST["tableName"]) && isset($_POST["tableID"])) {

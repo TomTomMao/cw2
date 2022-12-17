@@ -73,13 +73,13 @@
                 if (count($people)<=0) {
                     // echo "<div class='feedback-yellow'><div class='feedback-text-line'>".
                     // "Person with name: '".$_POST["peopleName"]."'"." Not found"."</div></div>";
-                    throw new Exception("Person with name: '".$_POST["peopleName"]."'"." Not found",0);
                     // insert audit trial for this.
                     $audit = new Audit("NULL", $user->getUsername()
                     , "People", "NULL", "NULL"
                     , '{"partialName":"'.$_POST["peopleName"].'"}'
                     , "SELECT-EMPTY", "now");
                     $auditDB->insertAudit($audit);
+                    throw new Exception("Person with name: '".$_POST["peopleName"]."'"." Not found",0);
                 } else {
                     echo Person::renderPeopleTable($people); // render table at server
                     foreach ($people as $person) {
@@ -103,13 +103,13 @@
                 echo "<hr>";
                 if (!$people) {
                     // echo "Person with driving licence: '".$_POST["peopleLicence"]."'"."Not found";
-                    throw new Exception("Person with driving licence: '".$_POST["peopleLicence"]."'"."Not found",0);
                     // insert audit trial for this.
                     $audit = new Audit("NULL", $user->getUsername()
                     , "People", "NULL", "NULL"
                     , '{"personLicence":"'.$_POST["peopleLicence"].'"}'
                     , "SELECT-EMPTY", "now");
                     $auditDB->insertAudit($audit);
+                    throw new Exception("Person with driving licence: '".$_POST["peopleLicence"]."'"."Not found",0);
                 } else {
                     echo Person::renderPeopleTable($people); // render table at server
                     foreach ($people as $person) {

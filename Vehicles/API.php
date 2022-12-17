@@ -164,11 +164,18 @@
             // echo "<hr>\$isPersonNew = ".strval($isPersonNew)."<hr>"; // debugging
             if ($isPersonNew==true) {
                 $personAudit = new Audit("NULL", $user->getUsername(), "People", $person->ID, "NULL", $person->toJSON(), "INSERT-SUCCESS", "now");
+                $auditDB->insertAudit($personAudit);
+                $auditTime = $personAudit->auditTime;
+                
+                $personAudit = new Audit("NULL", $user->getUsername(), "People", $person->ID, $person->toJSON(), "NULL",  "REFERENCE-INSERT", $auditTime);
+                $auditDB->insertAudit($personAudit);
             } elseif($isPersonNew==false) {
                 $personAudit = new Audit("NULL", $user->getUsername(), "People", $person->ID, $person->toJSON(), "NULL",  "REFERENCE-INSERT", "now");
+                $auditDB->insertAudit($personAudit);
+                $auditTime = $personAudit->auditTime;
             }
-            $auditDB->insertAudit($personAudit);
-            $auditTime = $personAudit->auditTime;
+            
+            
 
             // add audit trail for the new vehicle
             $vehicleAudit = new Audit("NULL", $user->getUsername(), "Vehicles", $newVehicle->ID, "NULL", $newVehicle->toJSON(), "INSERT-SUCCESS", $auditTime);

@@ -34,8 +34,8 @@
                             die();
                         }
                     // DONE: Assert the report belongs to the current user or the current user is admin
-                    echo "report accountUsername:".$report->accountUsername; //debugging
-                    echo "Your username:".$user->getUsername(); // debugging
+                    // echo "report accountUsername:".$report->accountUsername; //debugging
+                    // echo "Your username:".$user->getUsername(); // debugging
                         if ($report->accountUsername != $user->getUsername() && !$user->isAdmin()) {
                             header("Location: ../error.php?errorMessage=You can't edit this report! Because this report was not created by you.");
                         }
@@ -62,7 +62,7 @@
     </div> -->
     <h1>Edit Report</h1>
     <hr>
-    <form action="newSubmit.php" method="post" class="new-report-form">
+    <form action="newSubmit.php?edit=true&id=<?php echo $_GET['id']?>" method="post" class="new-report-form">
         <div class="new-report-form-data">
             <div>
                 <h3>*Report General Information</h3>
