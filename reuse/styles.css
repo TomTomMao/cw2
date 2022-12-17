@@ -265,3 +265,25 @@ body {
 .text-center {
     text-align: center;
 }
+
+/* audit-lookup filter */
+.audit-filter-container>button {
+    font-size: 1em;
+    position: fixed;
+    top: 100px;
+    left: 0vw;
+
+}
+
+div.audit-filter {
+    position: fixed;
+    top: 150px;
+    background-color: #e9e9e9;
+    left: 0vw;
+    border-radius: 5px;
+    ;
+}
+
+.general-audit-table {
+    border-radius: 5px;
+}

@@ -56,16 +56,16 @@
     ?>
     <script>
         let audits = [];
-        function getAuditByID(filteredAudits, targetAuditID) {
-            targetAudit = filteredAudits.filter(audit => audit.auditID == targetAuditID)[0];
+        function getAuditByID(filteredAuditss, targetAuditID) {
+            targetAudit = filteredAuditss.filter(audit => audit.auditID == targetAuditID)[0];
             return targetAudit;
         }
-        function showGeneralAuditInfo(filteredAudit, start) {
+        function showGeneralAuditInfo(filteredAudits, start) {
             // remove all the event listener of show detail buttons.
             document.querySelectorAll("general-audit-info button").forEach(button => {
                 button = button;
             });
-            // render filteredAudit[start] to filteredAudit[start+24] into the table#general-audit-table
+            // render filteredAudits[start] to filteredAudits[start+24] into the table#general-audit-table
             for (let i = start; i <= start + 24; i++) {
 
                 // remove the event lisener for buttons. // reference: https://bobbyhadz.com/blog/javascript-remove-all-event-listeners-from-element
@@ -73,20 +73,20 @@
                 button.replaceWith(button.cloneNode(true));
                 button = document.querySelector("#general-audit-info-" + (i - start) + " button");
 
-                if (i < filteredAudit.length) {
+                if (i < filteredAudits.length) {
                     // console.log(i)
-                    // console.log(filteredAudit.length)
+                    // console.log(filteredAudits.length)
                     // console.log("#general-audit-info-" + (i - start) + ">td.audit-id");
                     // console.log(document.querySelector("#general-audit-info-" + (i - start) + ">td.audit-id")); // debugging
-                    document.querySelector("#general-audit-info-" + (i - start) + ">td.audit-id").innerText = filteredAudit[i].auditID;
-                    document.querySelector("#general-audit-info-" + (i - start) + ">td.username").innerText = filteredAudit[i].accountUsername;
-                    document.querySelector("#general-audit-info-" + (i - start) + ">td.table-name").innerText = filteredAudit[i].tableName;
-                    document.querySelector("#general-audit-info-" + (i - start) + ">td.table-id").innerText = filteredAudit[i].tableID;
-                    document.querySelector("#general-audit-info-" + (i - start) + ">td.audit-behaviour").innerText = filteredAudit[i].behaviourType;
-                    document.querySelector("#general-audit-info-" + (i - start) + ">td.audit-time").innerText = filteredAudit[i].auditTime;
+                    document.querySelector("#general-audit-info-" + (i - start) + ">td.audit-id").innerText = filteredAudits[i].auditID;
+                    document.querySelector("#general-audit-info-" + (i - start) + ">td.username").innerText = filteredAudits[i].accountUsername;
+                    document.querySelector("#general-audit-info-" + (i - start) + ">td.table-name").innerText = filteredAudits[i].tableName;
+                    document.querySelector("#general-audit-info-" + (i - start) + ">td.table-id").innerText = filteredAudits[i].tableID;
+                    document.querySelector("#general-audit-info-" + (i - start) + ">td.audit-behaviour").innerText = filteredAudits[i].behaviourType;
+                    document.querySelector("#general-audit-info-" + (i - start) + ">td.audit-time").innerText = filteredAudits[i].auditTime;
                     button.classList = [""]
                     button.addEventListener("click", () => {
-                        audit = filteredAudit[i];
+                        audit = filteredAudits[i];
                         showDetailAuditInfo(audit);
                     })
                 } else {
@@ -528,15 +528,19 @@
                 table.deleteRow(1);
             }
         }
-        function showRangeButtons(filteredAudit) {
-            auditSize = filteredAudit.length;
+        function removeAllRangeButtons() {
+            buttons = Array.from(document.querySelectorAll("#audit-range button"));
+            buttons.forEach(button => document.getElementById("audit-range").removeChild(button));
+        }
+        function showRangeButtons(filteredAudits) {
+            auditSize = filteredAudits.length;
             numberOfButtons = Math.ceil(auditSize / 25);
             console.log(numberOfButtons);
             for (let i = 0; i < numberOfButtons; i++) {
                 button = document.createElement("button");
                 button.id = i * 25;
                 button.addEventListener("click", () => {
-                    showGeneralAuditInfo(filteredAudit, i * 25);
+                    showGeneralAuditInfo(filteredAudits, i * 25);
 
                     // set current button selected
                     buttons = Array.from(document.querySelectorAll("#audit-range button"));
@@ -550,13 +554,107 @@
                 document.getElementById("audit-range").appendChild(button);
             }
         }
+        function showFilterOptions(audits) {
+            accountUsernames = new Set();
+            tableNames = new Set();
+            behaviourTypes = new Set();
+            for (audit of audits) {
+                accountUsernames.add(audit.accountUsername);
+                tableNames.add(audit.tableName);
+                behaviourTypes.add(audit.behaviourType);
+            }
+            accountUsernameSelector = document.getElementById("filter-accountUsername");
+            accountUsernames.forEach((accountUsername) => {
+                usernameOption = document.createElement("option");
+                usernameOption.value = accountUsername;
+                usernameOption.innerText = accountUsername;
+                accountUsernameSelector.appendChild(usernameOption);
+            })
+            tableNamesSelector = document.getElementById("filter-tableName");
+            tableNames.forEach((tableName) => {
+                tableNameOption = document.createElement("option");
+                tableNameOption.value = tableName;
+                tableNameOption.innerText = tableName;
+                tableNamesSelector.appendChild(tableNameOption);
+            })
+            behaviourTypesSelector = document.getElementById("filter-behaviourType");
+            behaviourTypes.forEach((behaviourType) => {
+                behaviourTypeOption = document.createElement("option");
+                behaviourTypeOption.value = behaviourType;
+                behaviourTypeOption.innerText = behaviourType;
+                behaviourTypesSelector.appendChild(behaviourTypeOption);
+            })
+        }
+        function toggleFilter() {
+            filter = document.getElementById("audit-filter");
+            if (Array.from(filter.classList).includes("invisible")) {
+                // console.log("flag1")
+                filter.classList = ["audit-filter"]
+                document.getElementById("toggleFilter").innerText = "Hide Filter";
+            } else if (Array.from(filter.classList).includes("invisible") == false) {
+                // console.log("flag2")
+                filter.classList = ["audit-filter invisible"]
+                document.getElementById("toggleFilter").innerText = "Show Filter";
+            }
+        }
     </script>
     <?php
         foreach($audits as $audit) {
             echo "<script>audits.push(".$audit->toJSON().")</script>";
         }
     ?>
-
+    <div class="audit-filter-container">
+        <button onclick="toggleFilter()" id="toggleFilter">Show Filter</button>
+        <div class="audit-filter invisible" id="audit-filter">
+            <table>
+                <tr>
+                    <td><input type="checkbox" name="filterByAuditID" id="filterByAuditID"></td>
+                    <th>audit id:</th>
+                    <td><input type="number" name="filter-auditIDMin" id="filter-auditIDMin"></td>
+                    <td>to:</td>
+                    <td><input type="number" name="filter-auditIDMax" id="filter-auditIDMax"></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" name="filterByTime" id="filterByTime"></td>
+                    <th>time:</th>
+                    <td><input type="datetime-local" name="filter-timeStart" id="filter-timeStart"></td>
+                    <td>to:</td>
+                    <td><input type="datetime-local" name="filter-timeEnd" id="filter-timeEnd">
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" name="filterByAccountUsername" id="filterByAccountUsername"></td>
+                    <th>username:</th>
+                    <td>
+                        <select name="filter-accountUsername" id="filter-accountUsername">
+                            <!-- options here, from the list of array -->
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" name="filterByTableName" id="filterByTableName"></td>
+                    <th>table name</th>
+                    <td>
+                        <select name="filter-tableName" id="filter-tableName">
+                            <!-- options here, from the list of array -->
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" name="filterByBehaviourType" id="filterByBehaviourType"></td>
+                    <th>behaviour type</th>
+                    <td>
+                        <select name="filter-behaviourType" id="filter-behaviourType">
+                            <!-- options here, from the list of array -->
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><button role="button" onclick="filterAudits(audits)">confirm</button></td>
+                </tr>
+            </table>
+        </div>
+    </div>
     <div id="audit-trails">
         <div id="detail-audit-info" class="invisible">
             <button onclick="document.getElementById('detail-audit-info').classList=['invisible']">X</button>
@@ -846,13 +944,51 @@
 
     <script>
 
-        filteredAudit = audits;
-        showRangeButtons(filteredAudit);
+        filteredAudits = audits;
+        showFilterOptions(audits);
+        showRangeButtons(filteredAudits);
         firstButton = document.getElementById("0");
         if (firstButton != undefined && firstButton.classList != undefined) {
             firstButton.classList = ["button-selected"];
         }
-        showGeneralAuditInfo(filteredAudit, 0);
+        showGeneralAuditInfo(filteredAudits, 0);
+
+        function filterAudits(audits) {
+            filteredAudits = audits;
+            if (document.getElementById("filterByAuditID").checked) {
+                minAuditID = document.getElementById("filter-auditIDMin").value;
+                maxAuditID = document.getElementById("filter-auditIDMax").value;
+                filteredAudits = filteredAudits.filter(audit => parseInt(audit.auditID) >= parseInt(minAuditID) && parseInt(audit.auditID) <= parseInt(maxAuditID));
+            }
+            if (document.getElementById("filterByTime").checked) {
+                timeStart = document.getElementById("filter-timeStart").value;
+                timeEnd = document.getElementById("filter-timeEnd").value;
+                filteredAudits = filteredAudits.filter(audit => {
+                    auditTime = audit.auditTime.slice(0, 10) + "T" + audit.auditTime.slice(11, 16);
+                    return auditTime >= timeStart && auditTime <= timeEnd;
+                });
+            }
+            if (document.getElementById("filterByAccountUsername").checked) {
+                username = document.getElementById("filter-accountUsername").value;
+                filteredAudits = filteredAudits.filter(audit => audit.accountUsername == username);
+            }
+            if (document.getElementById("filterByTableName").checked) {
+                tableName = document.getElementById("filter-tableName").value;
+                filteredAudits = filteredAudits.filter(audit => audit.tableName == tableName);
+            }
+            if (document.getElementById("filterByBehaviourType").checked) {
+                behaviourType = document.getElementById("filter-behaviourType").value;
+                filteredAudits = filteredAudits.filter(audit => audit.behaviourType == behaviourType);
+            }
+            console.log(filteredAudits);
+            removeAllRangeButtons();
+            showRangeButtons(filteredAudits);
+            firstButton = document.getElementById("0");
+            if (firstButton != undefined && firstButton.classList != undefined) {
+                firstButton.classList = ["button-selected"];
+            }
+            showGeneralAuditInfo(filteredAudits, 0);
+        }
     </script>
     <div class="audit-detail-information-subcontainer invisible" id="old-data">
         <table class="people-table" id="people-table-template">
