@@ -83,7 +83,7 @@
                         ,$person->ID, $person->toJSON(), "NULL", "SELECT-FOUND", "now");
                         $auditDB->insertAudit($audit);
                         
-                        echo $person->toJSON()."<br>"; // testing person->toJSON()
+                        // echo $person->toJSON()."<br>"; // testing person->toJSON()
                     }    
                 }
 
@@ -109,7 +109,7 @@
                         ,$person->ID, $person->toJSON(), "NULL", "SELECT-FOUND", "now");
                         $auditDB->insertAudit($audit);
                         
-                        echo $person->toJSON()."<br>"; // testing person->toJSON()
+                        // echo $person->toJSON()."<br>"; // testing person->toJSON()
                     }    
                 }
 
