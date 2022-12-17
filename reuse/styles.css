@@ -284,6 +284,7 @@ div.audit-filter {
     ;
 }
 
-.general-audit-table {
-    border-radius: 5px;
+#audit-range {
+    overflow-x: scroll;
+    height: 4em;
 }
