@@ -8,6 +8,13 @@
     if ($user->isLoggedIn()) {
         echo "You shouldn't be here!";
     } else {
-        echo "<p style='color: green'>Log out successfully</p>"."<a href='login.php'>Go Login</a>";
+        
+        echo "<br>";
+        echo "<br>";
+        echo "<br>";
+        echo "<br>";
+        echo "<br>";
+        echo "<br>";
+        echo "<p style='color: green' class='text-center'>Log out successfully</p>"."<center><a href='login.php'>Go Login</a></center>";
     }
 ?>

@@ -260,3 +260,8 @@ body {
 .login-form input {
     height: 2em;
 }
+
+/* public class */
+.text-center {
+    text-align: center;
+}

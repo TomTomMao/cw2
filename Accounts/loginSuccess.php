@@ -8,6 +8,15 @@
     if (!$user->isLoggedIn()) {
         header("location: notLoginError.html");
     } else {
-        echo "<p style='color: green'>Log in successfully</p>"."<a href='home.php'>Go to Home Page</a>";
+        echo "<br>";
+        echo "<br>";
+        echo "<br>";
+        echo "<br>";
+        echo "<br>";
+        echo "<br>";
+        echo "<p style='color: green' class='text-center'>Log in successfully</p>"."<center><a href='home.php'>Go to Home Page</a></center>";
     }
 ?>
+
+</body>
+</html>
