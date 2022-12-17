@@ -235,3 +235,28 @@ body {
 }
 
 /* navbar */
+/* login.php */
+
+.login-form table {
+    margin: 30vh auto;
+}
+
+.login-form {
+    font-size: 2em;
+}
+
+.login-form button,
+.login-form input[value="login"] {
+    font-size: 0.8em;
+
+}
+
+.login-form input[value="login"] {
+    display: block;
+    margin: 0 0 0 auto;
+    ;
+}
+
+.login-form input {
+    height: 2em;
+}

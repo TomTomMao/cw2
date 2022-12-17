@@ -1,8 +1,10 @@
 <?php $pageTitle = "Login";
     require("../reuse/head.php");
+    require("../reuse/errorMessage.php");
 ?>
 
 <?php
+    try{
     session_start();
     require("_account.php");
     $user = new User();
@@ -11,7 +13,7 @@
         debugEcho("\$_POST is empty"."<br>\$_POST:");
         debugPrint_r($_POST);
         if ($_SERVER['REQUEST_METHOD']=="POST") {
-            echo "<p style='color: red'>please enter username and password</p>";
+            $msg = "please enter username and password";
         }
     } else { //entered username and password
         debugEcho("\$_POST is not empty"."<br>\$_POST:");
@@ -21,24 +23,22 @@
             header("location: loginSuccess.php");
             // echo "<p style='color: green'>Log in successfully</p>"."<a href='home.php'>Go to Home Page</a>";
         } elseif ($loginResult=="wrongPassword") {
-            echo "<p style='color: red'>Wrong password, please try again</p>";
+            $msg = "Wrong password, please try again";
         } elseif ($loginResult=="usernameNotExist") {
-            echo "<p style='color: red'>Username doesn't exist, please try again</p>";
+            $msg = "Username doesn't exist, please try again";
         }
     }
+?>
+<body>
+<?php
     if ($user->isLoggedIn()) { // already log in
         echo '
-            <body>
                 <p>You are already logged in</p>
-                <a href="home.php">Go to Home Page</a>
-            </body>
-
-            </html>';
+                <a href="home.php">Go to Home Page</a>';
     }
     else {
         echo '
-            <body>
-                <form action="login.php" method="post">
+                <form action="login.php" method="post" class="login-form">
                     <table>
                         <tr>
                             <td>
@@ -53,7 +53,7 @@
                         <tr>
                             <!-- // the effect of toggle password here referenced this page:
                             https://www.w3schools.com/howto/howto_js_toggle_password.asp -->
-                            <td>password</td>
+                            <td>password:</td>
                             <td>
                                 <input type="password" name="password" id="password">
                             </td>
@@ -77,10 +77,14 @@
                             </td>
                         </tr>
                     </table>
-                </form>
-            </body>
-
-            </html>';
+                </form>';
     }
-    
+    if (!empty($msg)) {
+        renderErrorMessage($msg);
+    }
+    } catch (Exception $error) {
+        renderErrorMessage($error->getMessage());
+    }
 ?>
+</body>
+</html>
