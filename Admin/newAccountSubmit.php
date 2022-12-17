@@ -101,6 +101,6 @@
         $auditDB->insertAudit($audit);
     } catch (Exception $error) {
         renderErrorMessage($error->getMessage());
-        throw $error;// debugging
+        // throw $error;// debugging
     }
 ?>
