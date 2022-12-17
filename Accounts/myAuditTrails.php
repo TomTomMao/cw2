@@ -370,6 +370,8 @@
                 document.querySelector("#vehicle-table #vehicleMake").innerText = audit.oldData.make;
                 document.querySelector("#vehicle-table #vehicleModel").innerText = audit.oldData.model;
                 document.querySelector("#vehicle-table #vehicleColour").innerText = audit.oldData.colour;
+            } else if (audit.behaviourType == "SELECT-EMPTY-SECONDARY") {
+                newContainer.innerHTML = "<h1>Not found vehicle with the vehicle licence when search an Ownership:</h1><p>" + audit.newData.vehicleLicence + "</p>"
             }
         }
         function renderIncidentData(oldContainer, newContainer, audit) {
