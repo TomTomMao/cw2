@@ -199,3 +199,39 @@ body {
     background-color: #3e3e3e;
     color: #ffffff;
 }
+
+
+
+/* for Reports/new.php */
+.new-report-form-data {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.new-report-form-data>div {
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    width: 600px;
+    height: 210px;
+    margin: 10px 10px;
+    padding: 5px;
+}
+
+.new-report-form-data>div>table {
+    margin: 0 auto;
+}
+
+.new-report-form-data>div>h3 {
+    text-align: center;
+}
+
+.new-report-form input[value="submit"] {
+    font-size: 2em;
+    display: block;
+    margin: 0 auto;
+}
+
+/* navbar */
