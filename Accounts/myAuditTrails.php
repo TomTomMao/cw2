@@ -172,7 +172,7 @@
 
                 table = document.getElementById("people-table-template").cloneNode(true);
                 table.id = "people-table";
-                oldContainer.innerHTML = "<h1>User saw this person data when searching incidents or ownership:</h1>"
+                oldContainer.innerHTML = "<h1>User saw this person data when looking at incident data or ownership data:</h1>"
                 oldContainer.appendChild(table);
                 document.querySelector("#people-table #personID").innerText = audit.oldData.ID;
                 document.querySelector("#people-table #personName").innerText = audit.oldData.firstName + " " + audit.oldData.lastName;
@@ -253,7 +253,7 @@
 
                 table = document.getElementById("ownership-table-template").cloneNode(true);
                 table.id = "ownership-table";
-                oldContainer.innerHTML = "<h1>User saw this person data when searching an incident:</h1>"
+                oldContainer.innerHTML = "<h1>User saw this person data when looking at an ownership data:</h1>"
                 oldContainer.appendChild(table);
                 document.querySelector("#ownership-table #ownershipID").innerText = audit.oldData.ownershipID;
                 document.querySelector("#ownership-table #vehicleLicence").innerText = audit.oldData.vehicle.licence;
@@ -337,7 +337,7 @@
 
                 table = document.getElementById("vehicle-table-template").cloneNode(true);
                 table.id = "vehicle-table";
-                oldContainer.innerHTML = "<h1>User saw this vehicle data when searching an ownership:</h1>"
+                oldContainer.innerHTML = "<h1>User saw this vehicle data when searching an ownership data or an incident data:</h1>"
                 oldContainer.appendChild(table);
                 document.querySelector("#vehicle-table #vehicleID").innerText = audit.oldData.ID;
                 document.querySelector("#vehicle-table #vehicleLicence").innerText = audit.oldData.licence;
