@@ -18,6 +18,7 @@
         require_once("_ownership.php");
         require("../reuse/_dbConnect.php");
         require("../reuse/_audit.php");
+        require("../reuse/errorMessage.php");
     ?>
     <body>
     <?php 
@@ -37,7 +38,7 @@
             <table>
                 <tr>
                     <td>Vehicle Licence:</td>
-                    <td><input type="text" name="vehicleLicence" value="<?php if (!empty($_POST['vehicleLicence'])) { echo $_POST['vehicleLicence'];}?>"></td>
+                    <td><input required minlength="7" maxlength="7" type="text" name="vehicleLicence" value="<?php if (!empty($_POST['vehicleLicence'])) { echo $_POST['vehicleLicence'];}?>"></td>
                     <td><input type="submit" value="search"></td>
                 </tr>
             </table>
@@ -46,6 +47,10 @@
         <!-- The line above is for testing the php object method Ownership->toJSON and Vehicle->toJSON and Person->toJSON -->
         <?php
             if(!empty($_POST["vehicleLicence"])) {
+                //invalid vehicle Licence length checking
+                if (strlen($_POST["vehicleLicence"])!=7) {
+                    throw new Exception("Invalid vehicle licence length, shoude be 7", 1);
+                }
                 $conn = connectDB();
                 $ownershipDB = new OwnershipDB($user,$conn);
                 $auditDB = new AuditDB($user, $conn);
@@ -85,7 +90,7 @@
                     // 
                     if ($ownership->isVehicleIDNull() && $vehicleAuditAdded==false) {
                         // vehicle doesn't exists
-                        echo "flag1";
+                        // echo "flag1"; //debugging
                         $audit = new Audit("NULL", $user->getUsername(), "Vehicles", "NULL"
                         , "NULL", '{"vehicleLicence": "'.$_POST["vehicleLicence"].'"}', "SELECT-EMPTY-SECONDARY", $auditTime);
                         $auditDB->insertAudit($audit);
@@ -113,13 +118,20 @@
                 echo $ownershipDiv;
                 mysqli_close($conn);
             } elseif(isset($_POST["vehicleLicence"])) {
-                echo "<p style='color: red'>please enter a licence</p>";
+                // empty value error
+                throw new Exception("please enter a licence", 1);
+                // echo "<p style='color: red'>please enter a licence</p>";
             }
         ?>
     
 <?php 
     } catch (Exception $error) {
-        header("location: ../error.php?errorMessage=".$error->getMessage());
+        if ($error->getCode()==0){
+            renderErrorMessage($error->getMessage(), false);
+        } else {
+            renderErrorMessage($error->getMessage(), true);
+        }
+        // header("location: ../error.php?errorMessage=".$error->getMessage());
     }
 ?>
 </body>
