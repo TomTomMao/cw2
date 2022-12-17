@@ -1,4 +1,6 @@
-<?php $pageTitle = "Audit trails";
+<?php 
+    try {
+    $pageTitle = "Audit trails";
     require("../reuse/head.php");
 ?>
 <?php // handle not login error
@@ -20,9 +22,18 @@
             header("location: ../error.php?errorMessage=You are not an admin, so you are not allowed to access this page."); 
         }
         if (isset($_POST["accountUsername"])) {
+            if(empty($_POST["accountUsername"])) {
+                throw new Exception ("User name is empty", 1);
+            }
             $audits = $auditDB->getAuditByUsername($_POST["accountUsername"]);
+            if (empty($audits)) {
+                throw new Exception ("Audit trails for the user '$accountUsername' not found", 0);
+            }
         } elseif (isset($_POST["tableName"]) && isset($_POST["tableID"])) {
             $audits = $auditDB->getAuditByTableID($_POST["tableName"], $_POST["tableID"]);
+            if (empty($_POST["tableName"]) || empty($_POST["tableID"])) {
+                throw new Exception ("table name and table ID should not be empty", 1);
+            }
         }
     } elseif (isset($_GET["q"])) {
         if ($_GET["q"]=="accounts") {
@@ -31,11 +42,16 @@
     } else {
         $audits = $auditDB->getAuditByUsername($user->getUsername());
     }
+    
 ?>
 
 <body>
     <?php 
         require("../reuse/navbar.php");
+        if (empty($audits)) {
+            throw new Exception ("Audit trails not found");
+            die();
+        }
     ?>
     <script>
         let audits = [];
@@ -520,6 +536,14 @@
                 button.id = i * 25;
                 button.addEventListener("click", () => {
                     showGeneralAuditInfo(filteredAudit, i * 25);
+
+                    // set current button selected
+                    buttons = Array.from(document.querySelectorAll("#audit-range button"));
+                    console.log(buttons);
+                    for (button of buttons) {
+                        button.classList = "";
+                    }
+                    document.getElementById(String(i * 25)).classList = "button-selected";
                 })
                 button.innerText = String(i * 25 + 1) + " - " + String(Math.min(auditSize, i * 25 + 25))
                 document.getElementById("audit-range").appendChild(button);
@@ -822,7 +846,11 @@
     <script>
 
         filteredAudit = audits;
-        showRangeButtons(filteredAudit)
+        showRangeButtons(filteredAudit);
+        firstButton = document.getElementById("0");
+        if (firstButton != undefined && firstButton.classList != undefined) {
+            firstButton.classList = ["button-selected"];
+        }
         showGeneralAuditInfo(filteredAudit, 0);
     </script>
     <div class="audit-detail-information-subcontainer invisible" id="old-data">
@@ -1064,3 +1092,14 @@
 </body>
 
 </html>
+<?php
+    }
+    catch (Exception $error) {
+        require("../reuse/errorMessage.php");
+        if ($error->getCode()==0) {
+            renderErrorMessage($error->getMessage(),false);
+        } else {
+            renderErrorMessage($error->getMessage(),true);
+        }
+    }
+?>

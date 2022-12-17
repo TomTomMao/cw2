@@ -194,3 +194,8 @@ body {
 .audit-detail-information-subcontainer h1 {
     color: rgb(242, 242, 242);
 }
+
+.button-selected {
+    background-color: #3e3e3e;
+    color: #ffffff;
+}

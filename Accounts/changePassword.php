@@ -1,4 +1,8 @@
-<?php $pageTitle = "Change Password";
+<?php 
+    try {
+        
+    
+    $pageTitle = "Change Password";
     require("../reuse/head.php");
 ?>
 
@@ -120,15 +124,24 @@
         </table>
     </div>
     <?php 
-    echo "<p style='color:";
-    if ($changeSuccess) {
-        echo "green";
-    } else {
-        echo "red";
+    if (!empty($msg)) {
+
+        echo "<div class='feedback-";
+        if ($changeSuccess) {
+            echo "green";
+        } else {
+            echo "red";
+        }
+        echo "'><div class='feedback-text-line'>".$msg."</div></div>";
     }
-    echo "'>".$msg."</p>";
     ?>
     </form>
 </body>
 
 </html>
+<?php
+} catch (Exception $error) {
+    require("../reuse/errorMessage.php");
+    renderErrorMessage($error->getMessage());
+}
+?>
