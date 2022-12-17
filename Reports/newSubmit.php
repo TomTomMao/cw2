@@ -124,7 +124,7 @@ try{
             if (strlen($_POST["ownerLastName"])>25 || strlen($_POST["ownerLastName"])<1) {
                 array_push($messages,"Invalid owner last name length!<br>length should be 1 to 25");
             }
-            if (strlen($_POST["ownerAddress"])>50 || strlen($_POST["vehicleModel"])<1) {
+            if (strlen($_POST["ownerAddress"])>50 || strlen($_POST["ownerAddress"])<1) {
                 array_push($messages,"Invalid owner address length!<br>length should be 1 to 50");
             }
             if (empty($_POST["ownerDOB"])) {
@@ -153,7 +153,7 @@ try{
             if (strlen($_POST["offenderLastName"])>25 || strlen($_POST["offenderLastName"])<1) {
                 array_push($messages,"Invalid offender last name length!<br>length should be 1 to 25");
             }
-            if (strlen($_POST["offenderAddress"])>50 || strlen($_POST["vehicleModel"])<1) {
+            if (strlen($_POST["offenderAddress"])>50 || strlen($_POST["offenderAddress"])<1) {
                 array_push($messages,"Invalid offender address length!<br>length should be 1 to 50");
             }
             if (empty($_POST["offenderDOB"])) {

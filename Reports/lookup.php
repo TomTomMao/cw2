@@ -440,7 +440,9 @@
                 // get these ownerships by id
                 $ownerships = [];
                 foreach($ownershipIDs as $ownershipID) {
-                    array_push($ownerships, $ownershipDB->getOwnershipByID($ownershipID));
+                    if ($ownershipID != NULL && $ownershipID != "NULL"){
+                        array_push($ownerships, $ownershipDB->getOwnershipByID($ownershipID));
+                    }
                 }
                 // echo "<hr>#ownerships:".count($ownerships)."<hr>"; // debugging
 
@@ -456,7 +458,9 @@
                 // get these vehicles by vehicleLicences
                 $vehicles = [];
                 foreach($vehicleLicences as $vehicleLicence) {
-                    array_push($vehicles, $vehiclesDB->getVehiclesByLicence($vehicleLicence)[0]);
+                    if ($vehicleLicence != NULL && $vehicleLicence != "NULL") {
+                        array_push($vehicles, $vehiclesDB->getVehiclesByLicence($vehicleLicence)[0]);
+                    }
                 }
                 // echo "<hr>#vehicles:".count($vehicles)."<hr>"; // debugging
 
