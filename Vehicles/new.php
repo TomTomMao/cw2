@@ -441,8 +441,8 @@
             if (data.state == "success") {
                 renderFeedbackText("feedbackBox1", "feedback-green", "Create Vehicle Success." +
                     "new ownership id: " + data.newOwnershipID +
-                    "new vehicle id:" + data.vehicleID +
-                    "person id:" + data.personID);
+                    " new vehicle id:" + data.vehicleID +
+                    " person id:" + data.personID);
             } else if (data.state == "failed") {
                 renderFeedbackText("feedbackBox1", "feedback-red", "Failed. Reason: " + data.reason);
             } else if (data.state == "error") {

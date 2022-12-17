@@ -109,7 +109,7 @@
                 echo "true,".$vehicleLicence." is new";
             }
         } else {
-            echo "false,Vehicle Licence format incorrect";
+            echo "false,the length should be 7";
         }
     } function createNewVehicleWithOwner($vehicleLicence,$vehicleColour,$vehicleMake,$vehicleModel,
     $personLicence,$personFirstName,$personLastName,$personAddress,$personDOB,$user,$conn) {

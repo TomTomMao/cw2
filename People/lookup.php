@@ -37,7 +37,7 @@
             <table>
                 <tr>
                     <td>Name:</td>
-                    <td><input type="text" name="peopleName" value="<?php if (!empty($_POST['peopleName'])) { echo $_POST['peopleName'];}?>"></td>
+                    <td><input required maxlength="50" type="text" name="peopleName" value="<?php if (!empty($_POST['peopleName'])) { echo $_POST['peopleName'];}?>"></td>
                     <td><input type="submit" value="search"></td>
                 </tr>
             </table>
@@ -48,7 +48,7 @@
             <table>
                 <tr>
                     <td>Licence:</td>
-                    <td><input type="text" name="peopleLicence" value="<?php if (!empty($_POST['peopleLicence'])) { echo $_POST['peopleLicence'];}?>"></td>
+                    <td><input required minlength="16" maxlength="16" type="text" name="peopleLicence" value="<?php if (!empty($_POST['peopleLicence'])) { echo $_POST['peopleLicence'];}?>"></td>
                     <td><input type="submit" value="search"></td>
                 </tr>
             </table>
