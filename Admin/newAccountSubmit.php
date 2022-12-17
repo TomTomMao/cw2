@@ -1,5 +1,9 @@
 <?php $pageTitle = "Create new account";
     require("../reuse/head.php");
+    require("../reuse/errorMessage.php");
+    try {
+        
+    
     session_start();
         require("../Accounts/_account.php");// there is a User class
         
@@ -82,4 +86,7 @@
     // add audit trail
         $audit = new Audit("NULL", $user->getUsername(), "Accounts", $usernameFromDB, "NULL", $accountJSON, "INSERT-SUCCESS", "now");
         $auditDB->insertAudit($audit);
+    } catch (Exception $error) {
+        renderErrorMessage($error->getMessage());
+    }
 ?>
