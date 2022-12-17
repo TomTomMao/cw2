@@ -57,18 +57,23 @@
         <?php
             require("../reuse/_dbConnect.php");
             require("../reuse/_audit.php");
+            require("../reuse/errorMessage.php");
             $conn = connectDB();
             $peopleDB = new PeopleDB($user, $conn);
             $auditDB =  new AuditDB($user, $conn);
             if(!empty($_POST["peopleName"])) {
+                // handling invalid input
+                if (strlen($_POST["peopleName"])>50) {
+                    throw new Exception("Invalid name",1);
+                }
                 $people = $peopleDB->getPeopleByName($_POST["peopleName"]);
                 
                 // check and render the data
                 echo "<hr>";
                 if (count($people)<=0) {
-                    echo "<div class='feedback-yellow'><div class='feedback-text-line'>".
-                    "Person with name: '".$_POST["peopleName"]."'"." Not found"."</div></div>";
-                    
+                    // echo "<div class='feedback-yellow'><div class='feedback-text-line'>".
+                    // "Person with name: '".$_POST["peopleName"]."'"." Not found"."</div></div>";
+                    throw new Exception("Person with name: '".$_POST["peopleName"]."'"." Not found",0);
                     // insert audit trial for this.
                     $audit = new Audit("NULL", $user->getUsername()
                     , "People", "NULL", "NULL"
@@ -89,12 +94,16 @@
 
             } elseif(!empty($_POST["peopleLicence"])) {
                 $people = $peopleDB->getPeopleByLicence($_POST["peopleLicence"]);
-
+                
+                // handling invalid input
+                if (strlen($_POST["peopleLicence"])!=16) {
+                    throw new Exception("Invalid driving licence length, the length should be 16",1);
+                }
                 // check and render the data
                 echo "<hr>";
                 if (!$people) {
-                    echo "Person with driving licence: '".$_POST["peopleLicence"]."'"."Not found";
-                    
+                    // echo "Person with driving licence: '".$_POST["peopleLicence"]."'"."Not found";
+                    throw new Exception("Person with driving licence: '".$_POST["peopleLicence"]."'"."Not found",0);
                     // insert audit trial for this.
                     $audit = new Audit("NULL", $user->getUsername()
                     , "People", "NULL", "NULL"
@@ -122,8 +131,13 @@
     
 <?php 
     } catch (Exception $error) {
-        throw $error;
+        // throw $error;
         // header("location: ../error.php?errorMessage=".$error->getMessage());
+        if ($error->getCode() == 0) {
+            renderErrorMessage($error->getMessage(), false);
+        } elseif ($error->getCode() == 1) {
+            renderErrorMessage($error->getMessage(), true);
+        }
     }
 ?>
 </body>
