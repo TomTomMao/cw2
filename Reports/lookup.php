@@ -385,7 +385,7 @@
                 if ($table) {
                     echo $table;
                 } else {
-                    echo "No report found";
+                    echo "<div class='feedback-yellow'><div class='feedback-text-line'>No report found</div></div>";
                 }
             }
         
