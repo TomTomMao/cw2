@@ -147,6 +147,8 @@
                 document.querySelector("#people-table #personAddress").innerText = audit.newData.address;
                 document.querySelector("#people-table #personLicence").innerText = audit.newData.licence;
                 document.querySelector("#people-table #personDOB").innerText = audit.newData.dateOfBirth;
+                document.querySelector("#people-table #totalFines").innerText = audit.newData.totalFine  ? audit.newData.totalFine : "user didn't see this field";
+                document.querySelector("#people-table #totalPoints").innerText = audit.newData.totalPoints ? audit.newData.totalPoints : "user didn't see this field";
             } else if (audit.behaviourType == "SELECT-FOUND") {
 
                 newContainer.innerHTML = "<h1>No new data</h1>"
@@ -160,6 +162,8 @@
                 document.querySelector("#people-table #personAddress").innerText = audit.oldData.address;
                 document.querySelector("#people-table #personLicence").innerText = audit.oldData.licence;
                 document.querySelector("#people-table #personDOB").innerText = audit.oldData.dateOfBirth;
+                document.querySelector("#people-table #totalFines").innerText = audit.oldData.totalFine ? audit.oldData.totalFine : "user didn't see this field";
+                document.querySelector("#people-table #totalPoints").innerText = audit.oldData.totalPoints ? audit.oldData.totalPoints : "user didn't see this field";
             } else if (audit.behaviourType == "SELECT-EMPTY") {
                 if (audit.newData.partialName) {
                     newContainer.innerHTML = "<h1>Not found people with the name:</h1><p>" + audit.newData.partialName + "</p>"
@@ -179,6 +183,8 @@
                 document.querySelector("#people-table #personAddress").innerText = audit.oldData.address;
                 document.querySelector("#people-table #personLicence").innerText = audit.oldData.licence;
                 document.querySelector("#people-table #personDOB").innerText = audit.oldData.dateOfBirth;
+                document.querySelector("#people-table #totalFines").innerText = audit.oldData.totalFine ? audit.oldData.totalFine : "user didn't see this field";
+                document.querySelector("#people-table #totalPoints").innerText = audit.oldData.totalPoints ? audit.oldData.totalPoints : "user didn't see this field";
             } else if (audit.behaviourType == "REFERENCE-INSERT") {
 
                 newContainer.innerHTML = "<h1>No new data</h1>"
@@ -192,6 +198,8 @@
                 document.querySelector("#people-table #personAddress").innerText = audit.oldData.address;
                 document.querySelector("#people-table #personLicence").innerText = audit.oldData.licence;
                 document.querySelector("#people-table #personDOB").innerText = audit.oldData.dateOfBirth;
+                document.querySelector("#people-table #totalFines").innerText = audit.oldData.totalFine ? audit.oldData.totalFine : "user didn't see this field";
+                document.querySelector("#people-table #totalPoints").innerText = audit.oldData.totalPoints ? audit.oldData.totalPoints : "user didn't see this field";
             } else if (audit.behaviourType == "REFERENCE-UPDATE") {
 
                 newContainer.innerHTML = "<h1>No new data</h1>"
@@ -205,6 +213,8 @@
                 document.querySelector("#people-table #personAddress").innerText = audit.oldData.address;
                 document.querySelector("#people-table #personLicence").innerText = audit.oldData.licence;
                 document.querySelector("#people-table #personDOB").innerText = audit.oldData.dateOfBirth;
+                document.querySelector("#people-table #totalFines").innerText = audit.oldData.totalFine ? audit.oldData.totalFine : "user didn't see this field";
+                document.querySelector("#people-table #totalPoints").innerText = audit.oldData.totalPoints ? audit.oldData.totalPoints : "user didn't see this field";
             }
         }
         function renderOwnershipData(oldContainer, newContainer, audit) {
@@ -993,7 +1003,7 @@
             showGeneralAuditInfo(filteredAudits, 0);
         }
     </script>
-    <div class="audit-detail-information-subcontainer invisible" id="old-data">
+    <div class="audit-detail-information-subcontainer invisible">
         <table class="people-table" id="people-table-template">
             <tbody>
                 <tr>
@@ -1002,6 +1012,8 @@
                     <th>Address</th>
                     <th>Driving Licence</th>
                     <th>DOB</th>
+                    <th>Total Fine</th>
+                    <th>Total Points</th>
                 </tr>
                 <tr>
                     <td id="personID"></td>
@@ -1009,11 +1021,13 @@
                     <td id="personAddress"></td>
                     <td id="personLicence"></td>
                     <td id="personDOB"></td>
+                    <td id="totalFines"></td>
+                    <td id="totalPoints"></td>
                 </tr>
             </tbody>
         </table>
     </div>
-    <div class="audit-detail-information-subcontainer invisible" id="old-data">
+    <div class="audit-detail-information-subcontainer invisible">
         <table>
             <tbody class="ownership-table" id="ownership-table-template">
                 <tr>
@@ -1061,7 +1075,7 @@
             </tbody>
         </table>
     </div>
-    <div class="audit-detail-information-subcontainer invisible" id="old-data">
+    <div class="audit-detail-information-subcontainer invisible">
         <table>
             <tbody class="vehicle-table" id="vehicle-table-template">
                 <tr>
@@ -1087,7 +1101,7 @@
             </tbody>
         </table>
     </div>
-    <div class="audit-detail-information-subcontainer invisible" id="old-data">
+    <div class="audit-detail-information-subcontainer invisible">
         <table class="report-detail-table" id="report-table-template">
             <tr>
                 <td class="report-detail-table-header">accountUsername</td>
@@ -1210,7 +1224,7 @@
         </table>
 
     </div>
-    <div class="audit-detail-information-subcontainer invisible" id="old-data">
+    <div class="audit-detail-information-subcontainer invisible">
         <table class="account-detail-table" id="account-table-template">
             <tr>
                 <td class="account-detail-table-header">Username:</td>
