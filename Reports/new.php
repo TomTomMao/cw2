@@ -169,7 +169,25 @@
         <input type="submit" value="submit">
         <!--  -->
     </form>
-    </div>
+    <h2>You would fail to create a report if:</h2>
+    <ul></ul>
+    <li>1. (Both Vehicle Information and Offender's information are empty.) OR:</li>
+    <li>2. (Vehicle information is empty AND Owner Information is not empty.) OR:</li>
+    <li>3. (There exists a special character (') in any input box.) OR:</li>
+    <li>4. Vehicle Information OR Owner Information OR Offender Information's length is invalid.</li>
+            <ul>
+            <li>1.	Registration Number: length should be 16</li>
+            <li>2.	Colour, Make, Model: length between [1,20]</li>
+            <li>3.	Driving Licence: length should be 0 or 16</li>
+            <li>4.	First name, last name: length between [1,25]</li>
+            <li>5.	Address: length between [1,50]</li>
+            <li>6.	DOB: should not be empty.
+</li>
+</ul>
+    <li>5. OR (Vehicle with the licence number has already been added before but the detailed information doesn't match.)</li>
+    <li>6. OR(Owner/Offender with the licence number has already been added before but the detailed information doesn't match.)</li>
+    <li>7. OR(Owner/Offender with the combination of (name, address, dob) has already been added before but the detailed licence info doesn't match.)</li>
+</div>
 </body>
 
 </html>

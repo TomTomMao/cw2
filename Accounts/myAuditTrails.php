@@ -609,6 +609,18 @@
                 document.getElementById("toggleFilter").innerText = "Show Filter";
             }
         }
+        function toggleHint() {
+            hint = document.getElementById("hint-text");
+            if (Array.from(hint.classList).includes("invisible")) {
+                // console.log("flag1")
+                hint.classList = ["hint-text"]
+                document.getElementById("toggleHint").innerText = "Hide Hint";
+            } else if (Array.from(hint.classList).includes("invisible") == false) {
+                // console.log("flag2")
+                hint.classList = ["hint-text invisible"]
+                document.getElementById("toggleHint").innerText = "Show Hint";
+            }
+        }
     </script>
     <?php
         foreach($audits as $audit) {
@@ -616,6 +628,34 @@
         }
     ?>
     <div class="content">
+    <div class="hint-container">
+        <button onclick="toggleHint()" id="toggleHint">Show Hint</button>
+        <div class="hint-text invisible" id=hint-text> 
+            <p> Many types of behaviour would be recorded: 
+                <li>user login</li>
+                <li>user logout</li>
+                <li>admin create accounts</li>
+                <li>failed to login</li>
+                <li>user saw some information indirectly such as saw the information of an offender of a report</li>
+                <li>admin adds fine</li>
+                <li>user searches people or vehicles or reports</li>
+                <li>user modifies a report</li>
+                <li>user adds vehicle information; user adds a report.</li>
+                <li>And so on.</li>
+            </p>
+            <h2> Behaviour:</h2>
+            <ul>
+                <li>- SELECT-FOUND means a user searched for this information and found it.</li>
+                <li>- SELECT-EMPTY means the information wasn't found.</li>
+                <li>- REFERENCE means the data was referenced as part of another data. For example, a user created a report with an offender, so the offender's data is referenced.</li>
+                <li>- The suffix of REFERENCE shows the information whether it was a reference for inserting or updating.</li>
+                <li>- LOGIN-SUCCESS, LOGIN-FAILED, LOGOUT-SUCCESS, refer to login information.</li>
+                <li>- UPDATE-SUCCESS means the user managed to update the data.</li>
+                <li>- INSERT-SUCCESS means the user managed to create the data.</li>
+                <li>- INSERT-SUCCESS for Accounts means an admin created the account, password info won't be displayed in the detail.</li>
+            </ul>
+       </div>
+    </div>
     <div class="audit-filter-container">
         <button onclick="toggleFilter()" id="toggleFilter">Show Filter</button>
         <div class="audit-filter invisible" id="audit-filter">
