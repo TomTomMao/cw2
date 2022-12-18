@@ -1251,10 +1251,12 @@
     }
     catch (Exception $error) {
         require("../reuse/errorMessage.php");
+        echo "<div class='content'>";
         if ($error->getCode()==0) {
             renderErrorMessage($error->getMessage(),false);
         } else {
             renderErrorMessage($error->getMessage(),true);
         }
+        echo "</div>";
     }
 ?>
