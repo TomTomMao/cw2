@@ -82,6 +82,10 @@
                     $auditDB->insertAudit($audit);
                     throw new Exception("Person with name: '".$_POST["peopleName"]."'"." Not found",0);
                 } else {
+                    // echo "peopleFineSetEnd<hr>";
+                    Person::setPeopleFineAndPoints($people, $peopleDB); // set fine information for each person.
+                    // echo "peopleFineSetEnd<hr>";
+                    // print_r($people);
                     echo Person::renderPeopleTable($people); // render table at server
                     foreach ($people as $person) {
                         // insert audit trial for each person found.
@@ -112,6 +116,7 @@
                     $auditDB->insertAudit($audit);
                     throw new Exception("Person with driving licence: '".$_POST["peopleLicence"]."'"."Not found",0);
                 } else {
+                    Person::setPeopleFineAndPoints($people, $peopleDB); // set fine information for each person.
                     echo Person::renderPeopleTable($people); // render table at server
                     foreach ($people as $person) {
                         // insert audit trial for each person found.
@@ -132,13 +137,13 @@
     
 <?php 
     } catch (Exception $error) {
-        // throw $error;
         // header("location: ../error.php?errorMessage=".$error->getMessage());
         if ($error->getCode() == 0) {
             renderErrorMessage($error->getMessage(), false);
         } elseif ($error->getCode() == 1) {
             renderErrorMessage($error->getMessage(), true);
         }
+        throw $error;
     }
 ?>
 </div>

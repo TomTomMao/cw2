@@ -9,8 +9,15 @@
             $this->dateOfBirth = $dateOfBirth;
             $this->name = $name;
             $this->photoID = $photoID;
+            $this->totalFine = NULL;
+            $this->totalPoints = NULL;
         }
-
+        function getTotalFine() {
+            return $this->totalFine;
+        }
+        function getTotalPoints() {
+            return $this->totalPoints;
+        }
         function getFullName() {
             return $this->name;
         }
@@ -63,6 +70,8 @@
                                 <th>Driving Licence</th>
                                 <th>DOB</th>
                                 <th>PhotoID</th>
+                                <th>Total fine</th>
+                                <th>Total points</th>
                             </tr>";
             $tableTail = "</table>";
             $tableBody = "";
@@ -76,6 +85,32 @@
                 return false;
             }
         }
+        static function setPeopleFineAndPoints($people, $peopleDB) {
+            // given a list of Person objects, search the fine info and set then on the attributes of each person.
+            // If the person don't has id or the person's id is not in database, set the attribute as NULL;
+            foreach($people as $person) {
+                if ($person->ID==NULL || $person->ID=="NULL") {
+                    
+                    // echo " 'set flag 0' ";
+                    $person->totalFine = NULL;
+                    $person->totalPoints = NULL;
+                } else {
+                    $fineData = $peopleDB->getPersonFineByID($person->ID);
+                    if ($fineData == false) {
+                        // echo " 'set flag 1' ";
+                        $person->totalFine = NULL;
+                        $person->totalPoints = NULL;
+                    } else {
+                        // echo "<hr>";
+                        // echo " 'set flag 2' ";
+                        // echo "<hr>";
+                        $person->totalFine = $fineData["totalFine"];
+                        $person->totalPoints = $fineData["totalPoints"];
+                        // print_r($person);
+                    }
+                }
+            }
+        }
 
         function renderRow($showTable = false) {
             if ($showTable) {
@@ -87,6 +122,8 @@
                     <th>Driving Licence</th>
                     <th>DOB</th>
                     <th>PhotoID</th>
+                    <th>Total fine</th>
+                    <th>Total points</th>
                 </tr>";
                 $tableTail = "</table>";
             } else {
@@ -100,6 +137,10 @@
             $personLicence = $this->getLicence() !=NULL ? $this->getLicence() : "NULL";
             $personDOB = $this->getDOB() !=NULL ? $this->getDOB() : "NULL";
             $personPhotoID = $this->getPhotoID() !=NULL ? $this->getPhotoID() : "NULL";
+            $totalFine = $this->getTotalFine() == NULL ? "NULL" : $this->getTotalFine();
+            $totalPoints = $this->getTotalPoints() == NULL ? "NULL" : $this->getTotalPoints();
+            // echo "totalFine:".$totalFine."<hr>"; //debugging
+            // echo "totalPoints:".$totalPoints."<hr>"; //debugging
             return $tableHead."
             <tr>
                 <td>".$personID."</td>
@@ -108,6 +149,8 @@
                 <td>".$personLicence."</td>
                 <td>".$personDOB."</td>
                 <td>".$personPhotoID."</td>
+                <td>".$totalFine."</td>
+                <td>".$totalPoints."</td>
             </tr>".$tableTail;
         }
     }
@@ -147,7 +190,25 @@
             }
             return $people;
         }
-        
+        function getPersonFineByID($personID) {
+            // return false if person not in database.
+            // return an assoc array ["totalFine"=>$totalFine, "totalPoints"=>$totalPoints].
+            $sql = "SELECT People.People_ID, People_name, SUM(Fine_amount) AS Total_fine, SUM(Fine_points) as Total_points"
+            ." FROM People LEFT JOIN Incident ON People.People_ID=Incident.People_ID"
+            ." LEFT JOIN Fines USING(Incident_ID) WHERE People.People_ID = '$personID';";
+            // echo $sql; // debugging
+            $conn = $this->conn;
+            $result = mysqli_query($conn,$sql);
+            if (mysqli_num_rows($result) == 1) {
+                if($row = mysqli_fetch_assoc($result)) {
+                    $totalFine = $row["Total_fine"] == NULL || $row["Total_fine"] == "NULL" ? "0" : $row["Total_fine"];
+                    $totalPoints = $row["Total_points"] == NULL || $row["Total_points"] == "NULL" ? "0" : $row["Total_points"];
+                    return ["totalFine"=>$totalFine, "totalPoints"=>$totalPoints];  
+                }
+            } else {
+                return false;
+            }
+        }
         function getPeopleByLicence($peopleLicence) {
             // Input the Licence of a person
             // Record the audit trial data into the table PeopleSearchAudit inside the database: (not implemented yet)
