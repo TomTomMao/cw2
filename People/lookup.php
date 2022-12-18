@@ -143,7 +143,7 @@
         } elseif ($error->getCode() == 1) {
             renderErrorMessage($error->getMessage(), true);
         }
-        throw $error;
+        // throw $error; // debugging
     }
 ?>
 </div>
