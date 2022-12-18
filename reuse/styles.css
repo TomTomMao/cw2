@@ -288,3 +288,27 @@ div.audit-filter {
     overflow-x: scroll;
     height: 4em;
 }
+
+/* navbar */
+
+
+.navbar-fixed-top {
+    width: 80vw;
+    background-color: white;
+    position: fixed;
+}
+
+div.content {
+    padding-top: 80px;
+}
+
+.navbar {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.navbar>a {
+    color: black;
+}

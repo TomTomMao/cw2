@@ -35,6 +35,7 @@
         <a href="../Reports/new.php">New report</a>
         <a href="../Accounts/home.php">My Account</a>
     </div> -->
+    <div class="content">
     <h1>Create New Report</h1>
     <hr>
     <form action="newSubmit.php" method="post" class="new-report-form">
@@ -168,7 +169,7 @@
         <input type="submit" value="submit">
         <!--  -->
     </form>
-
+    </div>
 </body>
 
 </html>

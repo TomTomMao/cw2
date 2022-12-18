@@ -30,6 +30,7 @@
             <a href="../Accounts/home.php">My Account</a>
         </div> -->
         <!-- <hr> -->
+        <div class="content">
         <h1>Look Up People</h1>
         <hr>
         <form action="lookup.php" method="post">
@@ -140,5 +141,6 @@
         }
     }
 ?>
+</div>
 </body>
 </html>

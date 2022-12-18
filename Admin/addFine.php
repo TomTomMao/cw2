@@ -38,6 +38,7 @@
         }
 ?>
 <body>
+    <div class="content">
     <form action="addFine.php?id=<?php echo $reportID;?>" method="post">
         <h1>Admin: Add Fine</h1>
         <table>
@@ -56,6 +57,7 @@
             <td><input type="submit" value="add" name="submit"></td>
         </table>
     </form>
+    </div>
 </body>
 </html>
 <?php 

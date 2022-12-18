@@ -1,7 +1,7 @@
 <?php 
     try { 
         require("../reuse/errorMessage.php");?>
-<?php $pageTitle = "Lookup People";
+<?php $pageTitle = "Retrieve Reports";
         require_once("../reuse/head.php");
         
     ?>
@@ -161,6 +161,7 @@
     <?php 
         require("../reuse/navbar.php");
     ?>
+    <div class="content">
     <script>
         let values = {}
         function toggleNullValue(inputBoxID) {
@@ -557,6 +558,7 @@
     }
     setEditLink();
 </script>
+</div>
 </body>
 
 </html>

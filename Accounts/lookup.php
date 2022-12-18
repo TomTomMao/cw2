@@ -10,7 +10,6 @@
             header("location: ../error.php?errorMessage=You are not an admin, so you are not allowed to access this page."); // check if logged in
         }
 
-        require("../reuse/navbar.php");
         require_once("../reuse/_dbConnect.php");
         $conn = connectDB();
 
@@ -21,6 +20,10 @@
 ?>
 <body>
     <?php 
+        require("../reuse/navbar.php");
+    ?>
+    <div class="content">
+    <?php
         echo "<table>
                 <tr>
                     <th>username</th>
@@ -41,7 +44,7 @@
                 <tr>";
         }
         echo "</table>"
-    ?>
+    ?></div>
 </body>
 </html>
 <?php 

@@ -605,6 +605,7 @@
             echo "<script>audits.push(".$audit->toJSON().")</script>";
         }
     ?>
+    <div class="content">
     <div class="audit-filter-container">
         <button onclick="toggleFilter()" id="toggleFilter">Show Filter</button>
         <div class="audit-filter invisible" id="audit-filter">
@@ -1227,6 +1228,7 @@
 
         </table>
 
+    </div>
     </div>
 </body>
 

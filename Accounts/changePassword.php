@@ -61,6 +61,7 @@
         <a href="../Accounts/logout.php">Log Out</a>
     </div>
     <hr> -->
+    <div class="content">
     <h1>Changing Password</h1>
     <form action="changePassword.php" method="post">
     <div>
@@ -136,6 +137,7 @@
     }
     ?>
     </form>
+    </div>
 </body>
 
 </html>

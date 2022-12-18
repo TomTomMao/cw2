@@ -1,3 +1,4 @@
+<div class="navbar-fixed-top">
 <div class="navbar">
         <?php 
             if ($user->isAdmin()) {
@@ -14,3 +15,4 @@
         <a href="../Accounts/logout.php">Log Out</a>
     </div>
     <hr>
+</div>

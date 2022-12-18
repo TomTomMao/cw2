@@ -18,6 +18,7 @@
 ?>
 
 <body>
+    <div class="content">
     <h1>Admin Home</h1>
     <hr>
     <h2><a href="../Admin/newAccount.php" target="blank">create an account</a></h2>
@@ -61,6 +62,7 @@
     </form>
     <hr>
     <h2><a href="../Accounts/myAuditTrails.php?q=accounts">Check account records</a></h2>
+    </div>
 </body>
 
 </html>

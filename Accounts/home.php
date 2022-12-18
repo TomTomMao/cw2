@@ -23,6 +23,7 @@
         <a href="../Accounts/logout.php">Log Out</a>
     </div> -->
     <!-- <hr> -->
+    <div class="content">
     <h1>Welcome, <?php echo $user->getUsername();?></h1>
     <div>
         <table>
@@ -31,6 +32,7 @@
             <tr><td>Officer Name:</td><td><?php echo $user->getOfficerName();?></td><td></td></tr>
             <tr><td>Officer ID:</td><td><?php echo $user->getOfficerID();?></td><td></td></tr>
         </table>
+    </div>
     </div>
 </body>
 </html>

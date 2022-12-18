@@ -32,6 +32,7 @@
             <a href="../Accounts/home.php">My Account</a>
         </div>
         <hr> -->
+        <div class="content">
         <h1>Look Up Vehicles</h1>
         <hr>
         <form action="lookup.php" method="post">
@@ -134,5 +135,6 @@
         // header("location: ../error.php?errorMessage=".$error->getMessage());
     }
 ?>
+</div>
 </body>
 </html>

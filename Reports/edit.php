@@ -60,6 +60,7 @@
         <a href="../Reports/new.php">New report</a>
         <a href="../Accounts/home.php">My Account</a>
     </div> -->
+    <div class="content">
     <h1>Edit Report</h1>
     <hr>
     <form action="newSubmit.php?edit=true&id=<?php echo $_GET['id']?>" method="post" class="new-report-form">
@@ -214,6 +215,7 @@
         document.getElementById("offenderAddress").value = reportJSON["offenderAddress"] ? reportJSON["offenderAddress"] : "";
         document.getElementById("offenderDOB").value = reportJSON["offenderDOB"] ? reportJSON["offenderDOB"] : "";
     </script>
+    </div>
 </body>
 
 </html>

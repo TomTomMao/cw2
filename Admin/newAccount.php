@@ -15,6 +15,7 @@
 
 ?>
 <body>
+    <div class="content">
     <form action="newAccountSubmit.php" method="post">
         <h1>Admin: Create Account</h1>
         <table>
@@ -37,6 +38,7 @@
             <td><input type="submit" value="create account" name="submit"></td>
         </table>
     </form>
+    </div>
 </body>
 </html>
 <?php 

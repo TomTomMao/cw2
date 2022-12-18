@@ -162,6 +162,7 @@
         <a href="../Accounts/home.php">My Account</a>
     </div>
     <hr> -->
+    <div class="content">
     <h1>Create New Vehicle</h1>
     <hr>
     <h2>Vehicle Information</h2>
@@ -455,6 +456,7 @@
     <button onclick="checkAll()">Check All</button>
     <button onclick="checkAll(true);">Submit</button>
     <div class="" id="feedbackBox1"></div>
+    </div>
 </body>
 
 </html>
