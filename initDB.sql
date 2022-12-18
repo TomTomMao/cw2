@@ -132,7 +132,8 @@ INSERT INTO Ownership (Ownership_ID, People_ID, Vehicle_ID) VALUES
 (7, 5, 17),
 (8, 6, 18),
 (9, 7, 21),
-(10, NULL, 22);
+(10, NULL, 22),
+(11, 10, 19);
 -- if put more ownership in initial db, update the test case of testInsertOwnershipBothExisted in Vehicles/_ownership.php/testInsertOwnershipBothExisted_Trivial()
 ALTER TABLE Ownership
   MODIFY Ownership_ID int(21) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
