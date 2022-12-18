@@ -21,8 +21,13 @@
             throw new Exception ("This page should be posted!");
             die();
         } 
-
+?>
+<body>
+<?php
     require("../reuse/navbar.php");
+?>
+<div class="content">
+<?php
     require("../reuse/_dbConnect.php");
     require("../reuse/_audit.php");
     $conn = connectDB();
@@ -103,4 +108,5 @@
         renderErrorMessage($error->getMessage());
         // throw $error;// debugging
     }
-?>
+?></div></body>
+</html>

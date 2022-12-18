@@ -309,6 +309,16 @@ div.content {
     justify-content: space-between;
 }
 
-.navbar>a {
+.nav-link {
     color: black;
+    text-decoration: none;
+}
+
+.nav-link-highlight {
+    color: rgb(42, 232, 0);
+    text-decoration: none;
+}
+
+.navbar a:hover {
+    color: #7145ff;
 }
