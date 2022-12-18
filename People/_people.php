@@ -55,6 +55,8 @@
                 '","dateOfBirth":"'.$this->getDOB().
                 '","firstName":"'.$this->getFirstName().
                 '","lastName":"'.$this->getLastName().
+                '","totalFine":"'.$this->getTotalFine().
+                '","totalPoints":"'.$this->getTotalPoints().
                 '","photoID":"'.$this->getPhotoID().'"}';
         }
         static function renderPeopleTable($people) {
