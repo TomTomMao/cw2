@@ -15,4 +15,9 @@
             echo '<div class="feedback-yellow"><div class="feedback-text-line">'.$message.'</div></div>';
         }
     }
+    function renderGreenMessage($message) {
+        
+            echo '<div class="feedback-green"><div class="feedback-text-line">'.$message.'</div></div>';
+        
+    }
 ?>
