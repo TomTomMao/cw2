@@ -37,29 +37,7 @@
             throw new Exception("You shouldn't be here, as the report already has a fine.");
         }
 ?>
-<body>
-    <div class="content">
-    <form action="addFine.php?id=<?php echo $reportID;?>" method="post">
-        <h1>Admin: Add Fine</h1>
-        <table>
-            <tr>
-                <td>Report ID:</td>
-                <td><input type="number" name="reportID" id="reportID" value="<?php echo $reportID;?>"></td>
-            </tr>
-            <tr>
-                <td>Fine Amount:</td>
-                <td><input type="number" name="fineAmount" id="fineAmount"></td>
-            </tr>
-            <tr>
-                <td>Fine Point:</td>
-                <td><input type="number" name="finePoints" id="finePoints"></td>
-            </tr>
-            <td><input type="submit" value="add" name="submit"></td>
-        </table>
-    </form>
-    </div>
-</body>
-</html>
+
 <?php 
     if (isset($_POST["submit"])) {
         // echo "this is a post"; // debugging
@@ -106,3 +84,26 @@
         // echo "not a post"; // debugging
     }
 ?>
+<body>
+    <div class="content">
+    <form action="addFine.php?id=<?php echo $reportID;?>" method="post">
+        <h1>Admin: Add Fine</h1>
+        <table>
+            <tr>
+                <td>Report ID:</td>
+                <td><input type="number" name="reportID" id="reportID" value="<?php echo $reportID;?>"></td>
+            </tr>
+            <tr>
+                <td>Fine Amount:</td>
+                <td><input type="number" name="fineAmount" id="fineAmount"></td>
+            </tr>
+            <tr>
+                <td>Fine Point:</td>
+                <td><input type="number" name="finePoints" id="finePoints"></td>
+            </tr>
+            <td><input type="submit" value="add" name="submit"></td>
+        </table>
+    </form>
+    </div>
+</body>
+</html>
